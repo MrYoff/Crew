@@ -26,6 +26,11 @@
   .sub{color:var(--muted);font-size:14px;margin:6px 0 18px}
   .me{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
   .me img{width:30px;height:30px;border-radius:50%}
+  .avbtn{position:relative;border:0;padding:0;background:none;cursor:pointer;flex:none}
+  .avbtn::after{content:"📷";position:absolute;right:-4px;bottom:-4px;font-size:11px;background:var(--panel2);border-radius:50%;padding:2px;line-height:1}
+  .av{width:40px;height:40px;border-radius:50%;object-fit:cover;display:grid;place-items:center;font:700 16px "Zen Kaku Gothic New";color:#fff;overflow:hidden;flex:none}
+  .av.sm{width:22px;height:22px;font-size:11px}
+  .chip{display:inline-flex;align-items:center;gap:7px}
   .link{background:none;border:0;color:var(--muted);font:inherit;text-decoration:underline;cursor:pointer;padding:0}
 
   nav.tabs{display:flex;gap:6px;background:var(--panel);padding:5px;border-radius:999px;border:1px solid var(--line);margin-bottom:16px;position:sticky;top:8px;z-index:6}
@@ -126,7 +131,7 @@
       <div class="kana">アニメ ランキング</div>
       <h1>Crew</h1>
     </div>
-    <div class="me hidden" id="me"><img id="meImg" alt="" referrerpolicy="no-referrer"><div><div id="meName"></div><button class="link" id="signOut">Sign out</button></div></div>
+    <div class="me hidden" id="me"><button class="avbtn" id="avBtn" type="button" aria-label="Change profile picture" title="Change profile picture"><span id="meAv"></span></button><div><div id="meName"></div><button class="link" id="signOut">Sign out</button></div></div>
   </div>
   <p class="sub">Your top 10, everything you've watched, and what's next. See what the rest of the crew is into.</p>
 
@@ -197,6 +202,7 @@
   </div>
   <p class="credit">Anime search and posters from <a href="https://anilist.co" target="_blank" rel="noopener">AniList</a> and <a href="https://myanimelist.net" target="_blank" rel="noopener">MyAnimeList</a>.</p>
 </div>
+<input type="file" id="avFile" accept="image/*" class="hidden">
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -238,9 +244,10 @@ function sanitize(d){
     malId:typeof x.malId==="number"?x.malId:null,
     img:IMG_OK(x.img)?x.img:null
   })) : [];
-  return { name:typeof d.name==="string"?d.name.slice(0,60):"", top:arr(d.top).slice(0,MAX_TOP), watched:arr(d.watched), watchlist:arr(d.watchlist) };
+  const avatar = (typeof d.avatar==="string" && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(d.avatar) && d.avatar.length<80000) ? d.avatar : null;
+  return { name:typeof d.name==="string"?d.name.slice(0,60):"", avatar, top:arr(d.top).slice(0,MAX_TOP), watched:arr(d.watched), watchlist:arr(d.watchlist) };
 }
-const blank = () => ({name:"",top:[],watched:[],watchlist:[]});
+const blank = () => ({name:"",avatar:null,top:[],watched:[],watchlist:[]});
 const USER_DOMAIN = "@users.crew-fd928.firebaseapp.com";
 function displayNameOf(u){ if(!u) return "Someone"; if(u.displayName) return u.displayName; if(u.email && u.email.endsWith(USER_DOMAIN)) return u.email.slice(0,-USER_DOMAIN.length); return "Someone"; }
 function mine(){ return state.docs[state.me.uid] || (state.docs[state.me.uid] = blank()); }
@@ -255,7 +262,7 @@ async function save(){
     do{
       dirty=false;
       const m = mine();
-      await setDoc(doc(db,"lists",state.me.uid), { name:displayNameOf(state.me).slice(0,60), top:m.top, watched:m.watched, watchlist:m.watchlist, updatedAt:new Date().toISOString() });
+      await setDoc(doc(db,"lists",state.me.uid), { name:displayNameOf(state.me).slice(0,60), avatar:m.avatar||null, top:m.top, watched:m.watched, watchlist:m.watchlist, updatedAt:new Date().toISOString() });
     } while(dirty);
   }catch(e){
     console.error(e);
@@ -317,6 +324,32 @@ function posterEl(x, big){
   }
   return p;
 }
+
+// ---- avatars ----
+function avatarEl(id, small){
+  const d = state.docs[id]; const name = id && state.me && id===state.me.uid ? displayNameOf(state.me) : ((d&&d.name)||"?");
+  let src = d && d.avatar;
+  if(!src && state.me && id===state.me.uid && state.me.photoURL) src = state.me.photoURL;
+  if(src){ const i=new Image(); i.className="av"+(small?" sm":""); i.alt=""; i.referrerPolicy="no-referrer"; i.src=src; return i; }
+  const h = hash(name.toLowerCase()); const e=el("span","av"+(small?" sm":""),(name[0]||"?").toUpperCase());
+  e.style.background=`linear-gradient(135deg,hsl(${h%360} 70% 50%),hsl(${(h%360+50)%360} 70% 32%))`; return e;
+}
+function renderMe(){ if(!state.me) return; $("#meAv").replaceChildren(avatarEl(state.me.uid)); }
+$("#avBtn").addEventListener("click",()=>{ const f=$("#avFile"); f.value=""; f.click(); });
+$("#avFile").addEventListener("change", async e=>{
+  const file=e.target.files&&e.target.files[0]; if(!file||!state.me) return;
+  const url=URL.createObjectURL(file);
+  try{
+    const img=await new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=url; });
+    const S=160, c=document.createElement("canvas"); c.width=S; c.height=S;
+    const side=Math.min(img.naturalWidth,img.naturalHeight);
+    c.getContext("2d").drawImage(img,(img.naturalWidth-side)/2,(img.naturalHeight-side)/2,side,side,0,0,S,S);
+    const data=c.toDataURL("image/jpeg",0.8);
+    if(data.length>=80000) throw new Error("too big");
+    mutate(m=>{ m.avatar=data; }); renderMe(); toast("Profile picture updated");
+  }catch(err){ toast("Couldn't use that image. Try a different photo."); }
+  finally{ URL.revokeObjectURL(url); }
+});
 
 // ---- helpers ----
 function el(tag, cls, text){ const e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e; }
@@ -427,7 +460,7 @@ function render(){
     else {
       people.style.display="";
       if(!state.friend || !friendIds.includes(state.friend)) state.friend=friendIds[0];
-      friendIds.sort((a,b)=>nameOf(a).localeCompare(nameOf(b))).forEach(id=>{ const c=el("button","chip"+(id===state.friend?" on":""),nameOf(id)); c.type="button"; c.addEventListener("click",()=>{state.friend=id; render();}); people.append(c); });
+      friendIds.sort((a,b)=>nameOf(a).localeCompare(nameOf(b))).forEach(id=>{ const c=el("button","chip"+(id===state.friend?" on":"")); c.append(avatarEl(id,true), el("span","",nameOf(id))); c.type="button"; c.addEventListener("click",()=>{state.friend=id; render();}); people.append(c); });
       showId=state.friend;
     }
   } else people.classList.add("hidden");
@@ -581,7 +614,7 @@ onAuthStateChanged(auth, user=>{
   }
   $("#signinView").classList.add("hidden"); $("#app").classList.remove("hidden"); $("#me").classList.remove("hidden");
   $("#meName").textContent = displayNameOf(user);
-  if(user.photoURL){ $("#meImg").src = user.photoURL; $("#meImg").classList.remove("hidden"); } else $("#meImg").classList.add("hidden");
+  renderMe();
   setStatus("Loading lists…");
   render();
   const timer=setTimeout(()=>{ if(!state.loaded) setStatus("Can't reach the database yet. Check your connection.", true); },10000);
@@ -589,7 +622,7 @@ onAuthStateChanged(auth, user=>{
     const next={};
     snap.forEach(d=>{ next[d.id]=sanitize(d.data()); });
     if((writing||dirty) && state.docs[user.uid]) next[user.uid]=state.docs[user.uid];
-    state.docs=next; state.loaded=true; clearTimeout(timer); setStatus(null); render();
+    state.docs=next; state.loaded=true; clearTimeout(timer); setStatus(null); render(); renderMe();
   }, err=>{
     clearTimeout(timer); console.error(err);
     setStatus(err && err.code==="permission-denied" ? "The database is blocking reads. Double-check the Firestore rules." : "Couldn't load the lists. Try refreshing.", true);
