@@ -63,6 +63,13 @@
   .range{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:13px;color:var(--muted)}
   .range input{flex:1;accent-color:var(--accent)}
   .sheet .hint{color:var(--muted);font-size:13px;margin:12px 0 0}
+  .rategrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:8px}
+  .rategrid button{border:1px solid var(--line);background:var(--panel2);color:var(--text);font:400 22px "Dela Gothic One";padding:14px 0;border-radius:14px;cursor:pointer}
+  .rategrid button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .rategrid button:active{transform:scale(.96)}
+  .ratefoot{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:14px}
+  .myscore{color:var(--accent2);font-weight:700}
+  .avg{display:block;font-family:"Zen Kaku Gothic New";font-size:11px;color:var(--muted);font-weight:700;margin-top:2px}
   .revlink{display:inline-flex;align-items:center;gap:4px;margin-top:4px;border:0;background:none;padding:0;color:var(--blue);font:700 12px "Zen Kaku Gothic New";cursor:pointer}
   .revhead{display:flex;gap:12px;align-items:center;margin:4px 0 6px}
   .revhead .t{font-weight:700;font-size:17px;overflow-wrap:anywhere}
@@ -342,6 +349,14 @@
 </div>
 <input type="file" id="avFile" accept="image/*" class="hidden">
 <input type="file" id="bgFile" accept="image/*" class="hidden">
+<div class="sheet-bg hidden" id="rateSheet" role="dialog" aria-modal="true" aria-labelledby="rateTitle">
+  <div class="sheet">
+    <div class="revhead" id="rateHead"></div>
+    <h4 id="rateTitle" style="margin-top:6px">Rate it out of 10</h4>
+    <div class="rategrid" id="rateGrid"></div>
+    <div class="ratefoot"><button class="btn" id="rateSkip" type="button">Skip</button><button class="link" id="rateReview" type="button">Write a review too</button></div>
+  </div>
+</div>
 <div class="sheet-bg hidden" id="revSheet" role="dialog" aria-modal="true" aria-labelledby="revTitle">
   <div class="sheet">
     <div class="head"><h3>Reviews</h3><button class="ic" id="revClose" type="button" aria-label="Close">✕</button></div>
@@ -542,6 +557,7 @@ const has = (arr,t) => arr.some(x=>same(x,t));
 const mediaOf = x => x.media || (state.mode==="manga" ? "manga" : state.mode==="anime" ? "anime" : null);
 function mk(a){ return {id:uid(), title:clean(a.title), score:null, year:a.year||null, kind:a.kind||null, malId:a.malId||null, img:IMG_OK(a.img)?a.img:null, media:mediaOf(a)}; }
 function addTop(a){
+  let ok=false; const media=mediaOf(a);
   mutate(m=>{
     const k=K();
     if(has(m[k.top],a)){ toast("Already in your top 10"); return; }
@@ -551,17 +567,20 @@ function addTop(a){
       if(!has(m[k.watched],a)) m[k.watched].unshift(mk(a));
       m[k.watchlist] = m[k.watchlist].filter(x=>norm(x.title)!==norm(a.title));
     }
-    toast("Added to your "+(state.mode==="overall"?"overall ":"")+"top 10 at #"+m[k.top].length);
+    toast("Added to your "+(state.mode==="overall"?"overall ":"")+"top 10 at #"+m[k.top].length); ok=true;
   });
+  if(ok) askRating({...a, media});
 }
 function addWatched(a){
+  let ok=false; const media=mediaOf(a);
   mutate(m=>{
     const k=K();
     if(has(m[k.watched],a)){ toast(W().alreadyW); return; }
     m[k.watched].unshift(mk(a));
     m[k.watchlist] = m[k.watchlist].filter(x=>norm(x.title)!==norm(a.title));
-    toast(W().addedW);
+    toast(W().addedW); ok=true;
   });
+  if(ok) askRating({...a, media});
 }
 function addWatch(a){
   mutate(m=>{
@@ -574,13 +593,42 @@ function addWatch(a){
 
 // ---- custom lists ----
 function addToList(a){
+  let ok=false; const media=mediaOf(a);
   mutate(m=>{
     const l=(m.custom||[]).find(x=>x.id===state.target); if(!l) return;
     if(has(l.items,a)){ toast("Already on "+l.name); return; }
     if(l.items.length>=MAX_LIST_ITEMS){ toast("That list is full ("+MAX_LIST_ITEMS+" max)."); return; }
-    l.items.push(mk(a)); toast("Added to "+l.name+" at #"+l.items.length);
+    l.items.push(mk(a)); toast("Added to "+l.name+" at #"+l.items.length); ok=true;
   });
+  if(ok) askRating({...a, media});
 }
+
+// ---- ratings: one score per title, kept in sync everywhere it appears in your lists ----
+function ratedPlaces(m, x){
+  const media=x.media||mediaOf(x)||"anime", mk_=MEDIA_KEYS[media];
+  const out=[...m[mk_.top], ...m[mk_.watched]].filter(y=>norm(y.title)===norm(x.title));
+  [...m.otop, ...m.custom.flatMap(l=>l.items)].forEach(y=>{ if(same(y,{title:x.title,media})) out.push(y); });
+  return out;
+}
+const scoreOf = (m, x) => { const y=ratedPlaces(m,x).find(y=>y.score); return y ? y.score : null; };
+function setScore(x, score){ mutate(m=>{ ratedPlaces(m,x).forEach(y=>{ y.score=score; }); }); }
+let rateItem=null;
+function askRating(x){
+  if(!state.me) return;
+  rateItem={title:clean(x.title), media:x.media||mediaOf(x)||"anime", kind:x.kind||null, year:x.year||null, img:x.img||null};
+  const cur=scoreOf(mine(), rateItem);
+  const head=$("#rateHead"); head.replaceChildren(posterEl(rateItem,true));
+  const t=el("div",""); t.append(el("div","t",rateItem.title), el("small","",cur?"Your current rating: "+cur+"/10":"How good was it?")); head.append(t);
+  const g=$("#rateGrid"); g.replaceChildren();
+  for(let i=1;i<=10;i++){ const b=el("button",i===cur?"on":"",String(i)); b.type="button"; b.setAttribute("aria-label",i+" out of 10");
+    b.addEventListener("click",()=>{ const it=rateItem; closeRate(); setScore(it,i); toast("Rated "+it.title+" "+i+"/10"); }); g.append(b); }
+  $("#rateSheet").classList.remove("hidden");
+}
+const closeRate=()=>{ $("#rateSheet").classList.add("hidden"); rateItem=null; };
+$("#rateSkip").addEventListener("click",closeRate);
+$("#rateReview").addEventListener("click",()=>{ const it=rateItem; closeRate(); if(it) openReviews(it); });
+$("#rateSheet").addEventListener("click",e=>{ if(e.target===$("#rateSheet")) closeRate(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape" && rateItem) closeRate(); });
 function editList(id, fn){ mutate(m=>{ const l=(m.custom||[]).find(x=>x.id===id); if(l) fn(l,m); }); }
 function setTarget(id){
   state.target=id; $("#q").value=""; lastResults=[]; searchState="idle"; render();
@@ -662,7 +710,7 @@ function metaOf(x){
   if(mixed() && x.media==="manga") return [x.kind||"Manga",x.year];
   return [x.year,x.kind];
 }
-function titleBlock(x){ const t=el("div","title",x.title); const meta=metaOf(x).filter(Boolean).join(" · "); if(meta) t.append(el("small","",meta)); t.append(revLink(x)); return t; }
+function titleBlock(x, showScore){ const t=el("div","title",x.title); const meta=metaOf(x).filter(Boolean).join(" · "); if(meta||(showScore&&x.score)){ const sm=el("small","",meta); if(showScore&&x.score){ if(meta) sm.append(" · "); sm.append(el("span","myscore","★ "+x.score+"/10")); } t.append(sm); } t.append(revLink(x)); return t; }
 
 // ---- reviews ----
 const revKey = x => (mediaOf(x)||"anime")+":"+norm(x.title);
@@ -896,7 +944,7 @@ function render(){
   if(!d.top.length) tl.append(el("div","empty", editable?"Nothing ranked yet. Search for your #1 above.":"No top 10 yet."));
   d.top.forEach((x,i)=>{
     const li=el("li","r"+(i+1));
-    li.append(el("div","rank",String(i+1)), posterEl(x,true), titleBlock(x));
+    li.append(el("div","rank",String(i+1)), posterEl(x,true), titleBlock(x,true));
     if(editable){
       const a=el("div","actions");
       a.append(
@@ -921,7 +969,7 @@ function render(){
       const sel=el("select","score"); sel.setAttribute("aria-label","Score for "+x.title);
       sel.append(new Option("–/10","")); for(let s=10;s>=1;s--) sel.append(new Option(s+"/10",String(s)));
       sel.value = x.score? String(x.score) : "";
-      sel.addEventListener("change",()=>mutate(m=>{ const it=m[k.watched].find(y=>y.id===x.id); if(it) it.score = sel.value?Number(sel.value):null; }));
+      sel.addEventListener("change",()=>setScore({...x, media:mediaOf(x)}, sel.value?Number(sel.value):null));
       const a=el("div","actions");
       a.append(icon("Add to top 10","★",()=>addTop(x),{disabled:topSet.has(norm(x.title))}), icon("Remove","✕",()=>mutate(m=>{ m[k.watched]=m[k.watched].filter(y=>y.id!==x.id); }),{cls:"del"}));
       li.append(sel, a);
@@ -937,7 +985,7 @@ function render(){
     const a=el("div","actions");
     if(editable){
       a.append(
-        icon(W().markDone,"✓",()=>mutate(m=>{ m[k.watchlist]=m[k.watchlist].filter(y=>y.id!==x.id); if(!has(m[k.watched],x)) m[k.watched].unshift(mk(x)); toast(W().moved); })),
+        icon(W().markDone,"✓",()=>{ const media=mediaOf(x); mutate(m=>{ m[k.watchlist]=m[k.watchlist].filter(y=>y.id!==x.id); if(!has(m[k.watched],x)) m[k.watched].unshift(mk(x)); toast(W().moved); }); askRating({...x, media}); }),
         icon("Remove","✕",()=>mutate(m=>{ m[k.watchlist]=m[k.watchlist].filter(y=>y.id!==x.id); }),{cls:"del"})
       );
     } else a.append(icon(W().toMine,"+",()=>addWatch(x)));
@@ -964,7 +1012,7 @@ function listCard(l, editable, ownerId){
   if(!l.items.length) ol.append(el("div","empty", editable ? "Empty so far. Tap + Add to fill it." : "Nothing on this list yet."));
   l.items.forEach((x,i)=>{
     const li=el("li","r"+(i+1));
-    li.append(el("div","rank",String(i+1)), posterEl(x,true), titleBlock(x));
+    li.append(el("div","rank",String(i+1)), posterEl(x,true), titleBlock(x,true));
     if(editable){
       const a=el("div","actions");
       a.append(
@@ -1010,10 +1058,10 @@ function renderCrew(){
     return;
   }
   const keyOf = x => (state.mode==="overall" ? (x.media||"")+":" : "") + norm(x.title);
-  const pts={}, item={}, voters={}, wcount={}, witem={}, wwho={};
+  const pts={}, item={}, voters={}, wcount={}, witem={}, wwho={}, scores={};
   Object.entries(state.docs).forEach(([id,full])=>{
     const d=L(full);
-    d.top.forEach((x,i)=>{ const k=keyOf(x); pts[k]=(pts[k]||0)+(10-i); item[k]=item[k]||x; (voters[k]=voters[k]||[]).push(nameOf(id)+" #"+(i+1)); });
+    d.top.forEach((x,i)=>{ const k=keyOf(x); const sc=x.score||scoreOf(full,{...x, media:x.media||(state.mode==="manga"?"manga":"anime")}); if(sc) (scores[k]=scores[k]||[]).push(sc); pts[k]=(pts[k]||0)+(10-i); item[k]=item[k]||x; (voters[k]=voters[k]||[]).push(nameOf(id)+" #"+(i+1)); });
     new Set(d.watchlist.map(x=>norm(x.title))).forEach(k=>{ wcount[k]=(wcount[k]||0)+1; (wwho[k]=wwho[k]||[]).push(nameOf(id)); });
     d.watchlist.forEach(x=>{ const k=norm(x.title); witem[k]=witem[k]||x; });
   });
@@ -1029,7 +1077,9 @@ function renderCrew(){
     mid.append(tt, revLink(item[k]));
     const bar=el("div","bar"); bar.style.width=Math.max(6,Math.round(pts[k]/max*100))+"%"; mid.append(bar);
     mid.append(el("div","who",voters[k].join(" · ")));
-    row.append(mid, el("div","pts",pts[k]+" pts")); ct.append(row);
+    const pp=el("div","pts",pts[k]+" pts");
+    if(scores[k]){ const a=scores[k].reduce((p,c)=>p+c,0)/scores[k].length; pp.append(el("span","avg","★ "+(Math.round(a*10)/10)+" avg")); }
+    row.append(mid, pp); ct.append(row);
   });
   const shared=Object.keys(wcount).filter(k=>wcount[k]>1).sort((a,b)=>wcount[b]-wcount[a]);
   const cw=$("#crewWatch"); cw.replaceChildren();
