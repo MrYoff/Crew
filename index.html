@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0f0e17">
 <title>Crew</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Crew">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
@@ -107,6 +114,57 @@
   .avstage img{position:absolute;left:0;top:0;transform-origin:0 0;user-select:none;-webkit-user-drag:none;pointer-events:none;max-width:none}
   .avstage .ph{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:13px;text-align:center;padding:20px}
   .avbtns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+  .filters{display:flex;gap:8px;margin:-4px 0 14px}
+  .filters select{flex:1;min-width:0;background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:10px;font:700 14px "Zen Kaku Gothic New"}
+  .filters select.on{border-color:var(--accent2);color:var(--accent2)}
+  .gtags{display:block;color:var(--muted);font-size:11px;font-weight:500;margin-top:1px}
+  .seasonbar{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+  .seasonbar h2{flex:1;text-align:center;margin:0!important;justify-content:center}
+  .sgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media (min-width:560px){ .sgrid{grid-template-columns:repeat(3,1fr)} }
+  .scard{background:var(--panel2);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;border:1px solid var(--line)}
+  .scard.mine{border-color:var(--accent2)}
+  .scard .poster,.scard .poster.big{width:100%;border-radius:0}
+  .scard .poster .gen b{font-size:30px}
+  .scard .body{padding:8px 9px 10px;display:flex;flex-direction:column;gap:3px;flex:1}
+  .scard .st{font-weight:700;font-size:14px;line-height:1.25;overflow-wrap:anywhere}
+  .scard .sg{color:var(--muted);font-size:11px}
+  .scard .sa{color:var(--accent2);font-size:12px;font-weight:700}
+  .scard .crew{display:flex;flex-wrap:wrap;gap:3px;margin-top:2px}
+  .scard .crew span{font-size:11px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:1px 7px;color:var(--text)}
+  .scard .sbtns{display:flex;flex-direction:column;gap:5px;margin-top:auto;padding-top:6px}
+  .scard .sbtns .pill{width:100%;padding:7px 4px;font-size:12px;text-align:center;white-space:nowrap}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+  .stat{background:var(--panel2);border-radius:12px;padding:10px 6px;text-align:center}
+  .stat b{display:block;font-family:"Dela Gothic One";font-weight:400;font-size:22px;color:var(--accent2);line-height:1.1}
+  .stat span{font-size:11px;color:var(--muted);font-weight:700}
+  .badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  @media (min-width:560px){ .badges{grid-template-columns:repeat(4,1fr)} }
+  .badge{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 6px;text-align:center}
+  .badge .e{font-size:26px;line-height:1}
+  .badge .n{font-weight:700;font-size:12px;margin-top:4px}
+  .badge .d{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.2}
+  .badge.locked{opacity:.38;filter:grayscale(1)}
+  .badge.got{border-color:color-mix(in srgb, var(--accent2) 55%, transparent)}
+  .poll{background:var(--panel2);border-radius:12px;padding:12px;margin-top:10px}
+  .poll .q{font-weight:700;font-size:16px;overflow-wrap:anywhere}
+  .poll .meta2{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12px;margin:4px 0 8px;flex-wrap:wrap}
+  .poll .cd{color:var(--accent2);font-weight:700}
+  .opt{position:relative;display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:10px;padding:10px 12px;margin-top:6px;cursor:pointer;overflow:hidden;font:500 14px "Zen Kaku Gothic New"}
+  .opt .fill{position:absolute;left:0;top:0;bottom:0;background:color-mix(in srgb, var(--accent) 22%, transparent);z-index:0}
+  .opt .row2{position:relative;z-index:1;display:flex;gap:8px;align-items:center}
+  .opt .row2 .lbl2{flex:1;overflow-wrap:anywhere;font-weight:700}
+  .opt .row2 .c{font-weight:700;color:var(--muted);font-size:13px}
+  .opt .who3{position:relative;z-index:1;font-size:11px;color:var(--muted);margin-top:2px}
+  .opt.mine{border-color:var(--accent)}
+  .opt.win .lbl2::after{content:" 👑"}
+  .pollform{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+  .pollform input{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:10px;font:15px "Zen Kaku Gothic New"}
+  .pollform label{font-size:12px;color:var(--muted);font-weight:700}
+  .pollform .r{display:flex;gap:8px;flex-wrap:wrap}
+  .installbar{display:flex;align-items:center;gap:10px}
+  .installbar .grow{flex:1;font-size:14px}
+  .installbar .btn{padding:7px 12px;font-size:13px}
   .rategrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:8px}
   .rategrid button{border:1px solid var(--line);background:var(--panel2);color:var(--text);font:400 22px "Dela Gothic One";padding:14px 0;border-radius:14px;cursor:pointer}
   .rategrid button.on{background:var(--accent);border-color:var(--accent);color:#fff}
@@ -145,7 +203,7 @@
   .link{background:none;border:0;color:var(--muted);font:inherit;text-decoration:underline;cursor:pointer;padding:0}
 
   nav.tabs{display:flex;gap:6px;background:var(--panel);padding:5px;border-radius:999px;border:1px solid var(--line);margin-bottom:16px;position:sticky;top:8px;z-index:6}
-  nav.tabs button{flex:1;border:0;background:transparent;color:var(--muted);font:700 14px "Zen Kaku Gothic New";padding:10px 8px;border-radius:999px;cursor:pointer}
+  nav.tabs button{flex:1;border:0;background:transparent;color:var(--muted);font:700 13px "Zen Kaku Gothic New";padding:10px 4px;white-space:nowrap;border-radius:999px;cursor:pointer}
   nav.tabs button.on{background:var(--accent);color:#fff}
 
   .people{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px}
@@ -303,7 +361,8 @@
   </div>
   <p class="sub">Your top 10s, everything you've watched and read, and what's next. See what the rest of the crew is into.</p>
 
-  <div id="status" class="notice">Loading…</div>
+  <div id="status" class="notice">Signing you in…</div>
+  <div id="installBar" class="notice installbar hidden"><span class="grow">📲 Add Crew to your home screen so it opens like an app.</span><button class="btn primary" id="installGo" type="button">How</button><button class="btn" id="installX" type="button" aria-label="Dismiss">✕</button></div>
 
   <div id="signinView" class="signin hidden">
     <form class="authbox" id="authForm" novalidate>
@@ -324,6 +383,7 @@
     <nav class="tabs">
       <button data-view="me" class="on">My lists</button>
       <button data-view="friends">Friends</button>
+      <button data-view="season">Season</button>
       <button data-view="crew">Crew picks</button>
     </nav>
     <div class="modeseg" id="modeSeg"><button type="button" data-mode="anime" class="on">Anime</button><button type="button" data-mode="manga">Manga</button><button type="button" data-mode="overall">Overall</button><button type="button" data-mode="lists">Custom</button></div>
@@ -337,6 +397,10 @@
         <svg class="mag" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
         <input id="q" type="search" placeholder="Search any anime…" aria-label="Search" autocomplete="off" maxlength="100">
         <div class="results hidden" id="results"></div>
+      </div>
+      <div class="filters hidden" id="filters">
+        <select id="fGenre" aria-label="Filter by genre"></select>
+        <select id="fSort" aria-label="Sort lists"><option value="recent">Newest first</option><option value="score">Highest rated</option><option value="title">A to Z</option><option value="year">Release year</option></select>
       </div>
 
       <section class="card hidden" id="airCard">
@@ -381,6 +445,16 @@
         </section>
         <div id="customLists"></div>
       </div>
+      <section class="card" id="statsCard"><h2 id="statsTitle">Stats &amp; badges</h2><div id="statsBody"></div></section>
+    </div>
+
+    <div id="seasonView" class="hidden">
+      <section class="card">
+        <div class="seasonbar"><button class="ic" id="seasonPrev" type="button" aria-label="Previous season">‹</button><h2 id="seasonTitle">This season</h2><button class="ic" id="seasonNext" type="button" aria-label="Next season">›</button></div>
+        <p class="hint">The most popular anime of the season. See who in the crew is watching what, and add shows in one tap.</p>
+        <div class="filters"><select id="sGenre" aria-label="Filter by genre"></select><select id="sShow" aria-label="Show"><option value="all">All shows</option><option value="crew">Crew is watching</option><option value="mine">On my lists</option></select></div>
+        <div id="seasonGrid" class="sgrid"></div>
+      </section>
     </div>
 
     <div id="crewView" class="hidden">
@@ -388,6 +462,21 @@
         <h2>For you</h2>
         <p class="hint">Stuff the crew rated 8 or higher that isn't on any of your lists yet.</p>
         <div id="recList"></div>
+      </section>
+      <section class="card" id="pollCard">
+        <h2>Polls <button class="sharebtn" id="pollNew" type="button">+ New poll</button></h2>
+        <p class="hint">Vote on what to watch next. Add a time to turn it into a watch party countdown.</p>
+        <form class="pollform hidden" id="pollForm">
+          <input id="pollQ" maxlength="100" placeholder="e.g. What should we watch Friday?" aria-label="Question">
+          <label>Options</label>
+          <div id="pollOpts"></div>
+          <div class="r"><button class="btn" id="pollAddOpt" type="button">+ Option</button></div>
+          <label for="pollWhen">Watch party time (optional)</label>
+          <input id="pollWhen" type="datetime-local">
+          <div class="r"><button class="btn primary" type="submit">Post poll</button><button class="btn" id="pollCancel" type="button">Cancel</button></div>
+        </form>
+        <datalist id="pollSuggest"></datalist>
+        <div id="pollList"></div>
       </section>
       <section class="card" id="crewTopCard">
         <h2 id="crewTopTitle">Crew top 10</h2>
@@ -470,6 +559,9 @@
     <div class="seg" id="schemeSeg"><button type="button" data-scheme="dark">🌙 Dark</button><button type="button" data-scheme="light">☀️ Light</button><button type="button" data-scheme="auto">Auto</button></div>
     <h4>Color theme</h4>
     <div class="swatches" id="swatches"></div>
+    <h4>Home screen</h4>
+    <div class="bgrow"><button class="btn primary" id="installSheet" type="button">📲 Add Crew to home screen</button></div>
+    <p class="hint" id="installHint" style="margin-top:8px"></p>
     <h4>Background picture</h4>
     <div class="bgrow">
       <div class="bgprev" id="bgPrev">None</div>
@@ -603,8 +695,15 @@ function sanitize(d){
     at:typeof x.at==="string"?x.at.slice(0,30):null,
     prog:(typeof x.prog==="number"&&x.prog>=0&&x.prog<100000)?Math.floor(x.prog):null,
     total:(typeof x.total==="number"&&x.total>0&&x.total<100000)?Math.floor(x.total):null,
-    upd:typeof x.upd==="string"?x.upd.slice(0,30):null
+    upd:typeof x.upd==="string"?x.upd.slice(0,30):null,
+    genres:Array.isArray(x.genres)?x.genres.filter(g=>typeof g==="string").map(g=>g.slice(0,20)).slice(0,6):null
   })) : [];
+  const polls = Array.isArray(d.polls) ? d.polls.filter(p=>p&&typeof p.q==="string"&&Array.isArray(p.opts)).slice(0,20).map(p=>({
+    id:String(p.id||uid()).slice(0,20), q:clean(p.q).slice(0,100),
+    opts:p.opts.filter(o=>o&&typeof o.t==="string"&&clean(o.t)).slice(0,6).map(o=>({id:String(o.id||uid()).slice(0,20), t:clean(o.t).slice(0,80)})),
+    when:typeof p.when==="string"&&Date.parse(p.when)?p.when.slice(0,30):null, at:typeof p.at==="string"?p.at.slice(0,30):""
+  })).filter(p=>p.q&&p.opts.length>=2) : [];
+  const votes = Array.isArray(d.votes) ? d.votes.filter(v=>v&&typeof v.p==="string"&&typeof v.o==="string").slice(0,200).map(v=>({p:v.p.slice(0,70), o:v.o.slice(0,20)})) : [];
   const reacts = Array.isArray(d.reacts) ? d.reacts.filter(v=>v&&typeof v.to==="string"&&typeof v.k==="string"&&REACTS.includes(v.e)).slice(0,MAX_REACTS).map(v=>({to:v.to.slice(0,40), k:v.k.slice(0,140), e:v.e, at:typeof v.at==="string"?v.at.slice(0,30):""})) : [];
   const replies = Array.isArray(d.replies) ? d.replies.filter(v=>v&&typeof v.to==="string"&&typeof v.k==="string"&&typeof v.text==="string"&&v.text.trim()).slice(0,MAX_REPLIES).map(v=>({id:String(v.id||uid()).slice(0,20), to:v.to.slice(0,40), k:v.k.slice(0,140), text:String(v.text).replace(/\r/g,"").trim().slice(0,MAX_REPLY_LEN), at:typeof v.at==="string"?v.at.slice(0,30):""})) : [];
   const custom = Array.isArray(d.custom) ? d.custom.filter(l=>l&&typeof l.name==="string"&&clean(l.name)).slice(0,MAX_LISTS).map(l=>({
@@ -614,7 +713,7 @@ function sanitize(d){
   })) : [];
   const avatar = (typeof d.avatar==="string" && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(d.avatar) && d.avatar.length<80000) ? d.avatar : null;
   return { name:typeof d.name==="string"?d.name.slice(0,60):"", avatar, top:arr(d.top).slice(0,MAX_TOP), watched:arr(d.watched), watchlist:arr(d.watchlist),
-    mtop:arr(d.mtop).slice(0,MAX_TOP), mread:arr(d.mread), mlist:arr(d.mlist), otop:arr(d.otop).slice(0,MAX_TOP), custom, watching:arr(d.watching), mreading:arr(d.mreading), reacts, replies,
+    mtop:arr(d.mtop).slice(0,MAX_TOP), mread:arr(d.mread), mlist:arr(d.mlist), otop:arr(d.otop).slice(0,MAX_TOP), custom, watching:arr(d.watching), mreading:arr(d.mreading), reacts, replies, polls, votes,
     reviews: Array.isArray(d.reviews) ? d.reviews.filter(v=>v&&typeof v.k==="string"&&typeof v.text==="string"&&v.text.trim()&&typeof v.title==="string").slice(0,MAX_REVIEWS).map(v=>({
       k:v.k.slice(0,140), title:clean(v.title), media:v.media==="anime"||v.media==="manga"?v.media:null,
       text:String(v.text).replace(/\r/g,"").trim().slice(0,MAX_REVIEW_LEN),
@@ -622,7 +721,7 @@ function sanitize(d){
       img:IMG_OK(v.img)?v.img:null, at:typeof v.at==="string"?v.at.slice(0,30):""
     })) : [] };
 }
-const blank = () => ({name:"",avatar:null,top:[],watched:[],watchlist:[],mtop:[],mread:[],mlist:[],otop:[],custom:[],reviews:[],watching:[],mreading:[],reacts:[],replies:[]});
+const blank = () => ({name:"",avatar:null,top:[],watched:[],watchlist:[],mtop:[],mread:[],mlist:[],otop:[],custom:[],reviews:[],watching:[],mreading:[],reacts:[],replies:[],polls:[],votes:[]});
 const USER_DOMAIN = "@users.crew-fd928.firebaseapp.com";
 function displayNameOf(u){ if(!u) return "Someone"; if(u.displayName) return u.displayName; if(u.email && u.email.endsWith(USER_DOMAIN)) return u.email.slice(0,-USER_DOMAIN.length); return "Someone"; }
 function mine(){ return state.docs[state.me.uid] || (state.docs[state.me.uid] = blank()); }
@@ -637,7 +736,7 @@ async function save(){
     do{
       dirty=false;
       const m = mine();
-      await setDoc(doc(db,"lists",state.me.uid), { name:displayNameOf(state.me).slice(0,60), avatar:m.avatar||null, top:m.top, watched:m.watched, watchlist:m.watchlist, mtop:m.mtop, mread:m.mread, mlist:m.mlist, otop:m.otop, custom:m.custom, reviews:m.reviews, watching:m.watching, mreading:m.mreading, reacts:m.reacts, replies:m.replies, updatedAt:new Date().toISOString() });
+      await setDoc(doc(db,"lists",state.me.uid), { name:displayNameOf(state.me).slice(0,60), avatar:m.avatar||null, top:m.top, watched:m.watched, watchlist:m.watchlist, mtop:m.mtop, mread:m.mread, mlist:m.mlist, otop:m.otop, custom:m.custom, reviews:m.reviews, watching:m.watching, mreading:m.mreading, reacts:m.reacts, replies:m.replies, polls:m.polls, votes:m.votes, updatedAt:new Date().toISOString() });
     } while(dirty);
   }catch(e){
     console.error(e);
@@ -650,7 +749,7 @@ function mutate(fn){ if(!state.me) return; fn(mine()); render(); save(); }
 const same = (x,t) => norm(x.title)===norm(t.title||t) && (!x.media||!t.media||x.media===t.media);
 const has = (arr,t) => arr.some(x=>same(x,t));
 const mediaOf = x => x.media || (state.mode==="manga" ? "manga" : state.mode==="anime" ? "anime" : null);
-function mk(a){ return {id:uid(), title:clean(a.title), score:null, year:a.year||null, kind:a.kind||null, malId:a.malId||null, img:IMG_OK(a.img)?a.img:null, media:mediaOf(a), at:new Date().toISOString(), total:(typeof a.total==="number"&&a.total>0)?a.total:null}; }
+function mk(a){ return {id:uid(), title:clean(a.title), score:null, year:a.year||null, kind:a.kind||null, malId:a.malId||null, img:IMG_OK(a.img)?a.img:null, media:mediaOf(a), at:new Date().toISOString(), total:(typeof a.total==="number"&&a.total>0)?a.total:null, genres:Array.isArray(a.genres)&&a.genres.length?a.genres.slice(0,6):null}; }
 function addTop(a){
   let ok=false; const media=mediaOf(a);
   mutate(m=>{
@@ -789,7 +888,7 @@ function metaOf(x){
   if(mixed() && x.media==="manga") return [x.kind||"Manga",x.year];
   return [x.year,x.kind];
 }
-function titleBlock(x, showScore){ const t=el("div","title",x.title); const meta=metaOf(x).filter(Boolean).join(" · "); if(meta||(showScore&&x.score)){ const sm=el("small","",meta); if(showScore&&x.score){ if(meta) sm.append(" · "); sm.append(el("span","myscore","★ "+x.score+"/10")); } t.append(sm); } t.append(revLink(x)); return t; }
+function titleBlock(x, showScore){ const t=el("div","title",x.title); const meta=metaOf(x).filter(Boolean).join(" · "); if(meta||(showScore&&x.score)){ const sm=el("small","",meta); if(showScore&&x.score){ if(meta) sm.append(" · "); sm.append(el("span","myscore","★ "+x.score+"/10")); } t.append(sm); } const gt=gtags(x); if(gt) t.append(gt); t.append(revLink(x)); return t; }
 
 // ---- reviews ----
 const revKey = x => (mediaOf(x)||"anime")+":"+norm(x.title);
@@ -866,7 +965,7 @@ const closeRev=()=>{ $("#revSheet").classList.add("hidden"); revItem=null; };
 $("#revClose").addEventListener("click",closeRev);
 $("#revSheet").addEventListener("click",e=>{ if(e.target===$("#revSheet")) closeRev(); });
 document.addEventListener("keydown",e=>{ if(e.key==="Escape" && revItem) closeRev(); });
-const hasAnything = d => d && (d.reviews.length||d.watching.length||d.mreading.length||d.top.length||d.watched.length||d.watchlist.length||d.mtop.length||d.mread.length||d.mlist.length||d.otop.length||d.custom.length);
+const hasAnything = d => d && (d.polls.length||d.reviews.length||d.watching.length||d.mreading.length||d.top.length||d.watched.length||d.watchlist.length||d.mtop.length||d.mread.length||d.mlist.length||d.otop.length||d.custom.length);
 
 // ---- search: instant local matches, then live AniList results (Jikan as backup) ----
 const LOCAL = [["Fullmetal Alchemist: Brotherhood",2009,"TV",["FMAB"]],["Fullmetal Alchemist",2003,"TV",["FMA"]],["Steins;Gate",2011,"TV",["Steins Gate"]],["Steins;Gate 0",2018,"TV",["Steins Gate 0"]],["Attack on Titan",2013,"TV",["Shingeki no Kyojin","AOT"]],["Death Note",2006,"TV"],["Hunter x Hunter",2011,"TV",["HxH"]],["Hunter x Hunter (1999)",1999,"TV",["HxH 1999"]],["Demon Slayer",2019,"TV",["Kimetsu no Yaiba"]],["Demon Slayer: Mugen Train",2020,"Movie",["Kimetsu no Yaiba Mugen Train"]],["Demon Slayer: Infinity Castle",2025,"Movie",["Kimetsu no Yaiba Infinity Castle"]],["Jujutsu Kaisen",2020,"TV",["JJK"]],["Jujutsu Kaisen 0",2021,"Movie",["JJK 0"]],["One Piece",1999,"TV"],["One Piece Film: Red",2022,"Movie"],["Naruto",2002,"TV"],["Naruto Shippuden",2007,"TV"],["Boruto: Naruto Next Generations",2017,"TV",["Boruto"]],["Bleach",2004,"TV"],["Bleach: Thousand-Year Blood War",2022,"TV",["TYBW"]],["Dragon Ball",1986,"TV",["DB"]],["Dragon Ball Z",1989,"TV",["DBZ"]],["Dragon Ball Super",2015,"TV",["DBS"]],["Dragon Ball Super: Broly",2018,"Movie",["Broly"]],["Dragon Ball Daima",2024,"TV"],["My Hero Academia",2016,"TV",["Boku no Hero Academia","MHA","BNHA"]],["One Punch Man",2015,"TV",["OPM"]],["Mob Psycho 100",2016,"TV"],["Chainsaw Man",2022,"TV",["CSM"]],["Chainsaw Man – The Movie: Reze Arc",2025,"Movie",["Reze Arc"]],["Spy x Family",2022,"TV",["Spy Family"]],["Spy x Family Code: White",2023,"Movie"],["Blue Lock",2022,"TV"],["Blue Lock: Episode Nagi",2024,"Movie",["Episode Nagi"]],["Haikyu!!",2014,"TV",["Haikyuu"]],["Haikyu!! The Dumpster Battle",2024,"Movie",["Haikyuu Dumpster Battle"]],["Kuroko's Basketball",2012,"TV",["Kuroko no Basket"]],["Slam Dunk",1993,"TV"],["The First Slam Dunk",2022,"Movie"],["Hajime no Ippo",2000,"TV",["Fighting Spirit"]],["Ace of Diamond",2013,"TV",["Diamond no Ace"]],["Yowamushi Pedal",2013,"TV"],["Eyeshield 21",2005,"TV"],["Run with the Wind",2018,"TV",["Kaze ga Tsuyoku Fuiteiru"]],["Megalobox",2018,"TV"],["Ao Ashi",2022,"TV",["Aoashi"]],["Free!",2013,"TV"],["Cowboy Bebop",1998,"TV"],["Samurai Champloo",2004,"TV"],["Neon Genesis Evangelion",1995,"TV",["Evangelion","NGE","Eva"]],["The End of Evangelion",1997,"Movie",["EoE"]],["Evangelion: 3.0+1.0 Thrice Upon a Time",2021,"Movie"],["Code Geass",2006,"TV"],["Gurren Lagann",2007,"TV",["Tengen Toppa Gurren Lagann","TTGL"]],["Kill la Kill",2013,"TV",["KLK"]],["Promare",2019,"Movie"],["Cyberpunk: Edgerunners",2022,"ONA",["Edgerunners"]],["Ghost in the Shell",1995,"Movie",["GITS"]],["Akira",1988,"Movie"],["Redline",2009,"Movie"],["Spirited Away",2001,"Movie",["Sen to Chihiro"]],["My Neighbor Totoro",1988,"Movie",["Totoro"]],["Princess Mononoke",1997,"Movie",["Mononoke Hime"]],["Howl's Moving Castle",2004,"Movie"],["Kiki's Delivery Service",1989,"Movie"],["Ponyo",2008,"Movie"],["Nausicaä of the Valley of the Wind",1984,"Movie",["Nausicaa"]],["Castle in the Sky",1986,"Movie",["Laputa"]],["The Boy and the Heron",2023,"Movie"],["Grave of the Fireflies",1988,"Movie"],["Your Name",2016,"Movie",["Kimi no Na wa"]],["Weathering with You",2019,"Movie",["Tenki no Ko"]],["Suzume",2022,"Movie"],["A Silent Voice",2016,"Movie",["Koe no Katachi"]],["I Want to Eat Your Pancreas",2018,"Movie"],["Perfect Blue",1997,"Movie"],["Paprika",2006,"Movie"],["Tokyo Godfathers",2003,"Movie"],["Wolf Children",2012,"Movie"],["Summer Wars",2009,"Movie"],["The Girl Who Leapt Through Time",2006,"Movie"],["Look Back",2024,"Movie"],["Your Lie in April",2014,"TV",["Shigatsu wa Kimi no Uso"]],["Clannad",2007,"TV"],["Clannad: After Story",2008,"TV"],["Anohana",2011,"TV"],["Violet Evergarden",2018,"TV"],["Toradora!",2008,"TV",["Toradora"]],["Fruits Basket",2019,"TV"],["Kaguya-sama: Love Is War",2019,"TV",["Kaguya sama"]],["Horimiya",2021,"TV"],["My Dress-Up Darling",2022,"TV",["Sono Bisque Doll"]],["Rascal Does Not Dream of Bunny Girl Senpai",2018,"TV",["Bunny Girl Senpai"]],["My Teen Romantic Comedy SNAFU",2013,"TV",["Oregairu"]],["Kimi ni Todoke",2009,"TV",["From Me to You"]],["Nana",2006,"TV"],["Ouran High School Host Club",2006,"TV"],["Rent-a-Girlfriend",2020,"TV",["Kanojo Okarishimasu"]],["The Quintessential Quintuplets",2019,"TV",["Gotoubun no Hanayome"]],["Komi Can't Communicate",2021,"TV"],["Skip and Loafer",2023,"TV"],["The Dangers in My Heart",2023,"TV",["Boku no Kokoro no Yabai Yatsu"]],["Teasing Master Takagi-san",2018,"TV",["Takagi san"]],["Don't Toy with Me, Miss Nagatoro",2021,"TV",["Nagatoro"]],["Tomo-chan Is a Girl!",2023,"TV"],["Wotakoi: Love Is Hard for Otaku",2018,"TV"],["Chihayafuru",2011,"TV"],["Hyouka",2012,"TV"],["Angel Beats!",2010,"TV"],["Charlotte",2015,"TV"],["Plastic Memories",2015,"TV"],["Given",2019,"TV"],["Yuri!!! on Ice",2016,"TV",["Yuri on Ice"]],["Banana Fish",2018,"TV"],["Frieren: Beyond Journey's End",2023,"TV",["Sousou no Frieren"]],["The Apothecary Diaries",2023,"TV",["Kusuriya no Hitorigoto"]],["Solo Leveling",2024,"TV"],["Dandadan",2024,"TV",["Dan Da Dan"]],["Kaiju No. 8",2024,"TV",["Kaiju 8"]],["Oshi no Ko",2023,"TV"],["Bocchi the Rock!",2022,"TV",["Bocchi"]],["Delicious in Dungeon",2024,"TV",["Dungeon Meshi"]],["Sakamoto Days",2025,"TV"],["Wind Breaker",2024,"TV"],["Gachiakuta",2025,"TV"],["The Fragrant Flower Blooms with Dignity",2025,"TV",["Kaoru Hana wa Rin to Saku"]],["Orb: On the Movements of the Earth",2024,"TV",["Chi"]],["Wistoria: Wand and Sword",2024,"TV"],["Shangri-La Frontier",2023,"TV"],["Undead Unluck",2023,"TV"],["Mashle: Magic and Muscles",2023,"TV",["Mashle"]],["Zom 100: Bucket List of the Dead",2023,"TV",["Zom 100"]],["Pluto",2023,"ONA"],["Hell's Paradise",2023,"TV",["Jigokuraku"]],["Mobile Suit Gundam: The Witch from Mercury",2022,"TV",["Witch from Mercury"]],["Lycoris Recoil",2022,"TV"],["Ya Boy Kongming!",2022,"TV",["Paripi Koumei"]],["The Eminence in Shadow",2022,"TV"],["Ranking of Kings",2021,"TV",["Ousama Ranking"]],["To Your Eternity",2021,"TV",["Fumetsu no Anata e"]],["Odd Taxi",2021,"TV"],["Wonder Egg Priority",2021,"TV"],["86",2021,"TV",["Eighty-Six"]],["Tokyo Revengers",2021,"TV"],["Mushoku Tensei: Jobless Reincarnation",2021,"TV",["Mushoku Tensei"]],["Sk8 the Infinity",2021,"TV",["SK8"]],["Akudama Drive",2020,"TV"],["Great Pretender",2020,"TV"],["Tower of God",2020,"TV"],["The God of High School",2020,"TV"],["Dorohedoro",2020,"TV"],["Toilet-Bound Hanako-kun",2020,"TV"],["Re:Zero − Starting Life in Another World",2016,"TV",["Re Zero","ReZero"]],["That Time I Got Reincarnated as a Slime",2018,"TV",["Tensura","Slime"]],["KonoSuba",2016,"TV",["Konosuba"]],["Overlord",2015,"TV"],["Sword Art Online",2012,"TV",["SAO"]],["No Game No Life",2014,"TV",["NGNL"]],["The Rising of the Shield Hero",2019,"TV",["Shield Hero"]],["Log Horizon",2013,"TV"],["Made in Abyss",2017,"TV"],["The Promised Neverland",2019,"TV",["Yakusoku no Neverland"]],["Tokyo Ghoul",2014,"TV"],["Parasyte: The Maxim",2014,"TV",["Kiseijuu","Parasyte"]],["Another",2012,"TV"],["Higurashi: When They Cry",2006,"TV",["Higurashi"]],["Erased",2016,"TV",["Boku dake ga Inai Machi"]],["Monster",2004,"TV"],["Psycho-Pass",2012,"TV",["Psycho Pass"]],["Terror in Resonance",2014,"TV",["Zankyou no Terror"]],["Vinland Saga",2019,"TV"],["Berserk",1997,"TV"],["Dororo",2019,"TV"],["Fire Force",2019,"TV",["Enen no Shouboutai"]],["Black Clover",2017,"TV"],["Fairy Tail",2009,"TV"],["The Seven Deadly Sins",2014,"TV",["Nanatsu no Taizai"]],["Magi: The Labyrinth of Magic",2012,"TV",["Magi"]],["Soul Eater",2008,"TV"],["D.Gray-man",2006,"TV",["D Gray Man"]],["Blue Exorcist",2011,"TV",["Ao no Exorcist"]],["Noragami",2014,"TV"],["Inuyasha",2000,"TV"],["Yu Yu Hakusho",1992,"TV",["YYH"]],["Rurouni Kenshin",1996,"TV",["Samurai X"]],["JoJo's Bizarre Adventure",2012,"TV",["JoJo","JJBA"]],["Trigun",1998,"TV"],["Trigun Stampede",2023,"TV"],["Hellsing Ultimate",2006,"OVA",["Hellsing"]],["Black Lagoon",2006,"TV"],["Great Teacher Onizuka",1999,"TV",["GTO"]],["Baki",2018,"TV"],["Kengan Ashura",2019,"ONA",["Kengan"]],["Beastars",2019,"TV"],["Dr. Stone",2019,"TV",["Dr Stone"]],["Food Wars!",2015,"TV",["Shokugeki no Soma"]],["Assassination Classroom",2015,"TV",["Ansatsu Kyoushitsu"]],["The Disastrous Life of Saiki K.",2016,"TV",["Saiki K"]],["Gintama",2006,"TV"],["Nichijou",2011,"TV",["My Ordinary Life"]],["Lucky Star",2007,"TV"],["K-On!",2009,"TV",["K On"]],["Azumanga Daioh",2002,"TV"],["Grand Blue",2018,"TV"],["Barakamon",2014,"TV"],["Laid-Back Camp",2018,"TV",["Yuru Camp"]],["A Place Further Than the Universe",2018,"TV",["Sora yori mo Tooi Basho"]],["March Comes in Like a Lion",2016,"TV",["3-gatsu no Lion"]],["Mushishi",2005,"TV"],["Natsume's Book of Friends",2008,"TV",["Natsume Yuujinchou"]],["Wolf's Rain",2003,"TV"],["Serial Experiments Lain",1998,"TV",["Lain"]],["Ergo Proxy",2006,"TV"],["Darker than Black",2007,"TV"],["Durarara!!",2010,"TV",["Durarara"]],["Baccano!",2007,"TV",["Baccano"]],["Bungo Stray Dogs",2016,"TV",["BSD"]],["Darling in the Franxx",2018,"TV",["Franxx"]],["Mobile Suit Gundam",1979,"TV",["Gundam"]],["Fate/Zero",2011,"TV",["Fate Zero"]],["Fate/stay night: Unlimited Blade Works",2014,"TV",["UBW","Fate Stay Night"]],["Puella Magi Madoka Magica",2011,"TV",["Madoka"]],["Sailor Moon",1992,"TV"],["Cardcaptor Sakura",1998,"TV"],["Pokémon",1997,"TV",["Pokemon"]],["Digimon Adventure",1999,"TV",["Digimon"]],["Yu-Gi-Oh!",2000,"TV",["Yugioh","Yu Gi Oh"]],["Hikaru no Go",2001,"TV"],["Initial D",1998,"TV"],["Case Closed",1996,"TV",["Detective Conan"]],["Kaiji",2007,"TV"],["Kakegurui",2017,"TV"],["Classroom of the Elite",2017,"TV",["COTE"]],["Akame ga Kill!",2014,"TV",["Akame ga Kill"]],["Elfen Lied",2004,"TV"],["Future Diary",2011,"TV",["Mirai Nikki"]],["Devilman Crybaby",2018,"ONA"],["Black Butler",2008,"TV",["Kuroshitsuji"]],["Death Parade",2015,"TV"],["Spice and Wolf",2008,"TV",["Ookami to Koushinryou"]],["The Ancient Magus' Bride",2017,"TV",["Mahoutsukai no Yome"]],["Bakuman",2010,"TV"],["Space Brothers",2012,"TV",["Uchuu Kyoudai"]],["Planetes",2003,"TV"],["Legend of the Galactic Heroes",1988,"OVA",["LOGH"]],["Kamisama Kiss",2012,"TV"],["Monogatari",2009,"TV",["Bakemonogatari"]],["Aldnoah.Zero",2014,"TV",["Aldnoah Zero"]],["Ninja Scroll",1993,"Movie"]].map(([title,year,kind,alt]) => ({title,year,kind,keys:[norm(title)].concat((alt||[]).map(norm))}));
@@ -885,7 +984,7 @@ function localSearch(q, type){
 }
 const KIND = {TV:"TV",TV_SHORT:"TV",MOVIE:"Movie",OVA:"OVA",ONA:"ONA",SPECIAL:"Special",MUSIC:"Music",MANGA:"Manga",NOVEL:"Novel",ONE_SHOT:"One-shot"};
 const COUNTRY_KIND = {KR:"Manhwa",CN:"Manhua",TW:"Manhua"};
-const ANILIST_Q = `query($s:String,$t:MediaType){Page(perPage:8){media(search:$s,type:$t,isAdult:false,sort:[SEARCH_MATCH]){id idMal format countryOfOrigin seasonYear startDate{year} episodes chapters title{romaji english} coverImage{medium large}}}}`;
+const ANILIST_Q = `query($s:String,$t:MediaType){Page(perPage:8){media(search:$s,type:$t,isAdult:false,sort:[SEARCH_MATCH]){id idMal format countryOfOrigin seasonYear startDate{year} episodes chapters genres title{romaji english} coverImage{medium large}}}}`;
 async function anilist(q, signal, mode){
   const r = await fetch("https://graphql.anilist.co",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({query:ANILIST_Q,variables:{s:q,t:mode==="manga"?"MANGA":"ANIME"}}),signal});
   if(!r.ok) throw new Error("anilist "+r.status);
@@ -894,7 +993,7 @@ async function anilist(q, signal, mode){
   return list.map(a=>{
     const en=a.title&&a.title.english, ro=a.title&&a.title.romaji;
     const img=(a.coverImage&&(a.coverImage.large||a.coverImage.medium))||null;
-    return { malId:a.idMal||null, title:clean(en||ro||""), alt:en&&ro&&en!==ro?ro:"", year:a.seasonYear||(a.startDate&&a.startDate.year)||null, kind:(a.format==="MANGA"&&COUNTRY_KIND[a.countryOfOrigin])||KIND[a.format]||null, img:IMG_OK(img)?img:null, media:mode==="manga"?"manga":"anime", total:a.episodes||a.chapters||null };
+    return { malId:a.idMal||null, title:clean(en||ro||""), alt:en&&ro&&en!==ro?ro:"", year:a.seasonYear||(a.startDate&&a.startDate.year)||null, kind:(a.format==="MANGA"&&COUNTRY_KIND[a.countryOfOrigin])||KIND[a.format]||null, img:IMG_OK(img)?img:null, media:mode==="manga"?"manga":"anime", total:a.episodes||a.chapters||null, genres:(a.genres||[]).slice(0,6) };
   }).filter(a=>a.title);
 }
 async function jikan(q, signal, mode){
@@ -903,7 +1002,7 @@ async function jikan(q, signal, mode){
   const j = await r.json();
   return (j.data||[]).map(a=>{
     const img=(a.images&&a.images.webp&&a.images.webp.image_url)||(a.images&&a.images.jpg&&a.images.jpg.image_url)||null;
-    return { malId:a.mal_id, title:clean(a.title_english||a.title), alt:a.title_english&&a.title!==a.title_english?a.title:"", year:a.year||(a.aired&&a.aired.prop&&a.aired.prop.from&&a.aired.prop.from.year)||(a.published&&a.published.prop&&a.published.prop.from&&a.published.prop.from.year)||null, kind:a.type==="Light Novel"?"Novel":(a.type||null), img:IMG_OK(img)?img:null, media:mode==="manga"?"manga":"anime", total:a.episodes||a.chapters||null };
+    return { malId:a.mal_id, title:clean(a.title_english||a.title), alt:a.title_english&&a.title!==a.title_english?a.title:"", year:a.year||(a.aired&&a.aired.prop&&a.aired.prop.from&&a.aired.prop.from.year)||(a.published&&a.published.prop&&a.published.prop.from&&a.published.prop.from.year)||null, kind:a.type==="Light Novel"?"Novel":(a.type||null), img:IMG_OK(img)?img:null, media:mode==="manga"?"manga":"anime", total:a.episodes||a.chapters||null, genres:(a.genres||[]).map(g=>g&&g.name).filter(Boolean).slice(0,6) };
   });
 }
 let searchTimer=null, searchSeq=0, controller=null, lastResults=[], searchState="idle";
@@ -1274,6 +1373,258 @@ const closeAv=()=>$("#avSheet").classList.add("hidden");
 $("#avClose").addEventListener("click",closeAv);
 $("#avSheet").addEventListener("click",e=>{ if(e.target===$("#avSheet")) closeAv(); });
 
+// ---- genres: fill in missing genres/episode counts for your items from AniList (once per visit) ----
+let backfilled=false;
+async function afterLoad(){
+  maybeShowInstall();
+  if(backfilled || !state.me) return; backfilled=true;
+  const m=mine();
+  for(const media of ["anime","manga"]){
+    const k=MEDIA_KEYS[media];
+    const items=[...m[k.top],...m[k.watched],...m[k.watchlist],...m[k.watching],...m.otop.filter(x=>x.media===media),...m.custom.flatMap(l=>l.items).filter(x=>x.media===media)];
+    const ids=[...new Set(items.filter(x=>x.malId && (!x.genres||!x.genres.length)).map(x=>x.malId))];
+    for(let i=0;i<ids.length;i+=50){
+      try{
+        const r=await fetch("https://graphql.anilist.co",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({query:`query($ids:[Int],$t:MediaType){Page(perPage:50){media(idMal_in:$ids,type:$t){idMal genres episodes chapters}}}`,variables:{ids:ids.slice(i,i+50),t:media.toUpperCase()}})});
+        if(!r.ok) break;
+        const j=await r.json(), info={};
+        ((j.data&&j.data.Page&&j.data.Page.media)||[]).forEach(a=>{ info[a.idMal]=a; });
+        mutate(mm=>{ [...mm[k.top],...mm[k.watched],...mm[k.watchlist],...mm[k.watching],...mm.otop,...mm.custom.flatMap(l=>l.items)].forEach(x=>{
+          if(mediaOf(x)!==media && x.media!==media) return;
+          const a=info[x.malId]; if(!a) return;
+          if((!x.genres||!x.genres.length) && a.genres) x.genres=a.genres.slice(0,6);
+          if(!x.total && (a.episodes||a.chapters)) x.total=a.episodes||a.chapters;
+        }); });
+      }catch(e){ break; }
+    }
+  }
+}
+
+// ---- filters (genre + sort) for anime/manga lists ----
+state.genre=""; state.sort="recent";
+$("#fGenre").addEventListener("change",e=>{ state.genre=e.target.value; render(); });
+$("#fSort").addEventListener("change",e=>{ state.sort=e.target.value; render(); });
+const passG = x => !state.genre || (x.genres||[]).includes(state.genre);
+function sortF(arr){
+  const a=arr.filter(passG);
+  if(state.sort==="score") a.sort((x,y)=>(y.score||0)-(x.score||0));
+  else if(state.sort==="title") a.sort((x,y)=>x.title.localeCompare(y.title));
+  else if(state.sort==="year") a.sort((x,y)=>(y.year||0)-(x.year||0));
+  return a;
+}
+function fillGenreSelect(sel, items, current, allLabel){
+  const set=new Set(); items.forEach(x=>(x.genres||[]).forEach(g=>set.add(g))); if(current) set.add(current);
+  sel.replaceChildren(new Option(allLabel,"")); [...set].sort().forEach(g=>sel.append(new Option(g,g)));
+  sel.value=current; sel.classList.toggle("on",!!current);
+}
+const gtags = x => (x.genres&&x.genres.length) ? el("span","gtags",x.genres.slice(0,3).join(" · ")) : null;
+
+// ---- seasonal chart ----
+const SEASONS=["WINTER","SPRING","SUMMER","FALL"], SEASON_NAME={WINTER:"Winter",SPRING:"Spring",SUMMER:"Summer",FALL:"Fall"};
+const nowSeason = () => { const d=new Date(); return {i:Math.floor(d.getMonth()/3), y:d.getFullYear()}; };
+state.season=nowSeason(); state.sGenre=""; state.sShow="all";
+const seasonCache={};
+function shiftSeason(n){ let i=state.season.i+n, y=state.season.y; while(i<0){ i+=4; y--; } while(i>3){ i-=4; y++; } state.season={i,y}; render(); }
+$("#seasonPrev").addEventListener("click",()=>shiftSeason(-1));
+$("#seasonNext").addEventListener("click",()=>shiftSeason(1));
+$("#sGenre").addEventListener("change",e=>{ state.sGenre=e.target.value; render(); });
+$("#sShow").addEventListener("change",e=>{ state.sShow=e.target.value; render(); });
+const SEASON_Q=`query($s:MediaSeason,$y:Int){Page(perPage:50){media(season:$s,seasonYear:$y,type:ANIME,isAdult:false,sort:POPULARITY_DESC,format_in:[TV,TV_SHORT,ONA,MOVIE]){idMal format episodes genres seasonYear title{english romaji} coverImage{large medium} nextAiringEpisode{episode airingAt}}}}`;
+function loadSeason(key, s, y){
+  if(seasonCache[key]) return;
+  seasonCache[key]={loading:true, list:[]};
+  fetch("https://graphql.anilist.co",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({query:SEASON_Q,variables:{s,y}})})
+    .then(r=>r.ok?r.json():Promise.reject(r.status))
+    .then(j=>{ seasonCache[key]={list:((j.data&&j.data.Page&&j.data.Page.media)||[]).map(a=>{ const img=a.coverImage&&(a.coverImage.large||a.coverImage.medium); return {title:clean(a.title.english||a.title.romaji||""), malId:a.idMal||null, img:IMG_OK(img)?img:null, media:"anime", kind:KIND[a.format]||null, year:a.seasonYear||y, total:a.episodes||null, genres:(a.genres||[]).slice(0,6), next:a.nextAiringEpisode||null}; }).filter(a=>a.title)}; if(state.view==="season") render(); })
+    .catch(()=>{ seasonCache[key]={error:true, list:[]}; if(state.view==="season") render(); });
+}
+function crewStatus(x){
+  const out=[]; const match=y=>(x.malId&&y.malId===x.malId)||norm(y.title)===norm(x.title);
+  Object.entries(state.docs).forEach(([id,d])=>{
+    let st=null; const w=d.watching.find(match), done=d.watched.find(match)||d.top.find(match), q=d.watchlist.find(match);
+    if(w) st={t:"▶ "+nameOf(id)+(w.prog?" Ep "+w.prog:""), rank:0}; else if(done) st={t:"✓ "+nameOf(id)+(done.score?" "+done.score+"/10":""), rank:1}; else if(q) st={t:"＋ "+nameOf(id), rank:2};
+    if(st) out.push({id,...st});
+  });
+  return out.sort((a,b)=>a.rank-b.rank);
+}
+function addWatchingFor(x, media){
+  const k=MEDIA_KEYS[media];
+  mutate(m=>{ if(has(m[k.watching],{...x,media})){ toast("Already on "+WORDS[media].watching); return; }
+    const it=mk({...x,media}); it.prog=0; it.upd=it.at; m[k.watching].unshift(it);
+    m[k.watchlist]=m[k.watchlist].filter(y=>norm(y.title)!==norm(x.title)); toast(WORDS[media].started+" "+it.title); });
+}
+function renderSeason(){
+  const {i,y}=state.season, s=SEASONS[i], key=s+y;
+  const isNow = i===nowSeason().i && y===nowSeason().y;
+  $("#seasonTitle").textContent = SEASON_NAME[s]+" "+y+(isNow?" · Now":"");
+  loadSeason(key, s, y);
+  const c=seasonCache[key], grid=$("#seasonGrid"); grid.replaceChildren();
+  fillGenreSelect($("#sGenre"), c.list, state.sGenre, "All genres");
+  $("#sShow").value=state.sShow;
+  if(c.loading){ grid.append(el("div","empty","Loading the season…")); return; }
+  if(c.error){ grid.append(el("div","empty","Couldn't load the season right now. Try again in a bit.")); delete seasonCache[key]; return; }
+  let list=c.list.filter(x=>!state.sGenre||x.genres.includes(state.sGenre)).map(x=>({x, crew:crewStatus(x)}));
+  if(state.sShow==="crew") list=list.filter(v=>v.crew.some(c=>c.id!==state.me.uid));
+  if(state.sShow==="mine") list=list.filter(v=>v.crew.some(c=>c.id===state.me.uid));
+  if(!list.length){ grid.append(el("div","empty","Nothing matches those filters.")); return; }
+  list.forEach(({x,crew})=>{
+    const meOn=crew.find(c=>c.id===state.me.uid);
+    const card=el("div","scard"+(meOn?" mine":"")); card.append(posterEl(x,true));
+    const b=el("div","body"); const t=el("button","revlink"); t.className="st"; t.style.cssText="border:0;background:none;padding:0;color:inherit;text-align:left;cursor:pointer;font:inherit;font-weight:700";
+    t.textContent=x.title; t.addEventListener("click",()=>openReviews(x)); b.append(t);
+    b.append(el("div","sg",[x.kind, x.total?x.total+" eps":null].filter(Boolean).join(" · ")+(x.genres.length?" · "+x.genres.slice(0,2).join(", "):"")));
+    if(x.next) b.append(el("div","sa","Ep "+x.next.episode+" "+untilText(x.next.airingAt-Date.now()/1000)));
+    if(crew.length){ const cr=el("div","crew"); crew.slice(0,4).forEach(c=>cr.append(el("span","",c.t))); if(crew.length>4) cr.append(el("span","","+"+(crew.length-4))); b.append(cr); }
+    const btns=el("div","sbtns");
+    const m=mine(), watching=has(m.watching,x), listed=has(m.watchlist,x)||has(m.watched,x);
+    const w=el("button","pill"+(watching?" done":""), watching?"✓ Watching":"▶ Watching"); w.type="button"; if(!watching) w.addEventListener("click",()=>addWatchingFor(x,"anime"));
+    const q=el("button","pill"+(listed||watching?" done":""), listed?"✓ Listed":"+ Watchlist"); q.type="button"; if(!listed&&!watching) q.addEventListener("click",()=>addWatchFor(x,"anime"));
+    btns.append(w,q); b.append(btns); card.append(b); grid.append(card);
+  });
+}
+
+// ---- stats & badges ----
+function statsOf(d){
+  const animeDone=d.watched.length, mangaDone=d.mread.length;
+  const eps=d.watched.reduce((p,x)=>p+(x.total||0),0)+d.watching.reduce((p,x)=>p+(x.prog||0),0);
+  const chs=d.mread.reduce((p,x)=>p+(x.total||0),0)+d.mreading.reduce((p,x)=>p+(x.prog||0),0);
+  const ratings=[...ratingsOf(d).values()].map(v=>v.sc);
+  const avg=ratings.length? ratings.reduce((p,c)=>p+c,0)/ratings.length : null;
+  const gcount={}; [...d.watched,...d.mread,...d.top,...d.mtop].forEach(x=>(x.genres||[]).forEach(g=>{ gcount[g]=(gcount[g]||0)+1; }));
+  const topG=Object.entries(gcount).sort((a,b)=>b[1]-a[1]);
+  const social=d.reacts.length+d.replies.length;
+  const tens=ratings.filter(r=>r===10).length;
+  return {animeDone, mangaDone, eps, chs, ratings:ratings.length, avg, topG, reviews:d.reviews.length, lists:d.custom.length, social, tens,
+    topFull:d.top.length>=10, mtopFull:d.mtop.length>=10, otopFull:d.otop.length>=10, watching:d.watching.length+d.mreading.length,
+    total:animeDone+mangaDone+d.watchlist.length+d.mlist.length+d.watching.length+d.mreading.length+d.top.length+d.mtop.length};
+}
+function badgesOf(st){
+  const g=st.topG[0];
+  return [
+    ["🌱","First steps","Add your first title", st.total>=1],
+    ["📺","Binger","Watch 10 anime", st.animeDone>=10],
+    ["🍿","Couch legend","Watch 50 anime", st.animeDone>=50],
+    ["👑","Anime royalty","Watch 100 anime", st.animeDone>=100],
+    ["⏱️","Marathoner","1,000 episodes", st.eps>=1000],
+    ["📚","Bookworm","Read 10 manga", st.mangaDone>=10],
+    ["🏯","Library","Read 50 manga", st.mangaDone>=50],
+    ["🔟","Ranked","Fill your anime top 10", st.topFull],
+    ["📖","Manga ranked","Fill your manga top 10", st.mtopFull],
+    ["⚖️","Overall","Fill your overall top 10", st.otopFull],
+    ["✍️","Critic","Write 5 reviews", st.reviews>=5],
+    ["🖋️","Wordsmith","Write 20 reviews", st.reviews>=20],
+    ["🗂️","Curator","Make 3 custom lists", st.lists>=3],
+    ["💬","Social butterfly","React or reply 10 times", st.social>=10],
+    ["🎯","Hard to please","Average under 6.5 (10+ ratings)", st.ratings>=10 && st.avg<6.5],
+    ["💖","Easy to please","Average over 8.5 (10+ ratings)", st.ratings>=10 && st.avg>8.5],
+    ["💯","Masterpiece hunter","Give out five 10/10s", st.tens>=5],
+    ["🧭", g&&g[1]>=10 ? g[0]+" fan" : "Genre fan", "10 titles in one genre", !!(g&&g[1]>=10)],
+    ["🔥","Multitasker","Watch or read 3 things at once", st.watching>=3]
+  ];
+}
+function renderStats(id){
+  const card=$("#statsCard"); if(!id){ card.classList.add("hidden"); return; }
+  card.classList.remove("hidden");
+  $("#statsTitle").textContent = (id===state.me.uid?"Your":nameOf(id)+"'s")+" stats & badges";
+  const st=statsOf(state.docs[id]||blank()), body=$("#statsBody"); body.replaceChildren();
+  const grid=el("div","stats");
+  [[st.animeDone,"anime watched"],[st.eps.toLocaleString(),"episodes"],[st.mangaDone,"manga read"],[st.chs.toLocaleString(),"chapters"],[st.avg?(Math.round(st.avg*10)/10):"–","avg rating"],[st.reviews,"reviews"]]
+    .forEach(([v,l])=>{ const c=el("div","stat"); c.append(el("b","",String(v)), el("span","",l)); grid.append(c); });
+  body.append(grid);
+  if(st.topG.length) body.append(el("p","hint","Top genres: "+st.topG.slice(0,3).map(([g,n])=>g+" ("+n+")").join(" · ")));
+  const bs=badgesOf(st), got=bs.filter(b=>b[3]).length;
+  body.append(el("div","mh","Badges · "+got+"/"+bs.length));
+  const bg=el("div","badges");
+  bs.sort((a,b)=>(b[3]?1:0)-(a[3]?1:0)).forEach(([e,n,d,ok])=>{ const c=el("div","badge "+(ok?"got":"locked")); c.append(el("div","e",e), el("div","n",n), el("div","d",d)); c.title=n+": "+d+(ok?" (earned)":""); bg.append(c); });
+  body.append(bg);
+}
+
+// ---- polls (poll lives in its creator's doc; each vote lives in the voter's doc) ----
+const MAX_POLLS=20, MAX_OPTS=6;
+function pollOptInput(v){ const i=el("input"); i.maxLength=80; i.placeholder="Option"; i.value=v||""; i.setAttribute("list","pollSuggest"); i.setAttribute("aria-label","Poll option"); return i; }
+function resetPollForm(){ $("#pollQ").value=""; $("#pollWhen").value=""; const o=$("#pollOpts"); o.replaceChildren(pollOptInput(), pollOptInput()); }
+$("#pollNew").addEventListener("click",()=>{
+  const f=$("#pollForm"); const opening=f.classList.contains("hidden"); f.classList.toggle("hidden");
+  if(opening){ resetPollForm();
+    const dl=$("#pollSuggest"); dl.replaceChildren(); const seen=new Set();
+    Object.values(state.docs).forEach(d=>[...d.watchlist,...d.watching,...d.mlist].forEach(x=>{ if(!seen.has(x.title)){ seen.add(x.title); dl.append(new Option(x.title)); } }));
+    $("#pollQ").focus(); }
+});
+$("#pollCancel").addEventListener("click",()=>$("#pollForm").classList.add("hidden"));
+$("#pollAddOpt").addEventListener("click",()=>{ const o=$("#pollOpts"); if(o.children.length>=MAX_OPTS){ toast("Up to "+MAX_OPTS+" options."); return; } const i=pollOptInput(); o.append(i); i.focus(); });
+$("#pollForm").addEventListener("submit",e=>{
+  e.preventDefault(); if(!state.me) return;
+  const q=clean($("#pollQ").value).slice(0,100);
+  const opts=[...$("#pollOpts").querySelectorAll("input")].map(i=>clean(i.value).slice(0,80)).filter(Boolean);
+  const uniq=[...new Set(opts)];
+  if(!q){ toast("Add a question."); return; }
+  if(uniq.length<2){ toast("Add at least 2 options."); return; }
+  const whenV=$("#pollWhen").value, when=whenV?new Date(whenV).toISOString():null;
+  if((mine().polls||[]).length>=MAX_POLLS){ toast("Delete an old poll first (max "+MAX_POLLS+")."); return; }
+  mutate(m=>{ m.polls.unshift({id:uid(), q, opts:uniq.map(t=>({id:uid(), t})), when, at:new Date().toISOString()}); });
+  $("#pollForm").classList.add("hidden"); toast("Poll posted");
+});
+function vote(ref, opt){
+  mutate(m=>{ const i=m.votes.findIndex(v=>v.p===ref);
+    if(i>=0 && m.votes[i].o===opt) m.votes.splice(i,1); else if(i>=0) m.votes[i].o=opt; else m.votes.unshift({p:ref, o:opt}); });
+}
+function renderPolls(){
+  const box=$("#pollList"); box.replaceChildren();
+  const all=[]; Object.entries(state.docs).forEach(([id,d])=>d.polls.forEach(p=>all.push({id,p})));
+  const votes={}; Object.entries(state.docs).forEach(([id,d])=>d.votes.forEach(v=>{ (votes[v.p]=votes[v.p]||[]).push({from:id,o:v.o}); }));
+  const ended = p => p.when && Date.parse(p.when) < Date.now()-3*3600*1000;
+  all.sort((a,b)=>(ended(a.p)?1:0)-(ended(b.p)?1:0) || (b.p.at||"").localeCompare(a.p.at||""));
+  if(!all.length){ box.append(el("div","empty","No polls yet. Tap + New poll to start one.")); return; }
+  all.slice(0,12).forEach(({id,p})=>{
+    const ref=id+":"+p.id, vs=votes[ref]||[], total=vs.length, mineV=(vs.find(v=>v.from===state.me.uid)||{}).o;
+    const counts={}; vs.forEach(v=>{ counts[v.o]=(counts[v.o]||0)+1; }); const max=Math.max(0,...Object.values(counts));
+    const c=el("div","poll"); c.append(el("div","q",p.q));
+    const meta=el("div","meta2"); meta.append(avatarEl(id,true), el("span","",nameOf(id)+" · "+ago(p.at)+" · "+total+" vote"+(total===1?"":"s")));
+    if(p.when){ const t=Date.parse(p.when), diff=(t-Date.now())/1000; const w=new Date(t).toLocaleString([], {weekday:"short", month:"short", day:"numeric", hour:"numeric", minute:"2-digit"});
+      meta.append(el("span","cd", diff>0 ? "🎉 "+w+" · "+untilText(diff) : ended(p) ? "Ended "+w : "🎉 Happening now")); }
+    if(id===state.me.uid){ const del=el("button","link","Delete"); del.type="button"; del.style.marginLeft="auto"; del.addEventListener("click",()=>{ if(confirm("Delete this poll?")) mutate(m=>{ m.polls=m.polls.filter(x=>x.id!==p.id); }); }); meta.append(del); }
+    c.append(meta);
+    p.opts.forEach(o=>{
+      const n=counts[o.id]||0, pct=total?Math.round(n/total*100):0;
+      const b=el("button","opt"+(mineV===o.id?" mine":"")+(n&&n===max&&(ended(p)||total>=2)?" win":"")); b.type="button";
+      const f=el("div","fill"); f.style.width=pct+"%"; b.append(f);
+      const row=el("div","row2"); row.append(el("span","lbl2",o.t), el("span","c", total? pct+"%" : "")); b.append(row);
+      const who=vs.filter(v=>v.o===o.id).map(v=>nameOf(v.from)); if(who.length) b.append(el("div","who3",who.join(", ")));
+      if(!ended(p)) b.addEventListener("click",()=>vote(ref,o.id)); else b.disabled=true;
+      c.append(b);
+    });
+    box.append(c);
+  });
+}
+
+// ---- home screen install ----
+let deferredInstall=null;
+const isStandalone = () => (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone===true;
+const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+window.addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); deferredInstall=e; updateInstallUI(); });
+window.addEventListener("appinstalled",()=>{ deferredInstall=null; $("#installBar").classList.add("hidden"); toast("Crew added to your home screen!"); });
+function installHow(){
+  if(isStandalone()) return "You're already using Crew as an app. 🎉";
+  if(isIOS()) return "In Safari, tap the Share button (the square with an arrow), scroll down, then tap “Add to Home Screen.”";
+  if(deferredInstall) return "Tap the button above to install.";
+  return "In Chrome, open the ⋮ menu and tap “Add to Home screen” or “Install app.”";
+}
+function updateInstallUI(){ $("#installHint").textContent=installHow(); $("#installSheet").classList.toggle("hidden", isStandalone()); $("#installGo").textContent = deferredInstall ? "Install" : "How"; }
+async function doInstall(){
+  if(deferredInstall){ deferredInstall.prompt(); try{ await deferredInstall.userChoice; }catch(e){} deferredInstall=null; updateInstallUI(); return; }
+  toast(installHow()); $("#installHint").textContent=installHow();
+}
+function maybeShowInstall(){
+  let dismissed=false; try{ dismissed=localStorage.getItem("crew.installDismissed")==="1"; }catch(e){}
+  $("#installBar").classList.toggle("hidden", isStandalone() || dismissed);
+  updateInstallUI();
+}
+$("#installGo").addEventListener("click",()=>{ if(deferredInstall) doInstall(); else { const t=$("#installBar .grow"); t.textContent=installHow(); } });
+$("#installX").addEventListener("click",()=>{ try{ localStorage.setItem("crew.installDismissed","1"); }catch(e){} $("#installBar").classList.add("hidden"); });
+$("#installSheet").addEventListener("click",doInstall);
+$("#gearBtn").addEventListener("click",updateInstallUI);
+
+
 // ---- render ----
 function render(){
   document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.toggle("on", b.dataset.view===state.view));
@@ -1283,8 +1634,10 @@ function render(){
   if(state.target && !targetList()) state.target=null;
   $("#q").placeholder = state.mode==="lists" ? "Search "+({anime:"anime",manga:"manga",both:"anime or manga"})[searchType()]+" to add…" : w.search; $("#watchedTitle").textContent=w.watched; $("#watchTitle").textContent=w.watchlist; $("#watchHint").textContent=w.qHint;
   $("#crewTopTitle").textContent=w.crewTop; $("#crewWatchTitle").textContent=w.party; $("#crewWatchHint").textContent=w.partyHint;
-  $("#listsView").classList.toggle("hidden", state.view==="crew");
+  $("#listsView").classList.toggle("hidden", state.view==="crew" || state.view==="season");
   $("#crewView").classList.toggle("hidden", state.view!=="crew");
+  $("#seasonView").classList.toggle("hidden", state.view!=="season");
+  $("#modeSeg").classList.toggle("hidden", state.view==="season");
   // shared poster index so custom-added titles pick up a poster if anyone has one
   Object.values(state.docs).forEach(d=>{
     const all=[];
@@ -1295,6 +1648,7 @@ function render(){
   buildRevIndex(); buildSocialIndex();
   if(revItem) renderReviewSheet();
   if(state.view==="crew"){ renderCrew(); return; }
+  if(state.view==="season"){ $("#kana").textContent="今期 アニメ"; renderSeason(); return; }
 
   const myId = state.me.uid;
   let showId = myId;
@@ -1315,6 +1669,8 @@ function render(){
   document.querySelectorAll(".editable").forEach(e=>e.classList.toggle("hidden",!editable));
   const std = state.mode==="anime" || state.mode==="manga";
   renderMatch(state.view==="friends" ? showId : null);
+  renderStats(showId);
+  $("#filters").classList.toggle("hidden", !std || !showId);
   renderAiring(editable && state.mode==="anime");
   $("#nowCard").classList.toggle("hidden", !std);
   $("#topCard").classList.toggle("hidden", state.mode==="lists");
@@ -1334,12 +1690,15 @@ function render(){
 
   const d = L(showId ? (state.docs[showId] || blank()) : blank());
   const k = K();
+  if(std){ fillGenreSelect($("#fGenre"), [...d.top,...d.watching,...d.watched,...d.watchlist], state.genre, "All genres"); $("#fSort").value=state.sort; }
+  const noMatch = (list, arr) => { if(arr.length && !list.children.length) list.append(el("div","empty","Nothing here matches "+state.genre+".")); };
 
   $("#topCount").textContent = d.top.length+"/10";
   $("#shareTop").classList.toggle("hidden", !d.top.length);
   const tl=$("#topList"); tl.replaceChildren();
   if(!d.top.length) tl.append(el("div","empty", editable?"Nothing ranked yet. Search for your #1 above.":"No top 10 yet."));
   d.top.forEach((x,i)=>{
+    if(std && !passG(x)) return;
     const li=el("li","r"+(i+1));
     li.append(el("div","rank",String(i+1)), posterEl(x,true), titleBlock(x,true));
     if(editable){
@@ -1353,13 +1712,14 @@ function render(){
     }
     tl.append(li);
   });
+  if(std) noMatch(tl, d.top);
 
   if(std){
     const w2=W();
     $("#nowTitle").textContent=w2.watching; $("#nowHint").textContent=w2.nowHint; $("#nowCount").textContent=d.watching.length;
     const nl=$("#nowList"); nl.replaceChildren();
     if(!d.watching.length) nl.append(el("div","empty", editable ? w2.nowEmpty+" Tap ▶ on something in your "+w2.watchlist.toLowerCase()+", or search above." : w2.nowEmpty));
-    d.watching.forEach(x=>{
+    sortF(d.watching).forEach(x=>{
       const li=el("li"); const t=titleBlock(x);
       const pr=el("div","prog"), p=x.prog||0;
       const lab=el("button","lab", w2.unit+" "+p+(x.total?" / "+x.total:"")); lab.type="button";
@@ -1375,13 +1735,14 @@ function render(){
       }
       nl.append(li);
     });
+    noMatch(nl, d.watching);
   }
 
   $("#watchedCount").textContent = d.watched.length;
   const wl=$("#watchedList"); wl.replaceChildren();
   if(!d.watched.length) wl.append(el("div","empty", editable?"Nothing here yet.":W().emptyW));
   const topSet = new Set(d.top.map(x=>norm(x.title)));
-  d.watched.forEach(x=>{
+  (std?sortF(d.watched):d.watched).forEach(x=>{
     const li=el("li"); const t=titleBlock(x);
     if(topSet.has(norm(x.title))) t.firstChild.after(el("span","tag","TOP 10"));
     li.append(posterEl(x), t);
@@ -1396,11 +1757,12 @@ function render(){
     } else if(x.score) li.append(el("div","scoretag",x.score+"/10"));
     wl.append(li);
   });
+  if(std) noMatch(wl, d.watched);
 
   $("#watchCount").textContent = d.watchlist.length;
   const ql=$("#watchList"); ql.replaceChildren();
   if(!d.watchlist.length) ql.append(el("div","empty", editable?W().myEmptyQ:W().emptyQ));
-  d.watchlist.forEach(x=>{
+  (std?sortF(d.watchlist):d.watchlist).forEach(x=>{
     const li=el("li"); li.append(posterEl(x), titleBlock(x));
     const a=el("div","actions");
     if(editable){
@@ -1412,6 +1774,7 @@ function render(){
     } else a.append(icon(W().toMine,"+",()=>addWatch(x)));
     li.append(a); ql.append(li);
   });
+  if(std) noMatch(ql, d.watchlist);
 }
 
 function listCard(l, editable, ownerId){
@@ -1467,7 +1830,7 @@ function renderLatestReviews(){
   all.slice(0,15).forEach(v=>box.append(reviewEl(v.id, v.r, true)));
 }
 function renderCrew(){
-  renderLatestReviews(); renderRecs(); renderActivity();
+  renderLatestReviews(); renderRecs(); renderActivity(); renderPolls();
   const isLists = state.mode==="lists";
   $("#crewTopCard").classList.toggle("hidden", isLists);
   $("#crewWatchCard").classList.toggle("hidden", state.mode!=="anime" && state.mode!=="manga");
@@ -1516,7 +1879,7 @@ function renderCrew(){
 document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>{ state.view=b.dataset.view; render(); }));
 document.querySelectorAll("#modeSeg button").forEach(b=>b.addEventListener("click",()=>{
   if(state.mode===b.dataset.mode) return;
-  state.mode=b.dataset.mode; state.target=null; if(window.CrewLook) CrewLook.put("mode",state.mode);
+  state.mode=b.dataset.mode; state.target=null; state.genre=""; if(window.CrewLook) CrewLook.put("mode",state.mode);
   clearTimeout(searchTimer); if(controller){ controller.abort(); controller=null; }
   $("#q").value=""; lastResults=[]; searchState="idle";
   if(state.me) render();
@@ -1572,12 +1935,13 @@ $("#signOut").addEventListener("click", ()=>signOut(auth));
 getRedirectResult(auth).catch(()=>{});
 
 onAuthStateChanged(auth, user=>{
+  window.__authSeen=true;
   if(state.unsub){ state.unsub(); state.unsub=null; }
   state.me = user; state.docs = {}; state.loaded=false;
   if(!user){
     $("#app").classList.add("hidden"); $("#me").classList.add("hidden"); $("#signinView").classList.remove("hidden"); setStatus(null); return;
   }
-  $("#signinView").classList.add("hidden"); $("#app").classList.remove("hidden"); $("#me").classList.remove("hidden");
+  $("#signinView").classList.add("hidden"); $("#app").classList.add("hidden"); $("#me").classList.remove("hidden");
   $("#meName").textContent = displayNameOf(user);
   renderMe();
   setStatus("Loading lists…");
@@ -1587,14 +1951,18 @@ onAuthStateChanged(auth, user=>{
     const next={};
     snap.forEach(d=>{ next[d.id]=sanitize(d.data()); });
     if((writing||dirty) && state.docs[user.uid]) next[user.uid]=state.docs[user.uid];
-    state.docs=next; state.loaded=true; clearTimeout(timer); setStatus(null); render(); renderMe();
+    state.docs=next; state.loaded=true; clearTimeout(timer); setStatus(null); $("#app").classList.remove("hidden"); render(); renderMe(); afterLoad();
   }, err=>{
     clearTimeout(timer); console.error(err);
     setStatus(err && err.code==="permission-denied" ? "The database is blocking reads. Double-check the Firestore rules." : "Couldn't load the lists. Try refreshing.", true);
   });
 });
-setStatus(null);
-$("#signinView").classList.remove("hidden");
+// Don't show the sign-in form until Firebase has told us whether you're signed in (prevents the flash on refresh).
+</script>
+<script>
+  if("serviceWorker" in navigator){ window.addEventListener("load",function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); }); }
+  // Fallback: if Firebase never loads (offline, blocked), show the sign-in form with a note instead of spinning forever.
+  setTimeout(function(){ if(window.__authSeen) return; var s=document.getElementById("status"); s.textContent="Taking a while to connect. Check your internet and refresh."; s.classList.add("warn"); document.getElementById("signinView").classList.remove("hidden"); }, 9000);
 </script>
 </body>
 </html>
