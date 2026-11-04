@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crew</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0f0e17; --panel:#1a1826; --panel2:#232033; --line:#2f2b45;
+    --text:#f4f1ea; --muted:#a39fb8; --accent:#ff3d5a; --accent2:#ffd23f; --blue:#3dd6ff;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:"Zen Kaku Gothic New",system-ui,sans-serif;font-size:16px;line-height:1.4}
+  body{background:
+    radial-gradient(900px 400px at 100% -10%, rgba(255,61,90,.18), transparent 60%),
+    radial-gradient(700px 400px at -10% 0%, rgba(61,214,255,.10), transparent 60%), var(--bg);
+    min-height:100vh}
+  .wrap{max-width:760px;margin:0 auto;padding:20px 16px 80px}
+  .top-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+  h1{font-family:"Dela Gothic One",sans-serif;font-weight:400;font-size:clamp(32px,8vw,48px);line-height:1;margin:0;color:var(--accent)}
+  .kana{font-family:"Dela Gothic One";color:var(--accent2);font-size:13px;letter-spacing:3px;opacity:.85}
+  .sub{color:var(--muted);font-size:14px;margin:6px 0 18px}
+  .me{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+  .me img{width:30px;height:30px;border-radius:50%}
+  .link{background:none;border:0;color:var(--muted);font:inherit;text-decoration:underline;cursor:pointer;padding:0}
+
+  nav.tabs{display:flex;gap:6px;background:var(--panel);padding:5px;border-radius:999px;border:1px solid var(--line);margin-bottom:16px;position:sticky;top:8px;z-index:6}
+  nav.tabs button{flex:1;border:0;background:transparent;color:var(--muted);font:700 14px "Zen Kaku Gothic New";padding:10px 8px;border-radius:999px;cursor:pointer}
+  nav.tabs button.on{background:var(--accent);color:#fff}
+
+  .people{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px}
+  .chip{flex:none;border:1px solid var(--line);background:var(--panel);color:var(--text);padding:8px 14px;border-radius:999px;font:500 14px "Zen Kaku Gothic New";cursor:pointer;white-space:nowrap}
+  .chip.on{border-color:var(--accent2);background:rgba(255,210,63,.12);color:var(--accent2)}
+
+  .search{position:relative;margin-bottom:16px}
+  .search input{width:100%;background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:14px;padding:14px 14px 14px 44px;font:16px "Zen Kaku Gothic New"}
+  .search input:focus{outline:2px solid var(--blue);outline-offset:-1px}
+  .search .mag{position:absolute;left:15px;top:25px;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+  .results{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin-top:8px;overflow:hidden}
+  .res{display:flex;align-items:center;gap:12px;padding:10px 12px;border-top:1px solid var(--line)}
+  .res:first-child{border-top:0}
+  .res .meta{flex:1;min-width:0}
+  .res .t{font-weight:700;overflow-wrap:anywhere}
+  .res .y{color:var(--muted);font-size:12px}
+  .res .adds{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;flex:none;max-width:160px}
+  .res.msg{color:var(--muted);font-size:14px;justify-content:center}
+  .pill{border:1px solid var(--line);background:var(--panel2);color:var(--text);font:700 12px "Zen Kaku Gothic New";padding:6px 9px;border-radius:999px;cursor:pointer}
+  .pill:hover{border-color:var(--accent2)}
+  .pill.done{opacity:.4;cursor:default}
+  .res.custom .t{color:var(--accent2)}
+
+  section.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:16px}
+  .card h2{font-family:"Dela Gothic One";font-weight:400;font-size:20px;margin:0 0 4px;display:flex;align-items:center;gap:10px}
+  .card h2 .count{font-family:"Zen Kaku Gothic New";font-size:13px;font-weight:700;color:var(--muted);background:var(--panel2);padding:2px 9px;border-radius:999px}
+  .card .hint{color:var(--muted);font-size:13px;margin:0 0 12px}
+
+  .poster{flex:none;width:44px;aspect-ratio:2/3;border-radius:7px;overflow:hidden;position:relative;background:var(--panel2)}
+  .poster.big{width:62px;border-radius:9px}
+  .poster img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+  .poster .gen{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:5px;color:#fff}
+  .poster .gen b{font-family:"Dela Gothic One";font-weight:400;font-size:17px;line-height:1;text-shadow:0 1px 3px rgba(0,0,0,.35)}
+  .poster.big .gen b{font-size:22px}
+  .poster .gen i{font-style:normal;font-size:8px;font-weight:700;opacity:.85;line-height:1.1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+
+  ol.top{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+  ol.top li{display:flex;align-items:center;gap:10px;background:var(--panel2);border-radius:12px;padding:8px 10px 8px 0;overflow:hidden}
+  .rank{font-family:"Dela Gothic One";font-size:24px;width:40px;text-align:center;flex:none;color:var(--muted)}
+  li.r1 .rank{color:var(--accent2)} li.r2 .rank{color:#d9dbe6} li.r3 .rank{color:#e39b62}
+  li.r1{background:linear-gradient(90deg,rgba(255,210,63,.16),var(--panel2) 55%)}
+  .title{flex:1;min-width:0;font-weight:700;overflow-wrap:anywhere}
+  .title small{display:block;color:var(--muted);font-weight:500;font-size:12px}
+  .actions{display:flex;gap:4px;flex:none}
+  .ic{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--text);cursor:pointer;font-size:15px;display:grid;place-items:center}
+  .ic:disabled{opacity:.3;cursor:default}
+  .ic.del:hover{border-color:var(--accent);color:var(--accent)}
+
+  ul.list{list-style:none;margin:0;padding:0}
+  ul.list li{display:flex;align-items:center;gap:10px;padding:9px 2px;border-top:1px solid var(--line)}
+  ul.list li:first-child{border-top:0}
+  select.score{background:var(--panel2);color:var(--accent2);border:1px solid var(--line);border-radius:8px;padding:6px 4px;font:700 14px "Zen Kaku Gothic New";flex:none}
+  .scoretag{color:var(--accent2);font-weight:700;font-size:14px;flex:none}
+  .tag{font-size:11px;font-weight:700;color:var(--accent2);border:1px solid rgba(255,210,63,.4);padding:1px 7px;border-radius:999px;margin-left:6px;white-space:nowrap}
+
+  .empty{color:var(--muted);font-size:14px;padding:14px;text-align:center;border:1px dashed var(--line);border-radius:12px}
+  .notice{background:rgba(61,214,255,.08);border:1px solid rgba(61,214,255,.3);color:#cdefff;padding:10px 12px;border-radius:10px;font-size:14px;margin-bottom:14px}
+  .notice.warn{background:rgba(255,61,90,.08);border-color:rgba(255,61,90,.35);color:#ffd5db}
+  .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(120px);background:var(--panel2);border:1px solid var(--line);padding:10px 16px;border-radius:999px;font-size:14px;transition:transform .25s;z-index:20;max-width:90vw;text-align:center}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+
+  .crewrow{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+  .crewrow:first-child{border-top:0}
+  .crewrow .rank{width:30px;font-size:20px}
+  .bar{height:6px;border-radius:6px;background:linear-gradient(90deg,var(--accent),var(--accent2));margin-top:6px}
+  .who{color:var(--muted);font-size:12px;margin-top:4px;font-weight:500}
+  .pts{font-family:"Dela Gothic One";font-size:16px;color:var(--accent2);flex:none;text-align:right}
+
+  .signin{text-align:center;padding:40px 16px}
+  .gbtn{display:inline-flex;align-items:center;gap:10px;background:#fff;color:#1f1f1f;border:0;border-radius:999px;padding:12px 22px;font:700 16px "Zen Kaku Gothic New";cursor:pointer}
+  .credit{color:var(--muted);font-size:11px;text-align:center;margin-top:24px}
+  .credit a{color:var(--muted)}
+  .hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top-row">
+    <div>
+      <div class="kana">アニメ ランキング</div>
+      <h1>Crew</h1>
+    </div>
+    <div class="me hidden" id="me"><img id="meImg" alt="" referrerpolicy="no-referrer"><div><div id="meName"></div><button class="link" id="signOut">Sign out</button></div></div>
+  </div>
+  <p class="sub">Your top 10, everything you've watched, and what's next. See what the rest of the crew is into.</p>
+
+  <div id="status" class="notice">Loading…</div>
+
+  <div id="signinView" class="signin hidden">
+    <p>Sign in to make your lists and see everyone else's.</p>
+    <button class="gbtn" id="signIn"><svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>Sign in with Google</button>
+  </div>
+
+  <div id="app" class="hidden">
+    <nav class="tabs">
+      <button data-view="me" class="on">My lists</button>
+      <button data-view="friends">Friends</button>
+      <button data-view="crew">Crew picks</button>
+    </nav>
+
+    <div id="listsView">
+      <div id="people" class="people hidden"></div>
+
+      <div class="search editable">
+        <svg class="mag" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+        <input id="q" type="search" placeholder="Search any anime…" autocomplete="off" maxlength="100">
+        <div class="results hidden" id="results"></div>
+      </div>
+
+      <section class="card">
+        <h2>Top 10 <span class="count" id="topCount">0/10</span></h2>
+        <p class="hint" id="topHint"></p>
+        <ol class="top" id="topList"></ol>
+      </section>
+
+      <section class="card">
+        <h2>Watched <span class="count" id="watchedCount">0</span></h2>
+        <p class="hint editable">Score it out of 10, or tap ★ to add it to your top 10.</p>
+        <ul class="list" id="watchedList"></ul>
+      </section>
+
+      <section class="card">
+        <h2>Watchlist <span class="count" id="watchCount">0</span></h2>
+        <p class="hint editable">Tap ✓ when you finish one and it moves to Watched.</p>
+        <ul class="list" id="watchList"></ul>
+      </section>
+    </div>
+
+    <div id="crewView" class="hidden">
+      <section class="card">
+        <h2>Crew top 10</h2>
+        <p class="hint">Everyone's top 10s combined. A #1 pick is worth 10 points, #2 is worth 9, and so on down to 1 point for #10.</p>
+        <div id="crewTop"></div>
+      </section>
+      <section class="card">
+        <h2>Watch party ideas</h2>
+        <p class="hint">Shows on more than one person's watchlist.</p>
+        <div id="crewWatch"></div>
+      </section>
+    </div>
+  </div>
+  <p class="credit">Anime search and posters from <a href="https://myanimelist.net" target="_blank" rel="noopener">MyAnimeList</a> via the <a href="https://jikan.moe" target="_blank" rel="noopener">Jikan API</a>.</p>
+</div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getFirestore, collection, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBoOyxhUbj8yLluCp9LWj4vvxmIMmxxYVE",
+  authDomain: "crew-fd928.firebaseapp.com",
+  projectId: "crew-fd928",
+  storageBucket: "crew-fd928.firebasestorage.app",
+  messagingSenderId: "1074427693768",
+  appId: "1:1074427693768:web:85511bfd6f6270c25573fd"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const $ = s => document.querySelector(s);
+const state = { me:null, docs:{}, view:"me", friend:null, canWrite:true, loaded:false, unsub:null };
+const MAX_TOP = 10;
+const uid = () => Math.random().toString(36).slice(2,10);
+const norm = t => String(t||"").normalize("NFKD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+const clean = t => String(t||"").trim().replace(/\s+/g," ").slice(0,120);
+const IMG_OK = u => typeof u==="string" && /^https:\/\/cdn\.myanimelist\.net\//.test(u) && u.length<300;
+
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove("show"),2200); }
+function setStatus(msg, warn){ const s=$("#status"); if(!msg){ s.classList.add("hidden"); return; } s.textContent=msg; s.classList.toggle("warn",!!warn); s.classList.remove("hidden"); }
+
+function sanitize(d){
+  d = d || {};
+  const arr = a => Array.isArray(a) ? a.filter(x=>x&&typeof x.title==="string"&&clean(x.title)).map(x=>({
+    id:String(x.id||uid()).slice(0,20), title:clean(x.title),
+    score:(typeof x.score==="number"&&x.score>=1&&x.score<=10)?Math.round(x.score):null,
+    year:(typeof x.year==="number"&&x.year>1900&&x.year<2100)?x.year:null,
+    kind:typeof x.kind==="string"?x.kind.slice(0,10):null,
+    malId:typeof x.malId==="number"?x.malId:null,
+    img:IMG_OK(x.img)?x.img:null
+  })) : [];
+  return { name:typeof d.name==="string"?d.name.slice(0,60):"", top:arr(d.top).slice(0,MAX_TOP), watched:arr(d.watched), watchlist:arr(d.watchlist) };
+}
+const blank = () => ({name:"",top:[],watched:[],watchlist:[]});
+function mine(){ return state.docs[state.me.uid] || (state.docs[state.me.uid] = blank()); }
+
+// ---- saving ----
+let writing=false, dirty=false;
+async function save(){
+  if(!state.me) return;
+  if(writing){ dirty=true; return; }
+  writing=true;
+  try{
+    do{
+      dirty=false;
+      const m = mine();
+      await setDoc(doc(db,"lists",state.me.uid), { name:(state.me.displayName||"Someone").slice(0,60), top:m.top, watched:m.watched, watchlist:m.watchlist, updatedAt:new Date().toISOString() });
+    } while(dirty);
+  }catch(e){
+    console.error(e);
+    toast(e && e.code==="permission-denied" ? "The database isn't set up to allow saving yet." : "Couldn't save that. Check your connection.");
+  } finally { writing=false; }
+}
+function mutate(fn){ if(!state.me) return; fn(mine()); render(); save(); }
+
+// ---- actions ----
+const has = (arr,t) => arr.some(x=>norm(x.title)===norm(t.title||t));
+function mk(a){ return {id:uid(), title:clean(a.title), score:null, year:a.year||null, kind:a.kind||null, malId:a.malId||null, img:IMG_OK(a.img)?a.img:null}; }
+function addTop(a){
+  mutate(m=>{
+    if(has(m.top,a)){ toast("Already in your top 10"); return; }
+    if(m.top.length>=MAX_TOP){ toast("Your top 10 is full. Remove one first."); return; }
+    m.top.push(mk(a));
+    if(!has(m.watched,a)) m.watched.unshift(mk(a));
+    m.watchlist = m.watchlist.filter(x=>norm(x.title)!==norm(a.title));
+    toast("Added to your top 10 at #"+m.top.length);
+  });
+}
+function addWatched(a){
+  mutate(m=>{
+    if(has(m.watched,a)){ toast("Already in Watched"); return; }
+    m.watched.unshift(mk(a));
+    m.watchlist = m.watchlist.filter(x=>norm(x.title)!==norm(a.title));
+    toast("Added to Watched");
+  });
+}
+function addWatch(a){
+  mutate(m=>{
+    if(has(m.watchlist,a)){ toast("Already on your watchlist"); return; }
+    if(has(m.watched,a)){ toast("You've already watched that one"); return; }
+    m.watchlist.unshift(mk(a)); toast("Added to your watchlist");
+  });
+}
+
+// ---- posters ----
+function hash(s){ let h=2166136261; for(const ch of s){ h^=ch.codePointAt(0); h=Math.imul(h,16777619); } return h>>>0; }
+function genPoster(title){
+  const h = hash(norm(title)); const a = h%360, b = (a+40+(h>>8)%80)%360;
+  const g = el("div","gen");
+  g.style.background = `linear-gradient(160deg, hsl(${a} 75% 52%), hsl(${b} 70% 28%))`;
+  const words = clean(title).replace(/[^\p{L}\p{N} ]/gu," ").split(" ").filter(Boolean);
+  const initials = (words.length>1 ? words.slice(0,2).map(w=>w[0]).join("") : (words[0]||"?").slice(0,2)).toUpperCase();
+  g.append(el("b","",initials), el("i","",title));
+  return g;
+}
+const imgIndex = {}; // norm(title) -> img url seen anywhere in the crew
+function posterEl(x, big){
+  const p = el("div","poster"+(big?" big":""));
+  p.append(genPoster(x.title));
+  const src = x.img || imgIndex[norm(x.title)];
+  if(src){
+    const img = new Image(); img.alt=""; img.loading="lazy"; img.decoding="async"; img.referrerPolicy="no-referrer";
+    img.onload = ()=>p.querySelector(".gen")?.remove();
+    img.onerror = ()=>img.remove();
+    img.src = src; p.append(img);
+  }
+  return p;
+}
+
+// ---- helpers ----
+function el(tag, cls, text){ const e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e; }
+function icon(label, sym, onClick, opts={}){ const b=el("button","ic"+(opts.cls?" "+opts.cls:""),sym); b.type="button"; b.title=label; b.setAttribute("aria-label",label); if(opts.disabled) b.disabled=true; b.addEventListener("click",onClick); return b; }
+function nameOf(id){ if(state.me && id===state.me.uid) return "You"; const d=state.docs[id]; return (d && d.name) || "Someone"; }
+function titleBlock(x){ const t=el("div","title",x.title); const meta=[x.year,x.kind].filter(Boolean).join(" · "); if(meta) t.append(el("small","",meta)); return t; }
+const hasAnything = d => d && (d.top.length||d.watched.length||d.watchlist.length);
+
+// ---- search (Jikan / MyAnimeList) ----
+let searchTimer=null, searchSeq=0, lastResults=[], lastQuery="", searchState="idle";
+const cache = new Map();
+$("#q").addEventListener("input", ()=>{
+  clearTimeout(searchTimer);
+  const q = clean($("#q").value);
+  if(!q){ lastResults=[]; lastQuery=""; searchState="idle"; renderResults(); return; }
+  searchState="loading"; renderResults();
+  searchTimer = setTimeout(()=>runSearch(q), 450);
+});
+$("#q").addEventListener("keydown", e=>{ if(e.key==="Escape"){ $("#q").value=""; lastResults=[]; lastQuery=""; searchState="idle"; renderResults(); } });
+async function runSearch(q){
+  const seq = ++searchSeq;
+  try{
+    let data = cache.get(q.toLowerCase());
+    if(!data){
+      const r = await fetch("https://api.jikan.moe/v4/anime?limit=10&sfw=true&order_by=members&sort=desc&q="+encodeURIComponent(q));
+      if(r.status===429){ if(seq===searchSeq){ searchState="busy"; renderResults(); } return; }
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      const j = await r.json();
+      const seen = new Set();
+      data = (j.data||[]).filter(a=>{ if(seen.has(a.mal_id)) return false; seen.add(a.mal_id); return true; }).slice(0,8).map(a=>{
+        const year = a.year || (a.aired && a.aired.prop && a.aired.prop.from && a.aired.prop.from.year) || null;
+        const img = (a.images && a.images.webp && (a.images.webp.image_url)) || (a.images && a.images.jpg && a.images.jpg.image_url) || null;
+        return { malId:a.mal_id, title:clean(a.title_english || a.title), alt:a.title_english && a.title!==a.title_english ? a.title : "", year, kind:a.type||null, img:IMG_OK(img)?img:null };
+      });
+      cache.set(q.toLowerCase(), data);
+    }
+    if(seq!==searchSeq) return;
+    lastResults=data; lastQuery=q; searchState="done"; renderResults();
+  }catch(e){
+    if(seq!==searchSeq) return;
+    lastResults=[]; lastQuery=q; searchState="error"; renderResults();
+  }
+}
+function renderResults(){
+  const box=$("#results"); const q=clean($("#q").value);
+  box.replaceChildren();
+  if(!q || !state.me){ box.classList.add("hidden"); return; }
+  const m = mine();
+  const row = (a, sub, custom) => {
+    const r=el("div","res"+(custom?" custom":""));
+    r.append(posterEl(a));
+    const meta=el("div","meta"); meta.append(el("div","t",a.title)); if(sub) meta.append(el("div","y",sub)); r.append(meta);
+    const adds=el("div","adds");
+    const b=(label,done,fn)=>{ const x=el("button","pill"+(done?" done":""),done?"✓ "+label:"+ "+label); x.type="button"; if(!done) x.addEventListener("click",()=>{ fn(a); renderResults(); }); return x; };
+    adds.append(b("Top 10",has(m.top,a),addTop), b("Watched",has(m.watched,a),addWatched), b("Watchlist",has(m.watchlist,a)||has(m.watched,a),addWatch));
+    r.append(adds); return r;
+  };
+  if(searchState==="loading") box.append(el("div","res msg","Searching…"));
+  else if(searchState==="busy") box.append(el("div","res msg","Search is busy. Give it a second and type again."));
+  else if(searchState==="error") box.append(el("div","res msg","Search isn't reachable right now. You can still add it as typed below."));
+  else lastResults.forEach(a=>box.append(row(a, [a.year,a.kind,a.alt].filter(Boolean).join(" · "), false)));
+  if(searchState!=="loading" && !lastResults.some(a=>norm(a.title)===norm(q))) box.append(row({title:q}, "Add it exactly as you typed it", true));
+  box.classList.remove("hidden");
+}
+
+// ---- render ----
+function render(){
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.toggle("on", b.dataset.view===state.view));
+  $("#listsView").classList.toggle("hidden", state.view==="crew");
+  $("#crewView").classList.toggle("hidden", state.view!=="crew");
+  // shared poster index so custom-added titles pick up a poster if anyone has one
+  Object.values(state.docs).forEach(d=>[...d.top,...d.watched,...d.watchlist].forEach(x=>{ if(x.img && !imgIndex[norm(x.title)]) imgIndex[norm(x.title)]=x.img; }));
+  if(state.view==="crew"){ renderCrew(); return; }
+
+  const myId = state.me.uid;
+  let showId = myId;
+  const friendIds = Object.keys(state.docs).filter(id=>id!==myId && hasAnything(state.docs[id]));
+  const people=$("#people");
+  if(state.view==="friends"){
+    people.classList.remove("hidden"); people.replaceChildren();
+    if(!friendIds.length){ people.append(el("div","empty","No friends have added lists yet. Send them the link and they'll show up here once they sign in.")); people.style.display="block"; showId=null; }
+    else {
+      people.style.display="";
+      if(!state.friend || !friendIds.includes(state.friend)) state.friend=friendIds[0];
+      friendIds.sort((a,b)=>nameOf(a).localeCompare(nameOf(b))).forEach(id=>{ const c=el("button","chip"+(id===state.friend?" on":""),nameOf(id)); c.type="button"; c.addEventListener("click",()=>{state.friend=id; render();}); people.append(c); });
+      showId=state.friend;
+    }
+  } else people.classList.add("hidden");
+
+  const editable = state.view==="me";
+  document.querySelectorAll(".editable").forEach(e=>e.classList.toggle("hidden",!editable));
+  if(editable) renderResults();
+  $("#topHint").textContent = editable ? "Search above to add shows. Use the arrows to reorder." : (showId ? nameOf(showId)+"'s ranking." : "");
+
+  const d = showId ? (state.docs[showId] || blank()) : blank();
+
+  $("#topCount").textContent = d.top.length+"/10";
+  const tl=$("#topList"); tl.replaceChildren();
+  if(!d.top.length) tl.append(el("div","empty", editable?"Nothing ranked yet. Search for your #1 above.":"No top 10 yet."));
+  d.top.forEach((x,i)=>{
+    const li=el("li","r"+(i+1));
+    li.append(el("div","rank",String(i+1)), posterEl(x,true), titleBlock(x));
+    if(editable){
+      const a=el("div","actions");
+      a.append(
+        icon("Move up","↑",()=>mutate(m=>{ [m.top[i-1],m.top[i]]=[m.top[i],m.top[i-1]]; }),{disabled:i===0}),
+        icon("Move down","↓",()=>mutate(m=>{ [m.top[i+1],m.top[i]]=[m.top[i],m.top[i+1]]; }),{disabled:i===d.top.length-1}),
+        icon("Remove from top 10","✕",()=>mutate(m=>{ m.top.splice(i,1); }),{cls:"del"})
+      );
+      li.append(a);
+    }
+    tl.append(li);
+  });
+
+  $("#watchedCount").textContent = d.watched.length;
+  const wl=$("#watchedList"); wl.replaceChildren();
+  if(!d.watched.length) wl.append(el("div","empty", editable?"Nothing here yet.":"Nothing watched yet."));
+  const topSet = new Set(d.top.map(x=>norm(x.title)));
+  d.watched.forEach(x=>{
+    const li=el("li"); const t=titleBlock(x);
+    if(topSet.has(norm(x.title))) t.firstChild.after(el("span","tag","TOP 10"));
+    li.append(posterEl(x), t);
+    if(editable){
+      const sel=el("select","score"); sel.setAttribute("aria-label","Score for "+x.title);
+      sel.append(new Option("–/10","")); for(let s=10;s>=1;s--) sel.append(new Option(s+"/10",String(s)));
+      sel.value = x.score? String(x.score) : "";
+      sel.addEventListener("change",()=>mutate(m=>{ const it=m.watched.find(y=>y.id===x.id); if(it) it.score = sel.value?Number(sel.value):null; }));
+      const a=el("div","actions");
+      a.append(icon("Add to top 10","★",()=>addTop(x),{disabled:topSet.has(norm(x.title))}), icon("Remove","✕",()=>mutate(m=>{ m.watched=m.watched.filter(y=>y.id!==x.id); }),{cls:"del"}));
+      li.append(sel, a);
+    } else if(x.score) li.append(el("div","scoretag",x.score+"/10"));
+    wl.append(li);
+  });
+
+  $("#watchCount").textContent = d.watchlist.length;
+  const ql=$("#watchList"); ql.replaceChildren();
+  if(!d.watchlist.length) ql.append(el("div","empty", editable?"Your watchlist is empty.":"Empty watchlist."));
+  d.watchlist.forEach(x=>{
+    const li=el("li"); li.append(posterEl(x), titleBlock(x));
+    const a=el("div","actions");
+    if(editable){
+      a.append(
+        icon("Mark as watched","✓",()=>mutate(m=>{ m.watchlist=m.watchlist.filter(y=>y.id!==x.id); if(!has(m.watched,x)) m.watched.unshift(mk(x)); toast("Moved to Watched"); })),
+        icon("Remove","✕",()=>mutate(m=>{ m.watchlist=m.watchlist.filter(y=>y.id!==x.id); }),{cls:"del"})
+      );
+    } else a.append(icon("Add to my watchlist","+",()=>addWatch(x)));
+    li.append(a); ql.append(li);
+  });
+}
+
+function renderCrew(){
+  const pts={}, item={}, voters={}, wcount={}, witem={}, wwho={};
+  Object.entries(state.docs).forEach(([id,d])=>{
+    d.top.forEach((x,i)=>{ const k=norm(x.title); pts[k]=(pts[k]||0)+(10-i); item[k]=item[k]||x; (voters[k]=voters[k]||[]).push(nameOf(id)+" #"+(i+1)); });
+    new Set(d.watchlist.map(x=>norm(x.title))).forEach(k=>{ wcount[k]=(wcount[k]||0)+1; (wwho[k]=wwho[k]||[]).push(nameOf(id)); });
+    d.watchlist.forEach(x=>{ const k=norm(x.title); witem[k]=witem[k]||x; });
+  });
+  const ranked=Object.keys(pts).sort((a,b)=>pts[b]-pts[a]||item[a].title.localeCompare(item[b].title)).slice(0,10);
+  const ct=$("#crewTop"); ct.replaceChildren();
+  if(!ranked.length) ct.append(el("div","empty","Once people add their top 10s, the crew ranking shows up here."));
+  const max = ranked.length? pts[ranked[0]] : 1;
+  ranked.forEach((k,i)=>{
+    const row=el("div","crewrow");
+    row.append(el("div","rank",String(i+1)), posterEl(item[k]));
+    const mid=el("div","title"); mid.append(el("div","",item[k].title));
+    const bar=el("div","bar"); bar.style.width=Math.max(6,Math.round(pts[k]/max*100))+"%"; mid.append(bar);
+    mid.append(el("div","who",voters[k].join(" · ")));
+    row.append(mid, el("div","pts",pts[k]+" pts")); ct.append(row);
+  });
+  const shared=Object.keys(wcount).filter(k=>wcount[k]>1).sort((a,b)=>wcount[b]-wcount[a]);
+  const cw=$("#crewWatch"); cw.replaceChildren();
+  if(!shared.length) cw.append(el("div","empty","No overlap yet. When two or more people want to watch the same show, it'll show up here."));
+  shared.forEach(k=>{
+    const row=el("div","crewrow"); row.append(posterEl(witem[k]));
+    const mid=el("div","title"); mid.append(el("div","",witem[k].title), el("div","who",wwho[k].join(", ")));
+    row.append(mid, el("div","pts",wcount[k]+"×")); cw.append(row);
+  });
+}
+
+document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>{ state.view=b.dataset.view; render(); }));
+
+// ---- auth ----
+const provider = new GoogleAuthProvider();
+$("#signIn").addEventListener("click", async ()=>{
+  try{ await signInWithPopup(auth, provider); }
+  catch(e){
+    if(e && (e.code==="auth/popup-blocked" || e.code==="auth/operation-not-supported-in-this-environment")){ await signInWithRedirect(auth, provider); }
+    else if(e && e.code==="auth/unauthorized-domain"){ setStatus("This website's address isn't on Firebase's approved list yet. Add it under Authentication → Settings → Authorized domains.", true); }
+    else if(e && e.code!=="auth/popup-closed-by-user" && e.code!=="auth/cancelled-popup-request"){ setStatus("Sign-in didn't work: "+(e.code||e.message), true); }
+  }
+});
+$("#signOut").addEventListener("click", ()=>signOut(auth));
+getRedirectResult(auth).catch(()=>{});
+
+onAuthStateChanged(auth, user=>{
+  if(state.unsub){ state.unsub(); state.unsub=null; }
+  state.me = user; state.docs = {}; state.loaded=false;
+  if(!user){
+    $("#app").classList.add("hidden"); $("#me").classList.add("hidden"); $("#signinView").classList.remove("hidden"); setStatus(null); return;
+  }
+  $("#signinView").classList.add("hidden"); $("#app").classList.remove("hidden"); $("#me").classList.remove("hidden");
+  $("#meName").textContent = user.displayName || "Signed in";
+  if(user.photoURL){ $("#meImg").src = user.photoURL; $("#meImg").classList.remove("hidden"); } else $("#meImg").classList.add("hidden");
+  setStatus("Loading lists…");
+  render();
+  const timer=setTimeout(()=>{ if(!state.loaded) setStatus("Can't reach the database yet. Check your connection.", true); },10000);
+  state.unsub = onSnapshot(collection(db,"lists"), snap=>{
+    const next={};
+    snap.forEach(d=>{ next[d.id]=sanitize(d.data()); });
+    if((writing||dirty) && state.docs[user.uid]) next[user.uid]=state.docs[user.uid];
+    state.docs=next; state.loaded=true; clearTimeout(timer); setStatus(null); render();
+  }, err=>{
+    clearTimeout(timer); console.error(err);
+    setStatus(err && err.code==="permission-denied" ? "The database is blocking reads. Double-check the Firestore rules." : "Couldn't load the lists. Try refreshing.", true);
+  });
+});
+setStatus(null);
+$("#signinView").classList.remove("hidden");
+</script>
+</body>
+</html>
