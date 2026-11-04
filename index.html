@@ -134,18 +134,6 @@
   .scard .crew span{font-size:11px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:1px 7px;color:var(--text)}
   .scard .sbtns{display:flex;flex-direction:column;gap:5px;margin-top:auto;padding-top:6px}
   .scard .sbtns .pill{width:100%;padding:7px 4px;font-size:12px;text-align:center;white-space:nowrap}
-  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
-  .stat{background:var(--panel2);border-radius:12px;padding:10px 6px;text-align:center}
-  .stat b{display:block;font-family:"Dela Gothic One";font-weight:400;font-size:22px;color:var(--accent2);line-height:1.1}
-  .stat span{font-size:11px;color:var(--muted);font-weight:700}
-  .badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-  @media (min-width:560px){ .badges{grid-template-columns:repeat(4,1fr)} }
-  .badge{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 6px;text-align:center}
-  .badge .e{font-size:26px;line-height:1}
-  .badge .n{font-weight:700;font-size:12px;margin-top:4px}
-  .badge .d{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.2}
-  .badge.locked{opacity:.38;filter:grayscale(1)}
-  .badge.got{border-color:color-mix(in srgb, var(--accent2) 55%, transparent)}
   .poll{background:var(--panel2);border-radius:12px;padding:12px;margin-top:10px}
   .poll .q{font-weight:700;font-size:16px;overflow-wrap:anywhere}
   .poll .meta2{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12px;margin:4px 0 8px;flex-wrap:wrap}
@@ -445,7 +433,6 @@
         </section>
         <div id="customLists"></div>
       </div>
-      <section class="card" id="statsCard"><h2 id="statsTitle">Stats &amp; badges</h2><div id="statsBody"></div></section>
     </div>
 
     <div id="seasonView" class="hidden">
@@ -1495,64 +1482,6 @@ function renderSeason(){
   });
 }
 
-// ---- stats & badges ----
-function statsOf(d){
-  const animeDone=d.watched.length, mangaDone=d.mread.length;
-  const eps=d.watched.reduce((p,x)=>p+(x.total||0),0)+d.watching.reduce((p,x)=>p+(x.prog||0),0);
-  const chs=d.mread.reduce((p,x)=>p+(x.total||0),0)+d.mreading.reduce((p,x)=>p+(x.prog||0),0);
-  const ratings=[...ratingsOf(d).values()].map(v=>v.sc);
-  const avg=ratings.length? ratings.reduce((p,c)=>p+c,0)/ratings.length : null;
-  const seenT=new Map();
-  ["anime","manga"].forEach(md=>{ const k=MEDIA_KEYS[md]; [...d[k.top],...d[k.watched]].forEach(x=>{ const key=rkey(md,x); const prev=seenT.get(key); if(!prev || (!(prev.genres||[]).length && (x.genres||[]).length)) seenT.set(key,x); }); });
-  const gcount={}; [...seenT.values()].forEach(x=>(x.genres||[]).forEach(g=>{ gcount[g]=(gcount[g]||0)+1; }));
-  const topG=Object.entries(gcount).sort((a,b)=>b[1]-a[1]);
-  const social=d.reacts.length+d.replies.length;
-  const tens=ratings.filter(r=>r===10).length;
-  return {animeDone, mangaDone, eps, chs, ratings:ratings.length, avg, topG, reviews:d.reviews.length, lists:d.custom.length, social, tens,
-    topFull:d.top.length>=10, mtopFull:d.mtop.length>=10, otopFull:d.otop.length>=10, watching:d.watching.length+d.mreading.length,
-    total:seenT.size+d.watchlist.length+d.mlist.length+d.watching.length+d.mreading.length+d.otop.length+d.custom.reduce((p,l)=>p+l.items.length,0)};
-}
-function badgesOf(st){
-  const g=st.topG[0];
-  return [
-    ["🌱","First steps","Add your first title", st.total>=1],
-    ["📺","Binger","Watch 10 anime", st.animeDone>=10],
-    ["🍿","Couch legend","Watch 50 anime", st.animeDone>=50],
-    ["👑","Anime royalty","Watch 100 anime", st.animeDone>=100],
-    ["⏱️","Marathoner","1,000 episodes", st.eps>=1000],
-    ["📚","Bookworm","Read 10 manga", st.mangaDone>=10],
-    ["🏯","Library","Read 50 manga", st.mangaDone>=50],
-    ["🔟","Ranked","Fill your anime top 10", st.topFull],
-    ["📖","Manga ranked","Fill your manga top 10", st.mtopFull],
-    ["⚖️","Overall","Fill your overall top 10", st.otopFull],
-    ["✍️","Critic","Write 5 reviews", st.reviews>=5],
-    ["🖋️","Wordsmith","Write 20 reviews", st.reviews>=20],
-    ["🗂️","Curator","Make 3 custom lists", st.lists>=3],
-    ["💬","Social butterfly","React or reply 10 times", st.social>=10],
-    ["🎯","Hard to please","Average under 6.5 (10+ ratings)", st.ratings>=10 && st.avg<6.5],
-    ["💖","Easy to please","Average over 8.5 (10+ ratings)", st.ratings>=10 && st.avg>8.5],
-    ["💯","Masterpiece hunter","Give out five 10/10s", st.tens>=5],
-    ["🧭", g&&g[1]>=10 ? g[0]+" fan" : "Genre fan", "10 titles in one genre", !!(g&&g[1]>=10)],
-    ["🔥","Multitasker","Watch or read 3 things at once", st.watching>=3]
-  ];
-}
-function renderStats(id){
-  const card=$("#statsCard"); if(!id){ card.classList.add("hidden"); return; }
-  card.classList.remove("hidden");
-  $("#statsTitle").textContent = (id===state.me.uid?"Your":nameOf(id)+"'s")+" stats & badges";
-  const st=statsOf(state.docs[id]||blank()), body=$("#statsBody"); body.replaceChildren();
-  const grid=el("div","stats");
-  [[st.animeDone,"anime watched"],[st.eps.toLocaleString(),"episodes"],[st.mangaDone,"manga read"],[st.chs.toLocaleString(),"chapters"],[st.avg?(Math.round(st.avg*10)/10):"–","avg rating"],[st.reviews,"reviews"]]
-    .forEach(([v,l])=>{ const c=el("div","stat"); c.append(el("b","",String(v)), el("span","",l)); grid.append(c); });
-  body.append(grid);
-  if(st.topG.length) body.append(el("p","hint","Top genres: "+st.topG.slice(0,3).map(([g,n])=>g+" ("+n+")").join(" · ")));
-  const bs=badgesOf(st), got=bs.filter(b=>b[3]).length;
-  body.append(el("div","mh","Badges · "+got+"/"+bs.length));
-  const bg=el("div","badges");
-  bs.sort((a,b)=>(b[3]?1:0)-(a[3]?1:0)).forEach(([e,n,d,ok])=>{ const c=el("div","badge "+(ok?"got":"locked")); c.append(el("div","e",e), el("div","n",n), el("div","d",d)); c.title=n+": "+d+(ok?" (earned)":""); bg.append(c); });
-  body.append(bg);
-}
-
 // ---- polls (poll lives in its creator's doc; each vote lives in the voter's doc) ----
 const MAX_POLLS=20, MAX_OPTS=6;
 function pollOptInput(v){ const i=el("input"); i.maxLength=80; i.placeholder="Option"; i.value=v||""; i.setAttribute("list","pollSuggest"); i.setAttribute("aria-label","Poll option"); return i; }
@@ -1684,7 +1613,6 @@ function render(){
   document.querySelectorAll(".editable").forEach(e=>e.classList.toggle("hidden",!editable));
   const std = state.mode==="anime" || state.mode==="manga";
   renderMatch(state.view==="friends" ? showId : null);
-  renderStats(showId);
   $("#filters").classList.toggle("hidden", !std || !showId);
   renderAiring(editable && state.mode==="anime");
   $("#nowCard").classList.toggle("hidden", !std);
