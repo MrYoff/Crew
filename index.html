@@ -1381,18 +1381,19 @@ async function afterLoad(){
   const m=mine();
   for(const media of ["anime","manga"]){
     const k=MEDIA_KEYS[media];
-    const items=[...m[k.top],...m[k.watched],...m[k.watchlist],...m[k.watching],...m.otop.filter(x=>x.media===media),...m.custom.flatMap(l=>l.items).filter(x=>x.media===media)];
-    const ids=[...new Set(items.filter(x=>x.malId && (!x.genres||!x.genres.length)).map(x=>x.malId))];
+    const itemsOf=mm=>[...mm[k.top],...mm[k.watched],...mm[k.watchlist],...mm[k.watching]].filter(x=>!x.media||x.media===media).concat(mm.otop.filter(x=>x.media===media), mm.custom.flatMap(l=>l.items).filter(x=>x.media===media));
+    const ids=[...new Set(itemsOf(m).filter(x=>x.malId && (!x.genres||!x.genres.length||!x.total)).map(x=>x.malId))];
     for(let i=0;i<ids.length;i+=50){
       try{
         const r=await fetch("https://graphql.anilist.co",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({query:`query($ids:[Int],$t:MediaType){Page(perPage:50){media(idMal_in:$ids,type:$t){idMal genres episodes chapters}}}`,variables:{ids:ids.slice(i,i+50),t:media.toUpperCase()}})});
         if(!r.ok) break;
         const j=await r.json(), info={};
         ((j.data&&j.data.Page&&j.data.Page.media)||[]).forEach(a=>{ info[a.idMal]=a; });
-        mutate(mm=>{ [...mm[k.top],...mm[k.watched],...mm[k.watchlist],...mm[k.watching],...mm.otop,...mm.custom.flatMap(l=>l.items)].forEach(x=>{
-          if(mediaOf(x)!==media && x.media!==media) return;
+        let changed=false;
+        itemsOf(mine()).forEach(x=>{ const a=info[x.malId]; if(a && (((!x.genres||!x.genres.length) && a.genres && a.genres.length) || (!x.total && (a.episodes||a.chapters)))) changed=true; });
+        if(changed) mutate(mm=>{ itemsOf(mm).forEach(x=>{
           const a=info[x.malId]; if(!a) return;
-          if((!x.genres||!x.genres.length) && a.genres) x.genres=a.genres.slice(0,6);
+          if((!x.genres||!x.genres.length) && a.genres && a.genres.length) x.genres=a.genres.slice(0,6);
           if(!x.total && (a.episodes||a.chapters)) x.total=a.episodes||a.chapters;
         }); });
       }catch(e){ break; }
@@ -1490,13 +1491,15 @@ function statsOf(d){
   const chs=d.mread.reduce((p,x)=>p+(x.total||0),0)+d.mreading.reduce((p,x)=>p+(x.prog||0),0);
   const ratings=[...ratingsOf(d).values()].map(v=>v.sc);
   const avg=ratings.length? ratings.reduce((p,c)=>p+c,0)/ratings.length : null;
-  const gcount={}; [...d.watched,...d.mread,...d.top,...d.mtop].forEach(x=>(x.genres||[]).forEach(g=>{ gcount[g]=(gcount[g]||0)+1; }));
+  const seenT=new Map();
+  ["anime","manga"].forEach(md=>{ const k=MEDIA_KEYS[md]; [...d[k.top],...d[k.watched]].forEach(x=>{ const key=rkey(md,x); const prev=seenT.get(key); if(!prev || (!(prev.genres||[]).length && (x.genres||[]).length)) seenT.set(key,x); }); });
+  const gcount={}; [...seenT.values()].forEach(x=>(x.genres||[]).forEach(g=>{ gcount[g]=(gcount[g]||0)+1; }));
   const topG=Object.entries(gcount).sort((a,b)=>b[1]-a[1]);
   const social=d.reacts.length+d.replies.length;
   const tens=ratings.filter(r=>r===10).length;
   return {animeDone, mangaDone, eps, chs, ratings:ratings.length, avg, topG, reviews:d.reviews.length, lists:d.custom.length, social, tens,
     topFull:d.top.length>=10, mtopFull:d.mtop.length>=10, otopFull:d.otop.length>=10, watching:d.watching.length+d.mreading.length,
-    total:animeDone+mangaDone+d.watchlist.length+d.mlist.length+d.watching.length+d.mreading.length+d.top.length+d.mtop.length};
+    total:seenT.size+d.watchlist.length+d.mlist.length+d.watching.length+d.mreading.length+d.otop.length+d.custom.reduce((p,l)=>p+l.items.length,0)};
 }
 function badgesOf(st){
   const g=st.topG[0];
@@ -1652,16 +1655,17 @@ function render(){
 
   const myId = state.me.uid;
   let showId = myId;
-  const friendIds = Object.keys(state.docs).filter(id=>id!==myId && hasAnything(state.docs[id]));
+  const friendIds = Object.keys(state.docs).filter(id=>id!==myId).sort((a,b)=>nameOf(a).toLowerCase().localeCompare(nameOf(b).toLowerCase()));
   const people=$("#people");
   if(state.view==="friends"){
     people.classList.remove("hidden"); people.replaceChildren();
-    if(!friendIds.length){ people.append(el("div","empty","No friends have added lists yet. Send them the link and they'll show up here once they sign in.")); people.style.display="block"; showId=null; }
+    if(!friendIds.length){ people.append(el("div","empty","No friends here yet. Send them the link and they'll show up as soon as they make an account.")); people.style.display="block"; showId=null; }
     else {
       people.style.display="";
       if(!state.friend || !friendIds.includes(state.friend)) state.friend=friendIds[0];
-      friendIds.sort((a,b)=>nameOf(a).localeCompare(nameOf(b))).forEach(id=>{ const c=el("button","chip"+(id===state.friend?" on":"")); const tm=tasteMatch(mine(), state.docs[id]); c.append(avatarEl(id,true), el("span","",nameOf(id)+(tm.pct!=null?" · "+tm.pct+"%":""))); c.type="button"; c.addEventListener("click",()=>{state.friend=id; render();}); people.append(c); });
+      friendIds.forEach(id=>{ const c=el("button","chip"+(id===state.friend?" on":"")); const tm=tasteMatch(mine(), state.docs[id]); c.append(avatarEl(id,true), el("span","",nameOf(id)+(tm.pct!=null?" · "+tm.pct+"%":""))); c.type="button"; c.addEventListener("click",()=>{state.friend=id; render();}); people.append(c); });
       showId=state.friend;
+      if(!hasAnything(state.docs[showId])) people.append(el("div","empty",nameOf(showId)+" hasn't added anything yet."));
     }
   } else people.classList.add("hidden");
 
@@ -1950,8 +1954,9 @@ onAuthStateChanged(auth, user=>{
   state.unsub = onSnapshot(collection(db,"lists"), snap=>{
     const next={};
     snap.forEach(d=>{ next[d.id]=sanitize(d.data()); });
+    const needDoc = !snap.metadata.fromCache && !next[user.uid] && !writing;
     if((writing||dirty) && state.docs[user.uid]) next[user.uid]=state.docs[user.uid];
-    state.docs=next; state.loaded=true; clearTimeout(timer); setStatus(null); $("#app").classList.remove("hidden"); render(); renderMe(); afterLoad();
+    state.docs=next; state.loaded=true; clearTimeout(timer); setStatus(null); $("#app").classList.remove("hidden"); render(); renderMe(); if(needDoc) save(); afterLoad();
   }, err=>{
     clearTimeout(timer); console.error(err);
     setStatus(err && err.code==="permission-denied" ? "The database is blocking reads. Double-check the Firestore rules." : "Couldn't load the lists. Try refreshing.", true);
