@@ -100,6 +100,20 @@
 
   .signin{text-align:center;padding:40px 16px}
   .gbtn{display:inline-flex;align-items:center;gap:10px;background:#fff;color:#1f1f1f;border:0;border-radius:999px;padding:12px 22px;font:700 16px "Zen Kaku Gothic New";cursor:pointer}
+  .authbox{max-width:360px;margin:0 auto;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;text-align:left}
+  .seg{display:flex;gap:4px;background:var(--panel2);border-radius:999px;padding:4px;margin-bottom:14px}
+  .seg button{flex:1;border:0;background:transparent;color:var(--muted);font:700 14px "Zen Kaku Gothic New";padding:9px;border-radius:999px;cursor:pointer}
+  .seg button.on{background:var(--accent);color:#fff}
+  .authbox label{display:block;font-size:13px;color:var(--muted);margin:10px 0 5px}
+  .authbox input{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:12px;font:16px "Zen Kaku Gothic New"}
+  .authbox input:focus{outline:2px solid var(--blue);outline-offset:-1px}
+  .authbox .go{width:100%;margin-top:16px;border:0;background:var(--accent);color:#fff;font:700 16px "Zen Kaku Gothic New";padding:13px;border-radius:12px;cursor:pointer}
+  .authbox .go:disabled{opacity:.5}
+  .authbox .err{color:#ffb3bf;font-size:13px;margin-top:10px;min-height:1em}
+  .authbox .small{color:var(--muted);font-size:12px;margin-top:8px}
+  .or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px;margin:18px 0 12px}
+  .or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+  .gbtn{width:100%;justify-content:center}
   .credit{color:var(--muted);font-size:11px;text-align:center;margin-top:24px}
   .credit a{color:var(--muted)}
   .hidden{display:none!important}
@@ -119,8 +133,18 @@
   <div id="status" class="notice">Loading…</div>
 
   <div id="signinView" class="signin hidden">
-    <p>Sign in to make your lists and see everyone else's.</p>
-    <button class="gbtn" id="signIn"><svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>Sign in with Google</button>
+    <form class="authbox" id="authForm" novalidate>
+      <div class="seg"><button type="button" data-mode="signup" class="on">Create account</button><button type="button" data-mode="signin">Sign in</button></div>
+      <label for="uname">Username</label>
+      <input id="uname" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="20" placeholder="e.g. anderson">
+      <label for="pw">Password</label>
+      <input id="pw" type="password" autocomplete="new-password" maxlength="100" placeholder="At least 6 characters">
+      <button class="go" id="goBtn" type="submit">Create account</button>
+      <div class="err" id="authErr"></div>
+      <div class="small" id="authNote">No email needed. Write your password down somewhere, because there's no way to reset it.</div>
+      <div class="or">or</div>
+      <button class="gbtn" id="signIn" type="button"><svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>Continue with Google</button>
+    </form>
   </div>
 
   <div id="app" class="hidden">
@@ -177,7 +201,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import { getFirestore, collection, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -217,6 +241,8 @@ function sanitize(d){
   return { name:typeof d.name==="string"?d.name.slice(0,60):"", top:arr(d.top).slice(0,MAX_TOP), watched:arr(d.watched), watchlist:arr(d.watchlist) };
 }
 const blank = () => ({name:"",top:[],watched:[],watchlist:[]});
+const USER_DOMAIN = "@users.crew-fd928.firebaseapp.com";
+function displayNameOf(u){ if(!u) return "Someone"; if(u.displayName) return u.displayName; if(u.email && u.email.endsWith(USER_DOMAIN)) return u.email.slice(0,-USER_DOMAIN.length); return "Someone"; }
 function mine(){ return state.docs[state.me.uid] || (state.docs[state.me.uid] = blank()); }
 
 // ---- saving ----
@@ -229,7 +255,7 @@ async function save(){
     do{
       dirty=false;
       const m = mine();
-      await setDoc(doc(db,"lists",state.me.uid), { name:(state.me.displayName||"Someone").slice(0,60), top:m.top, watched:m.watched, watchlist:m.watchlist, updatedAt:new Date().toISOString() });
+      await setDoc(doc(db,"lists",state.me.uid), { name:displayNameOf(state.me).slice(0,60), top:m.top, watched:m.watched, watchlist:m.watchlist, updatedAt:new Date().toISOString() });
     } while(dirty);
   }catch(e){
     console.error(e);
@@ -499,6 +525,42 @@ function renderCrew(){
 document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>{ state.view=b.dataset.view; render(); }));
 
 // ---- auth ----
+let authMode="signup";
+document.querySelectorAll(".seg button").forEach(b=>b.addEventListener("click",()=>{
+  authMode=b.dataset.mode;
+  document.querySelectorAll(".seg button").forEach(x=>x.classList.toggle("on",x===b));
+  $("#goBtn").textContent = authMode==="signup"?"Create account":"Sign in";
+  $("#pw").setAttribute("autocomplete", authMode==="signup"?"new-password":"current-password");
+  $("#authNote").classList.toggle("hidden", authMode!=="signup");
+  $("#authErr").textContent="";
+}));
+const AUTH_ERR = {
+  "auth/email-already-in-use":"That username is taken. Try another, or tap Sign in.",
+  "auth/invalid-credential":"Wrong username or password.",
+  "auth/wrong-password":"Wrong username or password.",
+  "auth/user-not-found":"No account with that username. Tap Create account.",
+  "auth/weak-password":"Password needs at least 6 characters.",
+  "auth/too-many-requests":"Too many tries. Wait a minute and try again.",
+  "auth/operation-not-allowed":"Username sign-up isn't switched on yet (Firebase → Authentication → Email/Password).",
+  "auth/network-request-failed":"No connection. Check your internet."
+};
+$("#authForm").addEventListener("submit", async e=>{
+  e.preventDefault();
+  const u = $("#uname").value.trim().toLowerCase(), pw = $("#pw").value;
+  const err=$("#authErr"); err.textContent="";
+  if(!/^[a-z0-9_]{3,20}$/.test(u)){ err.textContent="Usernames are 3–20 letters, numbers or underscores."; return; }
+  if(pw.length<6){ err.textContent="Password needs at least 6 characters."; return; }
+  const btn=$("#goBtn"); btn.disabled=true;
+  try{
+    if(authMode==="signup"){
+      const cred = await createUserWithEmailAndPassword(auth, u+USER_DOMAIN, pw);
+      try{ await updateProfile(cred.user, {displayName:u}); }catch(_){}
+    } else {
+      await signInWithEmailAndPassword(auth, u+USER_DOMAIN, pw);
+    }
+  }catch(ex){ err.textContent = AUTH_ERR[ex && ex.code] || ("Something went wrong ("+((ex&&ex.code)||"error")+")."); }
+  finally{ btn.disabled=false; }
+});
 const provider = new GoogleAuthProvider();
 $("#signIn").addEventListener("click", async ()=>{
   try{ await signInWithPopup(auth, provider); }
@@ -518,7 +580,7 @@ onAuthStateChanged(auth, user=>{
     $("#app").classList.add("hidden"); $("#me").classList.add("hidden"); $("#signinView").classList.remove("hidden"); setStatus(null); return;
   }
   $("#signinView").classList.add("hidden"); $("#app").classList.remove("hidden"); $("#me").classList.remove("hidden");
-  $("#meName").textContent = user.displayName || "Signed in";
+  $("#meName").textContent = displayNameOf(user);
   if(user.photoURL){ $("#meImg").src = user.photoURL; $("#meImg").classList.remove("hidden"); } else $("#meImg").classList.add("hidden");
   setStatus("Loading lists…");
   render();
