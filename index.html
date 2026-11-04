@@ -171,7 +171,7 @@
       </section>
     </div>
   </div>
-  <p class="credit">Anime search and posters from <a href="https://myanimelist.net" target="_blank" rel="noopener">MyAnimeList</a> via the <a href="https://jikan.moe" target="_blank" rel="noopener">Jikan API</a>.</p>
+  <p class="credit">Anime search and posters from <a href="https://anilist.co" target="_blank" rel="noopener">AniList</a> and <a href="https://myanimelist.net" target="_blank" rel="noopener">MyAnimeList</a>.</p>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -199,7 +199,7 @@ const MAX_TOP = 10;
 const uid = () => Math.random().toString(36).slice(2,10);
 const norm = t => String(t||"").normalize("NFKD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
 const clean = t => String(t||"").trim().replace(/\s+/g," ").slice(0,120);
-const IMG_OK = u => typeof u==="string" && /^https:\/\/cdn\.myanimelist\.net\//.test(u) && u.length<300;
+const IMG_OK = u => typeof u==="string" && /^https:\/\/(cdn\.myanimelist\.net|s4\.anilist\.co)\//.test(u) && u.length<300;
 
 function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove("show"),2200); }
 function setStatus(msg, warn){ const s=$("#status"); if(!msg){ s.classList.add("hidden"); return; } s.textContent=msg; s.classList.toggle("warn",!!warn); s.classList.remove("hidden"); }
@@ -299,40 +299,67 @@ function nameOf(id){ if(state.me && id===state.me.uid) return "You"; const d=sta
 function titleBlock(x){ const t=el("div","title",x.title); const meta=[x.year,x.kind].filter(Boolean).join(" · "); if(meta) t.append(el("small","",meta)); return t; }
 const hasAnything = d => d && (d.top.length||d.watched.length||d.watchlist.length);
 
-// ---- search (Jikan / MyAnimeList) ----
-let searchTimer=null, searchSeq=0, lastResults=[], lastQuery="", searchState="idle";
+// ---- search: instant local matches, then live AniList results (Jikan as backup) ----
+const LOCAL = [["Fullmetal Alchemist: Brotherhood",2009,"TV",["FMAB"]],["Fullmetal Alchemist",2003,"TV",["FMA"]],["Steins;Gate",2011,"TV",["Steins Gate"]],["Steins;Gate 0",2018,"TV",["Steins Gate 0"]],["Attack on Titan",2013,"TV",["Shingeki no Kyojin","AOT"]],["Death Note",2006,"TV"],["Hunter x Hunter",2011,"TV",["HxH"]],["Hunter x Hunter (1999)",1999,"TV",["HxH 1999"]],["Demon Slayer",2019,"TV",["Kimetsu no Yaiba"]],["Demon Slayer: Mugen Train",2020,"Movie",["Kimetsu no Yaiba Mugen Train"]],["Demon Slayer: Infinity Castle",2025,"Movie",["Kimetsu no Yaiba Infinity Castle"]],["Jujutsu Kaisen",2020,"TV",["JJK"]],["Jujutsu Kaisen 0",2021,"Movie",["JJK 0"]],["One Piece",1999,"TV"],["One Piece Film: Red",2022,"Movie"],["Naruto",2002,"TV"],["Naruto Shippuden",2007,"TV"],["Boruto: Naruto Next Generations",2017,"TV",["Boruto"]],["Bleach",2004,"TV"],["Bleach: Thousand-Year Blood War",2022,"TV",["TYBW"]],["Dragon Ball",1986,"TV",["DB"]],["Dragon Ball Z",1989,"TV",["DBZ"]],["Dragon Ball Super",2015,"TV",["DBS"]],["Dragon Ball Super: Broly",2018,"Movie",["Broly"]],["Dragon Ball Daima",2024,"TV"],["My Hero Academia",2016,"TV",["Boku no Hero Academia","MHA","BNHA"]],["One Punch Man",2015,"TV",["OPM"]],["Mob Psycho 100",2016,"TV"],["Chainsaw Man",2022,"TV",["CSM"]],["Chainsaw Man – The Movie: Reze Arc",2025,"Movie",["Reze Arc"]],["Spy x Family",2022,"TV",["Spy Family"]],["Spy x Family Code: White",2023,"Movie"],["Blue Lock",2022,"TV"],["Blue Lock: Episode Nagi",2024,"Movie",["Episode Nagi"]],["Haikyu!!",2014,"TV",["Haikyuu"]],["Haikyu!! The Dumpster Battle",2024,"Movie",["Haikyuu Dumpster Battle"]],["Kuroko's Basketball",2012,"TV",["Kuroko no Basket"]],["Slam Dunk",1993,"TV"],["The First Slam Dunk",2022,"Movie"],["Hajime no Ippo",2000,"TV",["Fighting Spirit"]],["Ace of Diamond",2013,"TV",["Diamond no Ace"]],["Yowamushi Pedal",2013,"TV"],["Eyeshield 21",2005,"TV"],["Run with the Wind",2018,"TV",["Kaze ga Tsuyoku Fuiteiru"]],["Megalobox",2018,"TV"],["Ao Ashi",2022,"TV",["Aoashi"]],["Free!",2013,"TV"],["Cowboy Bebop",1998,"TV"],["Samurai Champloo",2004,"TV"],["Neon Genesis Evangelion",1995,"TV",["Evangelion","NGE","Eva"]],["The End of Evangelion",1997,"Movie",["EoE"]],["Evangelion: 3.0+1.0 Thrice Upon a Time",2021,"Movie"],["Code Geass",2006,"TV"],["Gurren Lagann",2007,"TV",["Tengen Toppa Gurren Lagann","TTGL"]],["Kill la Kill",2013,"TV",["KLK"]],["Promare",2019,"Movie"],["Cyberpunk: Edgerunners",2022,"ONA",["Edgerunners"]],["Ghost in the Shell",1995,"Movie",["GITS"]],["Akira",1988,"Movie"],["Redline",2009,"Movie"],["Spirited Away",2001,"Movie",["Sen to Chihiro"]],["My Neighbor Totoro",1988,"Movie",["Totoro"]],["Princess Mononoke",1997,"Movie",["Mononoke Hime"]],["Howl's Moving Castle",2004,"Movie"],["Kiki's Delivery Service",1989,"Movie"],["Ponyo",2008,"Movie"],["Nausicaä of the Valley of the Wind",1984,"Movie",["Nausicaa"]],["Castle in the Sky",1986,"Movie",["Laputa"]],["The Boy and the Heron",2023,"Movie"],["Grave of the Fireflies",1988,"Movie"],["Your Name",2016,"Movie",["Kimi no Na wa"]],["Weathering with You",2019,"Movie",["Tenki no Ko"]],["Suzume",2022,"Movie"],["A Silent Voice",2016,"Movie",["Koe no Katachi"]],["I Want to Eat Your Pancreas",2018,"Movie"],["Perfect Blue",1997,"Movie"],["Paprika",2006,"Movie"],["Tokyo Godfathers",2003,"Movie"],["Wolf Children",2012,"Movie"],["Summer Wars",2009,"Movie"],["The Girl Who Leapt Through Time",2006,"Movie"],["Look Back",2024,"Movie"],["Your Lie in April",2014,"TV",["Shigatsu wa Kimi no Uso"]],["Clannad",2007,"TV"],["Clannad: After Story",2008,"TV"],["Anohana",2011,"TV"],["Violet Evergarden",2018,"TV"],["Toradora!",2008,"TV",["Toradora"]],["Fruits Basket",2019,"TV"],["Kaguya-sama: Love Is War",2019,"TV",["Kaguya sama"]],["Horimiya",2021,"TV"],["My Dress-Up Darling",2022,"TV",["Sono Bisque Doll"]],["Rascal Does Not Dream of Bunny Girl Senpai",2018,"TV",["Bunny Girl Senpai"]],["My Teen Romantic Comedy SNAFU",2013,"TV",["Oregairu"]],["Kimi ni Todoke",2009,"TV",["From Me to You"]],["Nana",2006,"TV"],["Ouran High School Host Club",2006,"TV"],["Rent-a-Girlfriend",2020,"TV",["Kanojo Okarishimasu"]],["The Quintessential Quintuplets",2019,"TV",["Gotoubun no Hanayome"]],["Komi Can't Communicate",2021,"TV"],["Skip and Loafer",2023,"TV"],["The Dangers in My Heart",2023,"TV",["Boku no Kokoro no Yabai Yatsu"]],["Teasing Master Takagi-san",2018,"TV",["Takagi san"]],["Don't Toy with Me, Miss Nagatoro",2021,"TV",["Nagatoro"]],["Tomo-chan Is a Girl!",2023,"TV"],["Wotakoi: Love Is Hard for Otaku",2018,"TV"],["Chihayafuru",2011,"TV"],["Hyouka",2012,"TV"],["Angel Beats!",2010,"TV"],["Charlotte",2015,"TV"],["Plastic Memories",2015,"TV"],["Given",2019,"TV"],["Yuri!!! on Ice",2016,"TV",["Yuri on Ice"]],["Banana Fish",2018,"TV"],["Frieren: Beyond Journey's End",2023,"TV",["Sousou no Frieren"]],["The Apothecary Diaries",2023,"TV",["Kusuriya no Hitorigoto"]],["Solo Leveling",2024,"TV"],["Dandadan",2024,"TV",["Dan Da Dan"]],["Kaiju No. 8",2024,"TV",["Kaiju 8"]],["Oshi no Ko",2023,"TV"],["Bocchi the Rock!",2022,"TV",["Bocchi"]],["Delicious in Dungeon",2024,"TV",["Dungeon Meshi"]],["Sakamoto Days",2025,"TV"],["Wind Breaker",2024,"TV"],["Gachiakuta",2025,"TV"],["The Fragrant Flower Blooms with Dignity",2025,"TV",["Kaoru Hana wa Rin to Saku"]],["Orb: On the Movements of the Earth",2024,"TV",["Chi"]],["Wistoria: Wand and Sword",2024,"TV"],["Shangri-La Frontier",2023,"TV"],["Undead Unluck",2023,"TV"],["Mashle: Magic and Muscles",2023,"TV",["Mashle"]],["Zom 100: Bucket List of the Dead",2023,"TV",["Zom 100"]],["Pluto",2023,"ONA"],["Hell's Paradise",2023,"TV",["Jigokuraku"]],["Mobile Suit Gundam: The Witch from Mercury",2022,"TV",["Witch from Mercury"]],["Lycoris Recoil",2022,"TV"],["Ya Boy Kongming!",2022,"TV",["Paripi Koumei"]],["The Eminence in Shadow",2022,"TV"],["Ranking of Kings",2021,"TV",["Ousama Ranking"]],["To Your Eternity",2021,"TV",["Fumetsu no Anata e"]],["Odd Taxi",2021,"TV"],["Wonder Egg Priority",2021,"TV"],["86",2021,"TV",["Eighty-Six"]],["Tokyo Revengers",2021,"TV"],["Mushoku Tensei: Jobless Reincarnation",2021,"TV",["Mushoku Tensei"]],["Sk8 the Infinity",2021,"TV",["SK8"]],["Akudama Drive",2020,"TV"],["Great Pretender",2020,"TV"],["Tower of God",2020,"TV"],["The God of High School",2020,"TV"],["Dorohedoro",2020,"TV"],["Toilet-Bound Hanako-kun",2020,"TV"],["Re:Zero − Starting Life in Another World",2016,"TV",["Re Zero","ReZero"]],["That Time I Got Reincarnated as a Slime",2018,"TV",["Tensura","Slime"]],["KonoSuba",2016,"TV",["Konosuba"]],["Overlord",2015,"TV"],["Sword Art Online",2012,"TV",["SAO"]],["No Game No Life",2014,"TV",["NGNL"]],["The Rising of the Shield Hero",2019,"TV",["Shield Hero"]],["Log Horizon",2013,"TV"],["Made in Abyss",2017,"TV"],["The Promised Neverland",2019,"TV",["Yakusoku no Neverland"]],["Tokyo Ghoul",2014,"TV"],["Parasyte: The Maxim",2014,"TV",["Kiseijuu","Parasyte"]],["Another",2012,"TV"],["Higurashi: When They Cry",2006,"TV",["Higurashi"]],["Erased",2016,"TV",["Boku dake ga Inai Machi"]],["Monster",2004,"TV"],["Psycho-Pass",2012,"TV",["Psycho Pass"]],["Terror in Resonance",2014,"TV",["Zankyou no Terror"]],["Vinland Saga",2019,"TV"],["Berserk",1997,"TV"],["Dororo",2019,"TV"],["Fire Force",2019,"TV",["Enen no Shouboutai"]],["Black Clover",2017,"TV"],["Fairy Tail",2009,"TV"],["The Seven Deadly Sins",2014,"TV",["Nanatsu no Taizai"]],["Magi: The Labyrinth of Magic",2012,"TV",["Magi"]],["Soul Eater",2008,"TV"],["D.Gray-man",2006,"TV",["D Gray Man"]],["Blue Exorcist",2011,"TV",["Ao no Exorcist"]],["Noragami",2014,"TV"],["Inuyasha",2000,"TV"],["Yu Yu Hakusho",1992,"TV",["YYH"]],["Rurouni Kenshin",1996,"TV",["Samurai X"]],["JoJo's Bizarre Adventure",2012,"TV",["JoJo","JJBA"]],["Trigun",1998,"TV"],["Trigun Stampede",2023,"TV"],["Hellsing Ultimate",2006,"OVA",["Hellsing"]],["Black Lagoon",2006,"TV"],["Great Teacher Onizuka",1999,"TV",["GTO"]],["Baki",2018,"TV"],["Kengan Ashura",2019,"ONA",["Kengan"]],["Beastars",2019,"TV"],["Dr. Stone",2019,"TV",["Dr Stone"]],["Food Wars!",2015,"TV",["Shokugeki no Soma"]],["Assassination Classroom",2015,"TV",["Ansatsu Kyoushitsu"]],["The Disastrous Life of Saiki K.",2016,"TV",["Saiki K"]],["Gintama",2006,"TV"],["Nichijou",2011,"TV",["My Ordinary Life"]],["Lucky Star",2007,"TV"],["K-On!",2009,"TV",["K On"]],["Azumanga Daioh",2002,"TV"],["Grand Blue",2018,"TV"],["Barakamon",2014,"TV"],["Laid-Back Camp",2018,"TV",["Yuru Camp"]],["A Place Further Than the Universe",2018,"TV",["Sora yori mo Tooi Basho"]],["March Comes in Like a Lion",2016,"TV",["3-gatsu no Lion"]],["Mushishi",2005,"TV"],["Natsume's Book of Friends",2008,"TV",["Natsume Yuujinchou"]],["Wolf's Rain",2003,"TV"],["Serial Experiments Lain",1998,"TV",["Lain"]],["Ergo Proxy",2006,"TV"],["Darker than Black",2007,"TV"],["Durarara!!",2010,"TV",["Durarara"]],["Baccano!",2007,"TV",["Baccano"]],["Bungo Stray Dogs",2016,"TV",["BSD"]],["Darling in the Franxx",2018,"TV",["Franxx"]],["Mobile Suit Gundam",1979,"TV",["Gundam"]],["Fate/Zero",2011,"TV",["Fate Zero"]],["Fate/stay night: Unlimited Blade Works",2014,"TV",["UBW","Fate Stay Night"]],["Puella Magi Madoka Magica",2011,"TV",["Madoka"]],["Sailor Moon",1992,"TV"],["Cardcaptor Sakura",1998,"TV"],["Pokémon",1997,"TV",["Pokemon"]],["Digimon Adventure",1999,"TV",["Digimon"]],["Yu-Gi-Oh!",2000,"TV",["Yugioh","Yu Gi Oh"]],["Hikaru no Go",2001,"TV"],["Initial D",1998,"TV"],["Case Closed",1996,"TV",["Detective Conan"]],["Kaiji",2007,"TV"],["Kakegurui",2017,"TV"],["Classroom of the Elite",2017,"TV",["COTE"]],["Akame ga Kill!",2014,"TV",["Akame ga Kill"]],["Elfen Lied",2004,"TV"],["Future Diary",2011,"TV",["Mirai Nikki"]],["Devilman Crybaby",2018,"ONA"],["Black Butler",2008,"TV",["Kuroshitsuji"]],["Death Parade",2015,"TV"],["Spice and Wolf",2008,"TV",["Ookami to Koushinryou"]],["The Ancient Magus' Bride",2017,"TV",["Mahoutsukai no Yome"]],["Bakuman",2010,"TV"],["Space Brothers",2012,"TV",["Uchuu Kyoudai"]],["Planetes",2003,"TV"],["Legend of the Galactic Heroes",1988,"OVA",["LOGH"]],["Kamisama Kiss",2012,"TV"],["Monogatari",2009,"TV",["Bakemonogatari"]],["Aldnoah.Zero",2014,"TV",["Aldnoah Zero"]],["Ninja Scroll",1993,"Movie"]].map(([title,year,kind,alt]) => ({title,year,kind,keys:[norm(title)].concat((alt||[]).map(norm))}));
+function localSearch(q){
+  const n=norm(q); if(!n) return [];
+  const words=n.split(" "); const out=[];
+  LOCAL.forEach(c=>{
+    let best=-1;
+    c.keys.forEach(k=>{ let s=-1; if(k===n) s=100; else if(k.startsWith(n)) s=80; else if(k.split(" ").some(w=>w.startsWith(n))) s=60; else if(words.every(w=>k.includes(w))) s=40; if(s>best) best=s; });
+    if(best>=0) out.push([best,c]);
+  });
+  out.sort((a,b)=>b[0]-a[0] || a[1].title.length-b[1].title.length);
+  return out.slice(0,6).map(([,c])=>({title:c.title, year:c.year, kind:c.kind, img:imgIndex[norm(c.title)]||null, alt:""}));
+}
+const KIND = {TV:"TV",TV_SHORT:"TV",MOVIE:"Movie",OVA:"OVA",ONA:"ONA",SPECIAL:"Special",MUSIC:"Music"};
+const ANILIST_Q = `query($s:String){Page(perPage:8){media(search:$s,type:ANIME,isAdult:false,sort:[SEARCH_MATCH]){id idMal format seasonYear startDate{year} title{romaji english} coverImage{medium large}}}}`;
+async function anilist(q, signal){
+  const r = await fetch("https://graphql.anilist.co",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({query:ANILIST_Q,variables:{s:q}}),signal});
+  if(!r.ok) throw new Error("anilist "+r.status);
+  const j = await r.json();
+  const list = (j && j.data && j.data.Page && j.data.Page.media) || [];
+  return list.map(a=>{
+    const en=a.title&&a.title.english, ro=a.title&&a.title.romaji;
+    const img=(a.coverImage&&(a.coverImage.large||a.coverImage.medium))||null;
+    return { malId:a.idMal||null, title:clean(en||ro||""), alt:en&&ro&&en!==ro?ro:"", year:a.seasonYear||(a.startDate&&a.startDate.year)||null, kind:KIND[a.format]||null, img:IMG_OK(img)?img:null };
+  }).filter(a=>a.title);
+}
+async function jikan(q, signal){
+  const r = await fetch("https://api.jikan.moe/v4/anime?limit=8&sfw=true&q="+encodeURIComponent(q),{signal});
+  if(!r.ok) throw new Error("jikan "+r.status);
+  const j = await r.json();
+  return (j.data||[]).map(a=>{
+    const img=(a.images&&a.images.webp&&a.images.webp.image_url)||(a.images&&a.images.jpg&&a.images.jpg.image_url)||null;
+    return { malId:a.mal_id, title:clean(a.title_english||a.title), alt:a.title_english&&a.title!==a.title_english?a.title:"", year:a.year||(a.aired&&a.aired.prop&&a.aired.prop.from&&a.aired.prop.from.year)||null, kind:a.type||null, img:IMG_OK(img)?img:null };
+  });
+}
+let searchTimer=null, searchSeq=0, controller=null, lastResults=[], searchState="idle";
 const cache = new Map();
-$("#q").addEventListener("input", ()=>{
+function onQuery(){
   clearTimeout(searchTimer);
+  if(controller){ controller.abort(); controller=null; }
   const q = clean($("#q").value);
-  if(!q){ lastResults=[]; lastQuery=""; searchState="idle"; renderResults(); return; }
-  searchState="loading"; renderResults();
-  searchTimer = setTimeout(()=>runSearch(q), 450);
-});
-$("#q").addEventListener("keydown", e=>{ if(e.key==="Escape"){ $("#q").value=""; lastResults=[]; lastQuery=""; searchState="idle"; renderResults(); } });
+  if(!q){ lastResults=[]; searchState="idle"; renderResults(); return; }
+  const key=q.toLowerCase();
+  if(cache.has(key)){ lastResults=cache.get(key); searchState="done"; renderResults(); return; }
+  lastResults = localSearch(q); searchState="loading"; renderResults();
+  if(q.length<2) return;
+  searchTimer = setTimeout(()=>runSearch(q), 200);
+}
+$("#q").addEventListener("input", onQuery);
+$("#q").addEventListener("keydown", e=>{ if(e.key==="Escape"){ $("#q").value=""; onQuery(); } });
 async function runSearch(q){
-  const seq = ++searchSeq;
-  try{
-    let data = cache.get(q.toLowerCase());
-    if(!data){
-      const r = await fetch("https://api.jikan.moe/v4/anime?limit=10&sfw=true&order_by=members&sort=desc&q="+encodeURIComponent(q));
-      if(r.status===429){ if(seq===searchSeq){ searchState="busy"; renderResults(); } return; }
-      if(!r.ok) throw new Error("HTTP "+r.status);
-      const j = await r.json();
-      const seen = new Set();
-      data = (j.data||[]).filter(a=>{ if(seen.has(a.mal_id)) return false; seen.add(a.mal_id); return true; }).slice(0,8).map(a=>{
-        const year = a.year || (a.aired && a.aired.prop && a.aired.prop.from && a.aired.prop.from.year) || null;
-        const img = (a.images && a.images.webp && (a.images.webp.image_url)) || (a.images && a.images.jpg && a.images.jpg.image_url) || null;
-        return { malId:a.mal_id, title:clean(a.title_english || a.title), alt:a.title_english && a.title!==a.title_english ? a.title : "", year, kind:a.type||null, img:IMG_OK(img)?img:null };
-      });
-      cache.set(q.toLowerCase(), data);
-    }
-    if(seq!==searchSeq) return;
-    lastResults=data; lastQuery=q; searchState="done"; renderResults();
-  }catch(e){
-    if(seq!==searchSeq) return;
-    lastResults=[]; lastQuery=q; searchState="error"; renderResults();
-  }
+  const seq=++searchSeq; controller=new AbortController(); const signal=controller.signal;
+  let data=null;
+  try{ data = await anilist(q, signal); }
+  catch(e){ if(signal.aborted) return; try{ data = await jikan(q, signal); }catch(e2){ if(signal.aborted) return; } }
+  if(seq!==searchSeq) return;
+  if(data){
+    const seen=new Set(); data=data.filter(a=>{ const k=norm(a.title); if(seen.has(k)) return false; seen.add(k); return true; });
+    cache.set(q.toLowerCase(), data); lastResults=data; searchState="done";
+  } else searchState = lastResults.length ? "done" : "error";
+  renderResults();
 }
 function renderResults(){
   const box=$("#results"); const q=clean($("#q").value);
@@ -348,11 +375,10 @@ function renderResults(){
     adds.append(b("Top 10",has(m.top,a),addTop), b("Watched",has(m.watched,a),addWatched), b("Watchlist",has(m.watchlist,a)||has(m.watched,a),addWatch));
     r.append(adds); return r;
   };
-  if(searchState==="loading") box.append(el("div","res msg","Searching…"));
-  else if(searchState==="busy") box.append(el("div","res msg","Search is busy. Give it a second and type again."));
+  lastResults.forEach(a=>box.append(row(a, [a.year,a.kind,a.alt].filter(Boolean).join(" · "), false)));
+  if(searchState==="loading") box.append(el("div","res msg","Loading more results and posters…"));
   else if(searchState==="error") box.append(el("div","res msg","Search isn't reachable right now. You can still add it as typed below."));
-  else lastResults.forEach(a=>box.append(row(a, [a.year,a.kind,a.alt].filter(Boolean).join(" · "), false)));
-  if(searchState!=="loading" && !lastResults.some(a=>norm(a.title)===norm(q))) box.append(row({title:q}, "Add it exactly as you typed it", true));
+  if(!lastResults.some(a=>norm(a.title)===norm(q))) box.append(row({title:q}, "Add it exactly as you typed it", true));
   box.classList.remove("hidden");
 }
 
