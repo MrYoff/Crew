@@ -727,23 +727,34 @@ function displayNameOf(u){ if(!u) return "Someone"; if(u.displayName) return u.d
 function mine(){ return state.docs[state.me.uid] || (state.docs[state.me.uid] = blank()); }
 
 // ---- saving ----
-let writing=false, dirty=false;
+// Every change is also kept on this device until the database confirms it, so nothing is lost if a save fails.
+let writing=false, dirty=false, unsaved=false, retryT=null;
+const pendKey = () => "crew.pending."+state.me.uid;
+function backupLocal(){ try{ localStorage.setItem(pendKey(), JSON.stringify({at:new Date().toISOString(), d:mine()})); }catch(e){} }
+function clearBackup(){ try{ localStorage.removeItem(pendKey()); }catch(e){} }
+function readBackup(){ try{ const v=JSON.parse(localStorage.getItem(pendKey())||"null"); return v&&v.d&&v.at?v:null; }catch(e){ return null; } }
 async function save(){
   if(!state.me) return;
   if(writing){ dirty=true; return; }
-  writing=true;
+  writing=true; clearTimeout(retryT);
+  const who=state.me.uid;
   try{
     do{
       dirty=false;
       const m = mine();
-      await setDoc(doc(db,"lists",state.me.uid), { name:displayNameOf(state.me).slice(0,60), avatar:m.avatar||null, top:m.top, watched:m.watched, watchlist:m.watchlist, mtop:m.mtop, mread:m.mread, mlist:m.mlist, otop:m.otop, custom:m.custom, reviews:m.reviews, watching:m.watching, mreading:m.mreading, reacts:m.reacts, replies:m.replies, polls:m.polls, votes:m.votes, updatedAt:new Date().toISOString() });
+      await setDoc(doc(db,"lists",who), { name:displayNameOf(state.me).slice(0,60), avatar:m.avatar||null, top:m.top, watched:m.watched, watchlist:m.watchlist, mtop:m.mtop, mread:m.mread, mlist:m.mlist, otop:m.otop, custom:m.custom, reviews:m.reviews, watching:m.watching, mreading:m.mreading, reacts:m.reacts, replies:m.replies, polls:m.polls, votes:m.votes, updatedAt:new Date().toISOString() });
     } while(dirty);
+    if(state.me && state.me.uid===who){ clearBackup(); if(unsaved){ unsaved=false; setStatus(null); toast("Saved ✓"); } }
   }catch(e){
     console.error(e);
-    toast(e && e.code==="permission-denied" ? "The database isn't set up to allow saving yet." : "Couldn't save that. Check your connection.");
+    unsaved=true;
+    const code=(e&&e.code)||(e&&e.message)||"unknown";
+    setStatus((code==="permission-denied" ? "⚠️ Your changes aren't saving: the database refused them" : "⚠️ Your changes aren't saved yet") + " ("+code+"). They're kept on this device and it'll keep retrying, so don't sign out or clear your browser.", true);
+    retryT=setTimeout(()=>{ if(state.me && unsaved) save(); }, 8000);
   } finally { writing=false; }
 }
-function mutate(fn){ if(!state.me) return; fn(mine()); render(); save(); }
+window.addEventListener("online",()=>{ if(state.me && unsaved) save(); });
+function mutate(fn){ if(!state.me) return; fn(mine()); backupLocal(); render(); save(); }
 
 // ---- actions ----
 const same = (x,t) => norm(x.title)===norm(t.title||t) && (!x.media||!t.media||x.media===t.media);
@@ -1935,13 +1946,13 @@ $("#signIn").addEventListener("click", async ()=>{
     else if(e && e.code!=="auth/popup-closed-by-user" && e.code!=="auth/cancelled-popup-request"){ setStatus("Sign-in didn't work: "+(e.code||e.message), true); }
   }
 });
-$("#signOut").addEventListener("click", ()=>signOut(auth));
+$("#signOut").addEventListener("click", ()=>{ if((unsaved||writing) && !confirm("Some of your changes haven't saved yet. Sign out anyway? (They'll come back next time you sign in on this device.)")) return; signOut(auth); });
 getRedirectResult(auth).catch(()=>{});
 
 onAuthStateChanged(auth, user=>{
   window.__authSeen=true;
   if(state.unsub){ state.unsub(); state.unsub=null; }
-  state.me = user; state.docs = {}; state.loaded=false;
+  state.me = user; state.docs = {}; state.loaded=false; unsaved=false; dirty=false; clearTimeout(retryT);
   if(!user){
     $("#app").classList.add("hidden"); $("#me").classList.add("hidden"); $("#signinView").classList.remove("hidden"); setStatus(null); return;
   }
@@ -1953,10 +1964,16 @@ onAuthStateChanged(auth, user=>{
   const timer=setTimeout(()=>{ if(!state.loaded) setStatus("Can't reach the database yet. Check your connection.", true); },10000);
   state.unsub = onSnapshot(collection(db,"lists"), snap=>{
     const next={};
-    snap.forEach(d=>{ next[d.id]=sanitize(d.data()); });
-    const needDoc = !snap.metadata.fromCache && !next[user.uid] && !writing;
-    if((writing||dirty) && state.docs[user.uid]) next[user.uid]=state.docs[user.uid];
-    state.docs=next; state.loaded=true; clearTimeout(timer); setStatus(null); $("#app").classList.remove("hidden"); render(); renderMe(); if(needDoc) save(); afterLoad();
+    let serverAt="";
+    snap.forEach(d=>{ const raw=d.data(); next[d.id]=sanitize(raw); if(d.id===user.uid) serverAt=typeof raw.updatedAt==="string"?raw.updatedAt:""; });
+    let needDoc = !snap.metadata.fromCache && !next[user.uid] && !writing;
+    if((writing||dirty||unsaved) && state.docs[user.uid]) next[user.uid]=state.docs[user.uid];
+    else if(!state.loaded && !snap.metadata.fromCache){
+      const b=readBackup();
+      if(b && b.at>serverAt){ next[user.uid]=sanitize(b.d); needDoc=true; toast("Restored changes that hadn't saved yet"); }
+      else if(b) clearBackup();
+    }
+    state.docs=next; state.loaded=true; clearTimeout(timer); if(!unsaved) setStatus(null); $("#app").classList.remove("hidden"); render(); renderMe(); if(needDoc) save(); afterLoad();
   }, err=>{
     clearTimeout(timer); console.error(err);
     setStatus(err && err.code==="permission-denied" ? "The database is blocking reads. Double-check the Firestore rules." : "Couldn't load the lists. Try refreshing.", true);
