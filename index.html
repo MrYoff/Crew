@@ -293,6 +293,9 @@
   .crewrow .rank{width:30px;font-size:20px}
   .bar{height:6px;border-radius:6px;background:linear-gradient(90deg,var(--accent),var(--accent2));margin-top:6px}
   .who{color:var(--muted);font-size:12px;margin-top:4px;font-weight:500}
+  .recsub{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin:16px 0 4px}
+  .recsub:first-child{margin-top:4px}
+  #recRefresh:disabled{opacity:.5;cursor:default}
   .pts{font-family:"Dela Gothic One";font-size:16px;color:var(--accent2);flex:none;text-align:right}
 
   .signin{text-align:center;padding:40px 16px}
@@ -577,8 +580,8 @@
         <div id="pollList"></div>
       </section>
       <section class="card" id="recCard">
-        <h2>For you</h2>
-        <p class="hint">Stuff the crew rated 8 or higher that isn't on any of your lists yet.</p>
+        <h2>For you<button class="sharebtn" id="recRefresh" type="button">↻ Refresh</button></h2>
+        <p class="hint">Crew favorites you haven't added yet, plus picks based on what you rate highly and the genres you like.</p>
         <div id="recList"></div>
       </section>
       <section class="card">
@@ -1352,23 +1355,98 @@ function addWatchFor(x, media){
   const k=MEDIA_KEYS[media]; let ok=false;
   mutate(m=>{ if(has(m[k.watchlist],{...x,media})||has(m[k.watched],{...x,media})){ toast(WORDS[media].alreadyQ); return; } m[k.watchlist].unshift(mk({...x,media})); ok=true; toast(WORDS[media].addedQ); });
 }
+// "For you": crew picks (friends' 8+ ratings) plus discovery picks from AniList, seeded by what you
+// and the crew rate highly (AniList's "if you liked X" recommendations) and your favorite genres.
+const disc={}; let recTurn=0, recBusy=false, recLast=0;
+const DISC_F=`fragment F on Media{idMal format countryOfOrigin seasonYear startDate{year} episodes chapters status nextAiringEpisode{episode} genres averageScore isAdult title{romaji english} coverImage{medium large}}`;
+const DISC_REC_Q=`query($ids:[Int],$t:MediaType){Page(perPage:12){media(idMal_in:$ids,type:$t){idMal recommendations(sort:RATING_DESC,perPage:12){nodes{rating mediaRecommendation{...F}}}}}}`+DISC_F;
+const DISC_GEN_Q=`query($g:[String],$t:MediaType,$p:Int,$pop:Int){Page(page:$p,perPage:30){media(genre_in:$g,type:$t,isAdult:false,sort:[SCORE_DESC],averageScore_greater:72,popularity_greater:$pop){...F}}}`+DISC_F;
+const DISC_TREND_Q=`query($t:MediaType,$p:Int){Page(page:$p,perPage:30){media(type:$t,isAdult:false,sort:[TRENDING_DESC]){...F}}}`+DISC_F;
+function discItem(a, media){
+  const img=a.coverImage&&(a.coverImage.large||a.coverImage.medium);
+  const kind=media==="manga"&&COUNTRY_KIND[a.countryOfOrigin] ? COUNTRY_KIND[a.countryOfOrigin] : (KIND[a.format]||null);
+  return { title:clean((a.title&&(a.title.english||a.title.romaji))||""), malId:a.idMal||null, img:IMG_OK(img)?img:null, media, kind, year:a.seasonYear||(a.startDate&&a.startDate.year)||null, ...countsFrom(a,media), genres:(a.genres||[]).slice(0,6), avg:a.averageScore||null };
+}
+// weighted random sample: higher weight = more likely, but every refresh mixes things up
+const wsample=(arr,n,w)=>arr.map(x=>[Math.pow(Math.random(),1/Math.max(.05,w(x))),x]).sort((a,b)=>b[0]-a[0]).slice(0,n).map(p=>p[1]);
+function discSeeds(media){
+  const me=mine(), k=MEDIA_KEYS[media], out=new Map();
+  const add=(x,w,why)=>{ if(!x.malId) return; const cur=out.get(x.malId); if(!cur||cur.w<w) out.set(x.malId,{id:x.malId,w,title:x.title,why}); };
+  ratingsOf(me).forEach(v=>{ if(v.x.media===media && v.sc>=7) add(v.x, v.sc-5, "you"); });
+  me[k.top].forEach((x,i)=>add(x, 4.5-i*0.25, "you"));
+  [...me[k.watching], ...me[k.watched]].forEach(x=>{ if(!x.score) add(x, 1.5, "you"); });
+  Object.entries(state.docs).forEach(([id,d])=>{ if(id===state.me.uid) return; ratingsOf(d).forEach(v=>{ if(v.x.media===media && v.sc>=8) add(v.x, (v.sc-6)*0.7, nameOf(id)); }); });
+  return [...out.values()];
+}
+function genreProfile(media){
+  const me=mine(), k=MEDIA_KEYS[media], g={}, seen=new Set();
+  [...me[k.top], ...me[k.watched], ...me[k.watching]].forEach(x=>{ const key=norm(x.title); if(seen.has(key)) return; seen.add(key); const w=x.score?Math.max(0,x.score-5):1; (x.genres||[]).forEach(n=>{ g[n]=(g[n]||0)+w; }); });
+  return Object.entries(g).sort((a,b)=>b[1]-a[1]).map(e=>e[0]);
+}
+async function loadDisc(media){
+  const T=media.toUpperCase(), seeds=wsample(discSeeds(media),10,s=>s.w), byId=new Map(seeds.map(s=>[s.id,s]));
+  const favG=genreProfile(media).slice(0,6), pickG=favG.length?wsample(favG,3,g=>6-favG.indexOf(g)):[];
+  const page=1+Math.floor(Math.random()*3), cand=new Map();
+  const put=(a,score,why)=>{ if(!a||a.isAdult) return; const it=discItem(a,media); if(!it.title) return; const key=it.malId?"id:"+it.malId:"t:"+norm(it.title);
+    const c=cand.get(key)||{x:it, score:0, why:[]}; c.score+=score; if(why && !c.why.includes(why)) c.why.push(why); cand.set(key,c); };
+  const jobs=[];
+  if(seeds.length) jobs.push(aniPost(DISC_REC_Q,{ids:seeds.map(s=>s.id),t:T}).then(j=>{ ((j.data&&j.data.Page&&j.data.Page.media)||[]).forEach(m=>{ const s=byId.get(m.idMal); if(!s) return;
+    ((m.recommendations&&m.recommendations.nodes)||[]).forEach(n=>{ if(!n.mediaRecommendation||n.rating<1) return; put(n.mediaRecommendation, s.w*Math.log2(1+n.rating), s.why==="you"?"Because you liked "+s.title:"Since "+s.why+" loved "+s.title); }); }); }));
+  if(pickG.length) jobs.push(aniPost(DISC_GEN_Q,{g:pickG,t:T,p:page,pop:media==="manga"?5000:20000}).then(j=>{ ((j.data&&j.data.Page&&j.data.Page.media)||[]).forEach(a=>{ const hit=(a.genres||[]).filter(n=>pickG.includes(n)); put(a, 2+hit.length*1.5+((a.averageScore||70)-70)/6, "Top rated "+hit.slice(0,2).join(" & ")); }); }));
+  if(!jobs.length) jobs.push(aniPost(DISC_TREND_Q,{t:T,p:page}).then(j=>{ ((j.data&&j.data.Page&&j.data.Page.media)||[]).forEach((a,i)=>put(a, 30-i, "Trending right now")); }));
+  const res=await Promise.allSettled(jobs);
+  if(res.every(r=>r.status==="rejected")) throw new Error("anilist");
+  // small boost for matching your favorite genres and for being well rated overall
+  cand.forEach(c=>{ c.score += (c.x.genres||[]).filter(n=>favG.includes(n)).length*0.8 + ((c.x.avg||65)-65)/12; });
+  const prev=new Set(((disc[media]&&disc[media].pool)||[]).slice(0,8).map(c=>c.x.malId||c.x.title));
+  // random but score-weighted order; things shown last time sink to the back
+  return [...cand.values()].map(c=>({...c, r:Math.max(.1,c.score)*(0.55+Math.random()*0.9)*(prev.has(c.x.malId||c.x.title)?0.35:1)})).sort((a,b)=>b.r-a.r);
+}
+function fetchDisc(media){
+  const cur=disc[media]; if(cur&&cur.loading) return;
+  disc[media]={pool:cur?cur.pool:[], loading:true, err:false, turn:recTurn};
+  loadDisc(media).then(pool=>{ disc[media]={pool, loading:false, err:false, turn:recTurn}; }).catch(()=>{ disc[media]={pool:cur?cur.pool:[], loading:false, err:true, turn:recTurn}; })
+    .finally(()=>{ recBusy=Object.values(disc).some(d=>d.loading); renderRecs(); });
+}
+$("#recRefresh").addEventListener("click",()=>{
+  if(recBusy || Date.now()-recLast<1500) return; recLast=Date.now(); recTurn++; recBusy=true;
+  const medias = state.mode==="anime"||state.mode==="manga" ? [state.mode] : ["anime","manga"];
+  medias.forEach(fetchDisc); renderRecs();
+});
+function recRow(x, whoText, showType){
+  const row=el("div","crewrow"); row.append(posterEl(x));
+  const mid=el("div","title"); const tt=el("div","",x.title); if(showType) tt.append(el("span","typetag",x.media==="manga"?"Manga":"Anime"));
+  mid.append(tt, el("div","who",whoText), revLink(x)); row.append(mid);
+  const acts=el("div","acts");
+  const b=el("button","pill","+ "+WORDS[x.media].watchlist); b.type="button"; b.addEventListener("click",()=>addWatchFor(x,x.media));
+  const w=el("button","pill","✓ "+WORDS[x.media].watched); w.type="button"; w.title="Already seen it? Mark it as "+WORDS[x.media].watched.toLowerCase(); w.addEventListener("click",()=>addWatchedFor(x,x.media));
+  acts.append(b, w); row.append(acts);
+  return row;
+}
 function renderRecs(){
   const box=$("#recList"); box.replaceChildren(); if(!state.me) return;
   const medias = state.mode==="anime"||state.mode==="manga" ? [state.mode] : ["anime","manga"];
-  const known=knownKeys(mine()), agg=new Map();
+  const known=knownKeys(mine()), agg=new Map(), both=medias.length>1;
+  const knownIds=new Set(); ["anime","manga"].forEach(md=>{ const k=MEDIA_KEYS[md]; [...mine()[k.top],...mine()[k.watched],...mine()[k.watchlist],...mine()[k.watching]].forEach(x=>{ if(x.malId) knownIds.add(md+":"+x.malId); }); });
   Object.entries(state.docs).forEach(([id,d])=>{ if(id===state.me.uid) return; ratingsOf(d).forEach((v,k)=>{ if(v.sc<8 || known.has(k) || !medias.includes(v.x.media)) return; const a=agg.get(k)||{x:v.x, s:[], who:[]}; a.s.push(v.sc); a.who.push(nameOf(id)+" "+v.sc); agg.set(k,a); }); });
-  const list=[...agg.values()].map(a=>({...a, avg:a.s.reduce((p,c)=>p+c,0)/a.s.length})).sort((a,b)=>(b.avg*Math.sqrt(b.s.length))-(a.avg*Math.sqrt(a.s.length))).slice(0,8);
-  if(!list.length){ box.append(el("div","empty","Nothing yet. Recommendations show up once friends rate things 8 or higher that you haven't added.")); return; }
-  list.forEach(a=>{
-    const row=el("div","crewrow"); row.append(posterEl(a.x));
-    const mid=el("div","title"); const tt=el("div","",a.x.title); if(medias.length>1) tt.append(el("span","typetag",a.x.media==="manga"?"Manga":"Anime"));
-    mid.append(tt, el("div","who",a.who.join(" · ")), revLink(a.x)); row.append(mid);
-    const acts=el("div","acts");
-    const b=el("button","pill","+ "+WORDS[a.x.media].watchlist); b.type="button"; b.addEventListener("click",()=>addWatchFor(a.x,a.x.media));
-    const w=el("button","pill","✓ "+WORDS[a.x.media].watched); w.type="button"; w.title="Already seen it? Mark it as "+WORDS[a.x.media].watched.toLowerCase(); w.addEventListener("click",()=>addWatchedFor(a.x,a.x.media));
-    acts.append(b, w); row.append(acts);
-    box.append(row);
-  });
+  const crewAll=[...agg.values()].map(a=>({...a, avg:a.s.reduce((p,c)=>p+c,0)/a.s.length})).sort((a,b)=>(b.avg*Math.sqrt(b.s.length))-(a.avg*Math.sqrt(a.s.length)));
+  // keep the strongest crew picks on top, rotate the rest on each refresh
+  const CREW_N=4; let crew=crewAll.slice(0,2);
+  const rest=crewAll.slice(2); if(rest.length){ const off=(recTurn*(CREW_N-2))%rest.length; crew=crew.concat(rest.slice(off).concat(rest.slice(0,off)).slice(0,CREW_N-2)); }
+  if(crew.length){ box.append(el("div","recsub","From the crew")); crew.forEach(a=>box.append(recRow(a.x, a.who.join(" · "), both))); }
+  const shownKeys=new Set(crewAll.map(a=>rkey(a.x.media,a.x)));
+  // discovery picks
+  if(state.loaded) medias.forEach(md=>{ if(!disc[md]) fetchDisc(md); });
+  const per=both?4:6, picks=[];
+  medias.forEach(md=>{ const d=disc[md]; if(!d) return; let n=0;
+    for(const c of d.pool){ if(n>=per) break; const key=rkey(md,c.x); if(known.has(key)||shownKeys.has(key)||(c.x.malId&&knownIds.has(md+":"+c.x.malId))) continue; shownKeys.add(key); picks.push(c); n++; } });
+  if(both){ const a=picks.filter(c=>c.x.media==="anime"), m=picks.filter(c=>c.x.media==="manga"); picks.length=0; for(let i=0;i<Math.max(a.length,m.length);i++){ if(a[i]) picks.push(a[i]); if(m[i]) picks.push(m[i]); } }
+  const loading=medias.some(md=>disc[md]&&disc[md].loading), err=medias.some(md=>disc[md]&&disc[md].err);
+  box.append(el("div","recsub","More you might like"));
+  if(picks.length) picks.forEach(c=>{ const why=c.why[0]||"Popular pick"; const extra=c.why.length>1?" (+"+(c.why.length-1)+" more)":""; const g=(c.x.genres||[]).slice(0,3).join(", ");
+    box.append(recRow(c.x, why+extra+(g?" · "+g:"")+(c.x.avg?" · ★ "+c.x.avg+"%":""), both)); });
+  else box.append(el("div","empty", loading?"Finding shows you'd like…":err?"Couldn't load picks right now. Try ↻ Refresh in a minute.":"Rate a few things you've watched and picks will show up here."));
+  const btn=$("#recRefresh"); btn.disabled=loading; btn.textContent=loading?"Loading…":"↻ Refresh";
 }
 
 // ---- activity feed (built from timestamps on everyone's lists) ----
@@ -2485,7 +2563,7 @@ let recChecked=false;
 onAuthStateChanged(auth, user=>{
   window.__authSeen=true; recChecked=false; hasRecovery=null; $("#recBar").classList.add("hidden");
   if(state.unsub){ state.unsub(); state.unsub=null; }
-  state.me = user; state.docs = {}; state.loaded=false; unsaved=false; dirty=false; clearTimeout(retryT);
+  state.me = user; state.docs = {}; state.loaded=false; Object.keys(disc).forEach(k=>delete disc[k]); unsaved=false; dirty=false; clearTimeout(retryT);
   if(!user){
     $("#app").classList.add("hidden"); $("#me").classList.add("hidden"); $("#signinView").classList.remove("hidden"); setStatus(null); return;
   }
