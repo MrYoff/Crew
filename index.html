@@ -196,6 +196,9 @@
   nav.tabs button{flex:1;border:0;background:transparent;color:var(--muted);font:700 13px "Zen Kaku Gothic New";padding:10px 4px;white-space:nowrap;border-radius:999px;cursor:pointer}
   nav.tabs button.on{background:var(--accent);color:#fff}
 
+  .chipname{display:flex;flex-direction:column;align-items:flex-start;line-height:1.15}
+  .chipname small{font-size:11px;color:var(--muted);font-weight:700}
+  .chip.on .chipname small{color:inherit;opacity:.8}
   .people{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px}
   .chip{flex:none;border:1px solid var(--line);background:var(--panel);color:var(--text);padding:8px 14px;border-radius:999px;font:500 14px "Zen Kaku Gothic New";cursor:pointer;white-space:nowrap}
   .chip.on{border-color:var(--accent2);background:color-mix(in srgb, var(--accent2) 12%, transparent);color:var(--accent2)}
@@ -424,16 +427,17 @@
         <ol class="top" id="topList"></ol>
       </section>
 
-      <section class="card" id="nowCard">
-        <h2><span id="nowTitle">Watching</span> <span class="count" id="nowCount">0</span></h2>
-        <p class="hint editable" id="nowHint"></p>
-        <ul class="list" id="nowList"></ul>
-      </section>
 
       <section class="card" id="watchedCard">
         <h2><span id="watchedTitle">Watched</span> <span class="count" id="watchedCount">0</span></h2>
         <p class="hint editable">Score it out of 10, or tap ★ to add it to your top 10.</p>
         <ul class="list" id="watchedList"></ul>
+      </section>
+
+      <section class="card" id="nowCard">
+        <h2><span id="nowTitle">Watching</span> <span class="count" id="nowCount">0</span></h2>
+        <p class="hint editable" id="nowHint"></p>
+        <ul class="list" id="nowList"></ul>
       </section>
 
       <section class="card" id="watchCard">
@@ -746,6 +750,13 @@ const blank = () => ({name:"",avatar:null,top:[],watched:[],watchlist:[],mtop:[]
 const USER_DOMAIN = "@users.crew-fd928.firebaseapp.com";
 function displayNameOf(u){ if(!u) return "Someone"; if(u.displayName) return u.displayName; if(u.email && u.email.endsWith(USER_DOMAIN)) return u.email.slice(0,-USER_DOMAIN.length); return "Someone"; }
 const ALL="__all";
+function topGenre(d){
+  if(!d) return null; const seen=new Map();
+  ["anime","manga"].forEach(md=>{ const k=MEDIA_KEYS[md]; [...d[k.top],...d[k.watched],...d[k.watching]].forEach(x=>{ const key=md+":"+norm(x.title); const prev=seen.get(key); if(!prev || (!(prev.genres||[]).length && (x.genres||[]).length)) seen.set(key,x); }); });
+  const c={}; [...seen.values()].forEach(x=>(x.genres||[]).forEach(g=>{ c[g]=(c[g]||0)+1; }));
+  const top=Object.entries(c).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]))[0];
+  return top ? top[0] : null;
+}
 function allDoc(ids){
   const out=blank(); const keyOf=x=>(x.media||"")+":"+norm(x.title);
   const merge=k=>{ const m=new Map(); ids.forEach(id=>((state.docs[id]||{})[k]||[]).forEach(x=>{ const kk=keyOf(x); let e=m.get(kk); if(!e){ e={...x, _who:[], _sc:[], at:x.at||""}; m.set(kk,e); } if(!e._who.includes(id)) e._who.push(id); if(!e.img&&x.img) e.img=x.img; if(!(e.genres||[]).length&&(x.genres||[]).length) e.genres=x.genres; if(x.score) e._sc.push(x.score); if((x.at||"")>e.at) e.at=x.at||""; })); 
@@ -1745,7 +1756,7 @@ function render(){
       people.style.display="";
       if(!state.friend || (state.friend!==ALL && !friendIds.includes(state.friend))) state.friend = friendIds.length>1 ? ALL : friendIds[0];
       if(friendIds.length>1){ const c=el("button","chip"+(state.friend===ALL?" on":"")); const g=el("span","av sm allav","👥"); c.append(g, el("span","","All friends")); c.type="button"; c.addEventListener("click",()=>{state.friend=ALL; render();}); people.append(c); }
-      friendIds.forEach(id=>{ const c=el("button","chip"+(id===state.friend?" on":"")); const tm=tasteMatch(mine(), state.docs[id]); c.append(avatarEl(id,true), el("span","",nameOf(id)+(tm.pct!=null?" · "+tm.pct+"%":""))); c.type="button"; c.addEventListener("click",()=>{state.friend=id; render();}); people.append(c); });
+      friendIds.forEach(id=>{ const c=el("button","chip"+(id===state.friend?" on":"")); const tm=tasteMatch(mine(), state.docs[id]); const nm=el("span","chipname"); nm.append(el("span","",nameOf(id)+(tm.pct!=null?" · "+tm.pct+"%":""))); const tg=topGenre(state.docs[id]); if(tg) nm.append(el("small","",tg)); c.append(avatarEl(id,true), nm); c.type="button"; c.addEventListener("click",()=>{state.friend=id; render();}); people.append(c); });
       showId=state.friend;
       if(showId!==ALL && !hasAnything(state.docs[showId])) people.append(el("div","empty",nameOf(showId)+" hasn't added anything yet."));
     }
