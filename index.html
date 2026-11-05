@@ -243,6 +243,27 @@
   ul.list{list-style:none;margin:0;padding:0}
   ul.list li{display:flex;align-items:center;gap:10px;padding:9px 2px;border-top:1px solid var(--line)}
   ul.list li:first-child{border-top:0}
+  .facts{display:flex;flex-direction:column;gap:5px;align-items:stretch;flex:none}
+  .facts .pill{white-space:nowrap}
+  .layseg{display:flex;flex:none;gap:2px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:3px}
+  .layseg button{border:0;background:transparent;color:var(--muted);font-size:17px;width:38px;border-radius:9px;cursor:pointer}
+  .layseg button.on{background:var(--accent);color:#fff}
+  ul.list.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px}
+  ul.list.grid li{flex-direction:column;align-items:stretch;gap:6px;padding:6px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);min-width:0}
+  ul.list.grid li:first-child{border-top:1px solid var(--line)}
+  ul.list.grid li>.poster{width:100%;border-radius:8px}
+  ul.list.grid li>.poster .gen b{font-size:24px}
+  ul.list.grid .title{font-size:13px;line-height:1.25;overflow-wrap:anywhere}
+  ul.list.grid .title small{display:block;font-size:11px}
+  ul.list.grid .actions{justify-content:center;flex-wrap:wrap}
+  ul.list.grid .ic{width:30px;height:30px;font-size:13px}
+  ul.list.grid select.score{width:100%}
+  ul.list.grid .scoretag{align-self:flex-start}
+  ul.list.grid .facts .pill{font-size:11px;padding:5px 4px;white-space:normal}
+  ul.list.grid .prog{flex-wrap:wrap}
+  ul.list.grid>.empty{grid-column:1/-1}
+  ul.list.grid .revlink{display:block;margin:2px 0 0;padding:0}
+  .crewtabs{margin-bottom:14px}
   select.score{background:var(--panel2);color:var(--accent2);border:1px solid var(--line);border-radius:8px;padding:6px 4px;font:700 14px "Zen Kaku Gothic New";flex:none}
   .scoretag{color:var(--accent2);font-weight:700;font-size:14px;flex:none}
   .tag{font-size:11px;font-weight:700;color:var(--accent2);border:1px solid color-mix(in srgb, var(--accent2) 40%, transparent);padding:1px 7px;border-radius:999px;margin-left:6px;white-space:nowrap}
@@ -391,14 +412,9 @@
       </div>
       <div class="filters hidden" id="filters">
         <select id="fGenre" aria-label="Filter by genre"></select>
-        <select id="fSort" aria-label="Sort lists"><option value="recent">Newest first</option><option value="score">Highest rated</option><option value="title">A to Z</option><option value="year">Release year</option></select>
+        <select id="fSort" aria-label="Sort lists"><option value="title">A to Z</option><option value="recent">Newest first</option><option value="score">Highest rated</option><option value="year">Release year</option></select>
+        <div class="layseg" id="laySeg" role="group" aria-label="Layout"><button type="button" data-lay="list" title="List view" aria-label="List view">☰</button><button type="button" data-lay="grid" title="Grid view" aria-label="Grid view">▦</button></div>
       </div>
-
-      <section class="card hidden" id="airCard">
-        <h2>Airing soon</h2>
-        <p class="hint">Next episodes of currently airing shows on your lists, in your time zone.</p>
-        <div id="airList"></div>
-      </section>
 
       <section class="card" id="topCard">
         <h2><span id="topTitle">Top 10</span> <span class="count" id="topCount">0/10</span><button class="sharebtn" id="shareTop" type="button">📤 Share</button></h2>
@@ -436,6 +452,12 @@
         </section>
         <div id="customLists"></div>
       </div>
+
+      <section class="card hidden" id="airCard">
+        <h2>Airing soon</h2>
+        <p class="hint">Next episodes of currently airing shows on your lists, in your time zone.</p>
+        <div id="airList"></div>
+      </section>
     </div>
 
     <div id="seasonView" class="hidden">
@@ -448,6 +470,7 @@
     </div>
 
     <div id="crewView" class="hidden">
+      <div class="seg crewtabs" id="crewTabs"><button type="button" data-ct="picks" class="on">Picks</button><button type="button" data-ct="lists">Custom lists</button></div>
       <section class="card" id="crewTopCard">
         <h2 id="crewTopTitle">Crew top 10</h2>
         <p class="hint">Everyone's top 10s combined. A #1 pick is worth 10 points, #2 is worth 9, and so on down to 1 point for #10.</p>
@@ -1417,14 +1440,17 @@ async function afterLoad(){
 }
 
 // ---- filters (genre + sort) for anime/manga lists ----
-state.genre=""; state.sort="recent";
+state.genre="";
+state.sort=(()=>{ const v=window.CrewLook&&CrewLook.get("sort"); return ["title","recent","score","year"].includes(v)?v:"title"; })();
+state.layout=(()=>{ const v=window.CrewLook&&CrewLook.get("layout"); return v==="grid"?"grid":"list"; })();
+document.querySelectorAll("#laySeg button").forEach(b=>b.addEventListener("click",()=>{ state.layout=b.dataset.lay; if(window.CrewLook) CrewLook.put("layout",state.layout); render(); }));
 $("#fGenre").addEventListener("change",e=>{ state.genre=e.target.value; render(); });
-$("#fSort").addEventListener("change",e=>{ state.sort=e.target.value; render(); });
+$("#fSort").addEventListener("change",e=>{ state.sort=e.target.value; if(window.CrewLook) CrewLook.put("sort",state.sort); render(); });
 const passG = x => !state.genre || (x.genres||[]).includes(state.genre);
 function sortF(arr){
   const a=arr.filter(passG);
   if(state.sort==="score") a.sort((x,y)=>(y.score||0)-(x.score||0));
-  else if(state.sort==="title") a.sort((x,y)=>x.title.localeCompare(y.title));
+  else if(state.sort==="title") a.sort((x,y)=>x.title.localeCompare(y.title,undefined,{sensitivity:"base",numeric:true}));
   else if(state.sort==="year") a.sort((x,y)=>(y.year||0)-(x.year||0));
   return a;
 }
@@ -1734,6 +1760,13 @@ function render(){
   const d = L(showId ? (state.docs[showId] || blank()) : blank());
   const k = K();
   if(std){ fillGenreSelect($("#fGenre"), [...d.top,...d.watching,...d.watched,...d.watchlist], state.genre, "All genres"); $("#fSort").value=state.sort; }
+  document.querySelectorAll("#laySeg button").forEach(b=>b.classList.toggle("on", b.dataset.lay===state.layout));
+  ["#nowList","#watchedList","#watchList"].forEach(id=>$(id).classList.toggle("grid", state.layout==="grid"));
+  const friendActs = x => { if(editable || !state.me) return null; const media=mediaOf(x)||"anime", mk2=MEDIA_KEYS[media], me=mine(), it={...x,media};
+    const inW=has(me[mk2.watched],it), inQ=has(me[mk2.watchlist],it)||inW, a=el("div","facts");
+    const q=el("button","pill"+(inQ?" done":""), (inQ?"✓ ":"+ ")+WORDS[media].watchlist); q.type="button"; if(!inQ) q.addEventListener("click",()=>addWatchFor(x,media));
+    const w=el("button","pill"+(inW?" done":""), "✓ "+WORDS[media].watched); w.type="button"; if(!inW) w.addEventListener("click",()=>addWatchedFor(x,media));
+    a.append(q,w); return a; };
   const noMatch = (list, arr) => { if(arr.length && !list.children.length) list.append(el("div","empty","Nothing here matches "+state.genre+".")); };
 
   $("#topCount").textContent = d.top.length+"/10";
@@ -1744,6 +1777,7 @@ function render(){
     if(std && !passG(x)) return;
     const li=el("li","r"+(i+1));
     li.append(el("div","rank",String(i+1)), posterEl(x,true), titleBlock(x,true));
+    if(!editable){ const fa=friendActs(x); if(fa) li.append(fa); }
     if(editable){
       const a=el("div","actions");
       a.append(
@@ -1775,7 +1809,7 @@ function render(){
         const a=el("div","actions");
         a.append(icon("+1 "+w2.unitLong,"+",()=>setProg(x,p+1)), icon("Finished","✓",()=>finishNow(x)), icon("Remove","✕",()=>mutate(m=>{ m[k.watching]=m[k.watching].filter(y=>y.id!==x.id); }),{cls:"del"}));
         li.append(a);
-      }
+      } else { const fa=friendActs(x); if(fa) li.append(fa); }
       nl.append(li);
     });
     noMatch(nl, d.watching);
@@ -1797,7 +1831,7 @@ function render(){
       const a=el("div","actions");
       a.append(icon("Add to top 10","★",()=>addTop(x),{disabled:topSet.has(norm(x.title))}), icon("Remove","✕",()=>mutate(m=>{ m[k.watched]=m[k.watched].filter(y=>y.id!==x.id); }),{cls:"del"}));
       li.append(sel, a);
-    } else if(x.score) li.append(el("div","scoretag",x.score+"/10"));
+    } else { if(x.score) li.append(el("div","scoretag",x.score+"/10")); const fa=friendActs(x); if(fa) li.append(fa); }
     wl.append(li);
   });
   if(std) noMatch(wl, d.watched);
@@ -1814,8 +1848,9 @@ function render(){
         icon(W().markDone,"✓",()=>{ const media=mediaOf(x); mutate(m=>{ m[k.watchlist]=m[k.watchlist].filter(y=>y.id!==x.id); if(!has(m[k.watched],x)) m[k.watched].unshift(mk(x)); toast(W().moved); }); askRating({...x, media}); }),
         icon("Remove","✕",()=>mutate(m=>{ m[k.watchlist]=m[k.watchlist].filter(y=>y.id!==x.id); }),{cls:"del"})
       );
-    } else a.append(icon(W().toMine,"+",()=>addWatch(x)));
-    li.append(a); ql.append(li);
+      li.append(a);
+    } else { const fa=friendActs(x); if(fa) li.append(fa); }
+    ql.append(li);
   });
   if(std) noMatch(ql, d.watchlist);
 }
@@ -1873,10 +1908,13 @@ function renderLatestReviews(){
   all.slice(0,15).forEach(v=>box.append(reviewEl(v.id, v.r, true)));
 }
 function renderCrew(){
-  renderLatestReviews(); renderRecs(); renderActivity(); renderPolls(); renderParty();
-  const isLists = state.mode==="lists";
-  $("#crewTopCard").classList.toggle("hidden", isLists);
+  if(state.mode==="lists") state.crewTab="lists";
+  const isLists = state.crewTab==="lists";
+  document.querySelectorAll("#crewTabs button").forEach(b=>b.classList.toggle("on", b.dataset.ct===state.crewTab));
+  document.querySelectorAll("#crewView > section").forEach(c=>c.classList.toggle("hidden", isLists));
+  $("#modeSeg").classList.toggle("hidden", isLists);
   $("#crewLists").classList.toggle("hidden", !isLists);
+  if(!isLists){ renderLatestReviews(); renderRecs(); renderActivity(); renderPolls(); renderParty(); }
   if(isLists){
     const box=$("#crewLists"); box.replaceChildren();
     const ids=Object.keys(state.docs).filter(id=>state.docs[id].custom.length).sort((a,b)=>(a===state.me.uid?-1:b===state.me.uid?1:nameOf(a).localeCompare(nameOf(b))));
@@ -1909,9 +1947,16 @@ function renderCrew(){
 }
 
 document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>{ state.view=b.dataset.view; render(); }));
+state.crewTab = (window.CrewLook && CrewLook.get("crewTab"))==="lists" ? "lists" : "picks";
+state.lastMode = state.mode==="lists" ? "anime" : state.mode;
+document.querySelectorAll("#crewTabs button").forEach(b=>b.addEventListener("click",()=>{
+  state.crewTab=b.dataset.ct; if(window.CrewLook) CrewLook.put("crewTab",state.crewTab);
+  if(state.crewTab==="picks" && state.mode==="lists"){ state.mode=state.lastMode||"anime"; if(window.CrewLook) CrewLook.put("mode",state.mode); }
+  if(state.me) render();
+}));
 document.querySelectorAll("#modeSeg button").forEach(b=>b.addEventListener("click",()=>{
   if(state.mode===b.dataset.mode) return;
-  state.mode=b.dataset.mode; state.target=null; state.genre=""; if(window.CrewLook) CrewLook.put("mode",state.mode);
+  state.mode=b.dataset.mode; if(state.mode!=="lists") state.lastMode=state.mode; state.target=null; state.genre=""; if(window.CrewLook) CrewLook.put("mode",state.mode);
   clearTimeout(searchTimer); if(controller){ controller.abort(); controller=null; }
   $("#q").value=""; lastResults=[]; searchState="idle";
   if(state.me) render();
