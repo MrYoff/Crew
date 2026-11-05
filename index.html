@@ -1707,6 +1707,7 @@ function render(){
   $("#crewView").classList.toggle("hidden", state.view!=="crew");
   $("#seasonView").classList.toggle("hidden", state.view!=="season");
   $("#modeSeg").classList.toggle("hidden", state.view==="season");
+  $('#modeSeg button[data-mode="lists"]').classList.toggle("hidden", state.view==="crew");
   // shared poster index so custom-added titles pick up a poster if anyone has one
   Object.values(state.docs).forEach(d=>{
     const all=[];
