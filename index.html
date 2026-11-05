@@ -187,6 +187,8 @@
   .avbtn::after{content:"📷";position:absolute;right:-4px;bottom:-4px;font-size:11px;background:var(--panel2);border-radius:50%;padding:2px;line-height:1}
   .av{width:40px;height:40px;border-radius:50%;object-fit:cover;display:grid;place-items:center;font:700 16px "Zen Kaku Gothic New";color:#fff;overflow:hidden;flex:none}
   .av.sm{width:22px;height:22px;font-size:11px}
+  .allav{background:var(--panel2);font-size:12px}
+  .whoavs{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}
   .chip{display:inline-flex;align-items:center;gap:7px}
   .link{background:none;border:0;color:var(--muted);font:inherit;text-decoration:underline;cursor:pointer;padding:0}
 
@@ -743,6 +745,17 @@ function sanitize(d){
 const blank = () => ({name:"",avatar:null,top:[],watched:[],watchlist:[],mtop:[],mread:[],mlist:[],otop:[],custom:[],reviews:[],watching:[],mreading:[],reacts:[],replies:[],polls:[],votes:[],party:[]});
 const USER_DOMAIN = "@users.crew-fd928.firebaseapp.com";
 function displayNameOf(u){ if(!u) return "Someone"; if(u.displayName) return u.displayName; if(u.email && u.email.endsWith(USER_DOMAIN)) return u.email.slice(0,-USER_DOMAIN.length); return "Someone"; }
+const ALL="__all";
+function allDoc(ids){
+  const out=blank(); const keyOf=x=>(x.media||"")+":"+norm(x.title);
+  const merge=k=>{ const m=new Map(); ids.forEach(id=>((state.docs[id]||{})[k]||[]).forEach(x=>{ const kk=keyOf(x); let e=m.get(kk); if(!e){ e={...x, _who:[], _sc:[], at:x.at||""}; m.set(kk,e); } if(!e._who.includes(id)) e._who.push(id); if(!e.img&&x.img) e.img=x.img; if(!(e.genres||[]).length&&(x.genres||[]).length) e.genres=x.genres; if(x.score) e._sc.push(x.score); if((x.at||"")>e.at) e.at=x.at||""; })); 
+    return [...m.values()].map(e=>{ e.score=e._sc.length? Math.round(e._sc.reduce((p,c)=>p+c,0)/e._sc.length*10)/10 : null; e.prog=null; return e; }); };
+  const mergeTop=k=>{ const m=new Map(); ids.forEach(id=>((state.docs[id]||{})[k]||[]).forEach((x,i)=>{ const kk=keyOf(x); let e=m.get(kk); if(!e){ e={...x, _who:[], _pts:0, score:null}; m.set(kk,e); } e._who.push(id); e._pts+=10-i; if(!e.img&&x.img) e.img=x.img; })); 
+    return [...m.values()].sort((a,b)=>b._pts-a._pts||a.title.localeCompare(b.title)).slice(0,10); };
+  ["top","mtop","otop"].forEach(k=>out[k]=mergeTop(k));
+  ["watched","watchlist","watching","mread","mlist","mreading"].forEach(k=>out[k]=merge(k));
+  return out;
+}
 function mine(){ return state.docs[state.me.uid] || (state.docs[state.me.uid] = blank()); }
 
 // ---- saving ----
@@ -918,7 +931,8 @@ function metaOf(x){
   if(mixed() && x.media==="manga") return [x.kind||"Manga",x.year];
   return [x.year,x.kind];
 }
-function titleBlock(x, showScore){ const t=el("div","title",x.title); const meta=metaOf(x).filter(Boolean).join(" · "); if(meta||(showScore&&x.score)){ const sm=el("small","",meta); if(showScore&&x.score){ if(meta) sm.append(" · "); sm.append(el("span","myscore","★ "+x.score+"/10")); } t.append(sm); } const gt=gtags(x); if(gt) t.append(gt); t.append(revLink(x)); return t; }
+function titleBlock(x, showScore){ const t=el("div","title",x.title); const meta=metaOf(x).filter(Boolean).join(" · "); if(meta||(showScore&&x.score)){ const sm=el("small","",meta); if(showScore&&x.score){ if(meta) sm.append(" · "); sm.append(el("span","myscore","★ "+x.score+"/10")); } t.append(sm); } const gt=gtags(x); if(gt) t.append(gt); if(x._who) t.append(whoEl(x._who)); t.append(revLink(x)); return t; }
+function whoEl(ids){ const w=el("div","whoavs"); ids.forEach(id=>{ const a=avatarEl(id,true); a.title=nameOf(id)+(arguments[1]&&arguments[1][id]?" "+arguments[1][id]:""); w.append(a); }); return w; }
 
 // ---- reviews ----
 const revKey = x => (mediaOf(x)||"anime")+":"+norm(x.title);
@@ -1729,17 +1743,18 @@ function render(){
     if(!friendIds.length){ people.append(el("div","empty","No friends here yet. Send them the link and they'll show up as soon as they make an account.")); people.style.display="block"; showId=null; }
     else {
       people.style.display="";
-      if(!state.friend || !friendIds.includes(state.friend)) state.friend=friendIds[0];
+      if(!state.friend || (state.friend!==ALL && !friendIds.includes(state.friend))) state.friend = friendIds.length>1 ? ALL : friendIds[0];
+      if(friendIds.length>1){ const c=el("button","chip"+(state.friend===ALL?" on":"")); const g=el("span","av sm allav","👥"); c.append(g, el("span","","All friends")); c.type="button"; c.addEventListener("click",()=>{state.friend=ALL; render();}); people.append(c); }
       friendIds.forEach(id=>{ const c=el("button","chip"+(id===state.friend?" on":"")); const tm=tasteMatch(mine(), state.docs[id]); c.append(avatarEl(id,true), el("span","",nameOf(id)+(tm.pct!=null?" · "+tm.pct+"%":""))); c.type="button"; c.addEventListener("click",()=>{state.friend=id; render();}); people.append(c); });
       showId=state.friend;
-      if(!hasAnything(state.docs[showId])) people.append(el("div","empty",nameOf(showId)+" hasn't added anything yet."));
+      if(showId!==ALL && !hasAnything(state.docs[showId])) people.append(el("div","empty",nameOf(showId)+" hasn't added anything yet."));
     }
   } else people.classList.add("hidden");
 
   const editable = state.view==="me";
   document.querySelectorAll(".editable").forEach(e=>e.classList.toggle("hidden",!editable));
   const std = state.mode==="anime" || state.mode==="manga";
-  renderMatch(state.view==="friends" ? showId : null);
+  renderMatch(state.view==="friends" && showId!==ALL ? showId : null);
   $("#filters").classList.toggle("hidden", !std || !showId);
   renderAiring(editable && state.mode==="anime");
   $("#nowCard").classList.toggle("hidden", !std);
@@ -1756,9 +1771,10 @@ function render(){
   $("#topTitle").textContent = state.mode==="overall" ? "Overall top 10" : "Top 10";
   $("#topHint").textContent = editable
     ? (state.mode==="overall" ? "Anime and manga together. Search above to add either one, and use the arrows to reorder." : "Search above to add "+(state.mode==="manga"?"manga":"shows")+". Use the arrows to reorder.")
+    : showId===ALL ? "Everyone's "+(state.mode==="overall"?"overall ":"")+"top 10s combined. A #1 pick is worth 10 points, #10 is worth 1."
     : (showId ? nameOf(showId)+"'s "+(state.mode==="overall"?"overall ":"")+"ranking." : "");
 
-  const d = L(showId ? (state.docs[showId] || blank()) : blank());
+  const d = L(showId ? (showId===ALL ? allDoc(friendIds) : (state.docs[showId] || blank())) : blank());
   const k = K();
   if(std){ fillGenreSelect($("#fGenre"), [...d.top,...d.watching,...d.watched,...d.watchlist], state.genre, "All genres"); $("#fSort").value=state.sort; }
   document.querySelectorAll("#laySeg button").forEach(b=>b.classList.toggle("on", b.dataset.lay===state.layout));
@@ -1771,7 +1787,7 @@ function render(){
   const noMatch = (list, arr) => { if(arr.length && !list.children.length) list.append(el("div","empty","Nothing here matches "+state.genre+".")); };
 
   $("#topCount").textContent = d.top.length+"/10";
-  $("#shareTop").classList.toggle("hidden", !d.top.length);
+  $("#shareTop").classList.toggle("hidden", !d.top.length || showId===ALL);
   const tl=$("#topList"); tl.replaceChildren();
   if(!d.top.length) tl.append(el("div","empty", editable?"Nothing ranked yet. Search for your #1 above.":"No top 10 yet."));
   d.top.forEach((x,i)=>{
@@ -1799,7 +1815,7 @@ function render(){
     if(!d.watching.length) nl.append(el("div","empty", editable ? w2.nowEmpty+" Tap ▶ on something in your "+w2.watchlist.toLowerCase()+", or search above." : w2.nowEmpty));
     sortF(d.watching).forEach(x=>{
       const li=el("li"); const t=titleBlock(x);
-      const pr=el("div","prog"), p=x.prog||0;
+      const pr=el("div","prog"+(x._who?" hidden":"")), p=x.prog||0;
       const lab=el("button","lab", w2.unit+" "+p+(x.total?" / "+x.total:"")); lab.type="button";
       if(editable){ lab.title="Set "+w2.unitLong; lab.addEventListener("click",()=>{ const v=prompt("Which "+w2.unitLong+" are you on?", String(p)); if(v==null) return; const n=parseInt(v,10); if(isNaN(n)||n<0) return; setProg(x,n); }); } else lab.disabled=true;
       pr.append(lab);
@@ -1832,7 +1848,7 @@ function render(){
       const a=el("div","actions");
       a.append(icon("Add to top 10","★",()=>addTop(x),{disabled:topSet.has(norm(x.title))}), icon("Remove","✕",()=>mutate(m=>{ m[k.watched]=m[k.watched].filter(y=>y.id!==x.id); }),{cls:"del"}));
       li.append(sel, a);
-    } else { if(x.score) li.append(el("div","scoretag",x.score+"/10")); const fa=friendActs(x); if(fa) li.append(fa); }
+    } else { if(x.score) li.append(el("div","scoretag",x._who&&x._sc.length>1?"★ "+x.score+" avg":x.score+"/10")); const fa=friendActs(x); if(fa) li.append(fa); }
     wl.append(li);
   });
   if(std) noMatch(wl, d.watched);
@@ -1894,6 +1910,11 @@ function listCard(l, editable, ownerId){
 function renderCustomLists(showId, editable){
   const box=$("#customLists"); box.replaceChildren();
   if(!showId) return;
+  if(showId===ALL){
+    const ids=Object.keys(state.docs).filter(id=>id!==state.me.uid && state.docs[id].custom.length).sort((a,b)=>nameOf(a).localeCompare(nameOf(b)));
+    if(!ids.length){ const c=el("section","card"); c.append(el("div","empty","None of your friends have made a list yet.")); box.append(c); return; }
+    ids.forEach(id=>state.docs[id].custom.forEach(l=>box.append(listCard(l,false,id)))); return;
+  }
   const lists=(state.docs[showId]||blank()).custom||[];
   if(!lists.length){
     const c=el("section","card"); c.append(el("div","empty", editable ? "No lists yet. Make your first one above." : nameOf(showId)+" hasn't made any lists yet.")); box.append(c); return;
