@@ -1758,7 +1758,7 @@ function render(){
   $("#filters").classList.toggle("hidden", !std || !showId);
   renderAiring(editable && state.mode==="anime");
   $("#nowCard").classList.toggle("hidden", !std);
-  $("#topCard").classList.toggle("hidden", state.mode==="lists");
+  $("#topCard").classList.toggle("hidden", state.mode==="lists" || (state.view==="friends" && showId===ALL && state.mode!=="overall"));
   $("#watchedCard").classList.toggle("hidden", !std);
   $("#watchCard").classList.toggle("hidden", !std);
   $("#customArea").classList.toggle("hidden", state.mode!=="lists");
