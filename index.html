@@ -317,6 +317,59 @@
   .by{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:13px;margin:0 0 10px}
   .target{display:flex;align-items:center;gap:10px;justify-content:space-between}
   .target .btn{padding:6px 12px;font-size:13px;flex:none}
+  /* roulette */
+  .spinstage{display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px 0 4px;min-height:270px}
+  .spinstage .poster{width:140px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.35)}
+  .spinstage .poster .gen b{font-size:34px}
+  .spinstage .t{font-weight:700;font-size:19px;text-align:center;overflow-wrap:anywhere}
+  .spinstage .s{color:var(--muted);font-size:12px;text-align:center}
+  .spinstage.rolling .poster{transform:scale(.94);opacity:.8}
+  .spinstage.landed .poster{animation:pop .35s ease-out}
+  @keyframes pop{0%{transform:scale(.9)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+  /* head to head */
+  .cmphead{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0 6px}
+  .cmphead div{display:flex;align-items:center;gap:6px;font-weight:700;font-size:14px;min-width:0}
+  .cmpgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .cmpcell{display:flex;gap:6px;align-items:center;background:var(--panel2);border-radius:10px;padding:5px;min-height:54px;border:1px solid transparent;font-size:13px;font-weight:700;min-width:0}
+  .cmpcell.both{border-color:var(--accent2);background:color-mix(in srgb, var(--accent2) 10%, var(--panel2))}
+  .cmpcell .rk{font-family:"Dela Gothic One";font-weight:400;color:var(--muted);width:20px;text-align:center;flex:none}
+  .cmpcell .poster{width:30px;border-radius:5px}
+  .cmpcell .poster .gen b{font-size:11px} .cmpcell .poster .gen i{display:none}
+  .cmpcell .nm{flex:1;min-width:0;overflow-wrap:anywhere;line-height:1.2}
+  .cmpcell .nm small{display:block;color:var(--accent2);font-size:11px}
+  .cmpcell.blank{color:var(--muted);font-weight:500;justify-content:center}
+  .cmpsum{color:var(--muted);font-size:13px;margin:4px 0 0}
+  /* stats */
+  .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .tile{background:var(--panel2);border-radius:12px;padding:10px 6px;text-align:center;min-width:0}
+  .tile b{display:block;font-family:"Dela Gothic One";font-weight:400;font-size:22px;color:var(--accent2);line-height:1.15;overflow-wrap:anywhere}
+  .tile span{font-size:11px;color:var(--muted);font-weight:700}
+  .gbar{display:flex;align-items:center;gap:8px;font-size:13px;margin-top:6px}
+  .gbar .gn{width:100px;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
+  .gbar .gt{flex:1;height:8px;background:var(--panel2);border-radius:8px;overflow:hidden}
+  .gbar .gt i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+  .gbar .gc{color:var(--muted);font-size:12px;width:26px;text-align:right}
+  .hist{display:flex;align-items:flex-end;gap:4px;height:84px;margin-top:6px}
+  .hist div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:2px;min-width:0}
+  .hist i{display:block;width:100%;background:linear-gradient(0deg,var(--accent),var(--accent2));border-radius:4px 4px 0 0;min-height:2px}
+  .hist em{font-style:normal;font-size:10px;color:var(--text);font-weight:700}
+  .hist span{font-size:10px;color:var(--muted)}
+  .yearline{color:var(--muted);font-size:13px;margin-top:10px}
+  .yearline b{color:var(--text)}
+  /* activity reactions (compact) */
+  .act .reacts{margin-top:5px}
+  .act .txt .reacts .rx{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:999px;padding:2px 8px;font:700 12px "Zen Kaku Gothic New"}
+  .act .txt .reacts .rx.on{border-color:var(--accent2);background:color-mix(in srgb, var(--accent2) 14%, transparent)}
+  .act .txt .reacts .rx.add{color:var(--muted)}
+  .act .txt .reacts .rp{font-size:12px;margin-left:4px}
+  .act .txt .replies button{color:var(--muted)}
+  /* account + recovery */
+  .acct label{display:block;font-size:13px;color:var(--muted);margin:10px 0 5px}
+  .acct input{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:12px;font:16px "Zen Kaku Gothic New"}
+  .acct .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .acct .err{color:var(--err);font-size:13px;margin-top:8px;min-height:1em}
+  .codebox{font:400 26px "Dela Gothic One";letter-spacing:2px;text-align:center;background:var(--panel2);border:1px dashed var(--accent2);color:var(--accent2);border-radius:14px;padding:18px 8px;margin:10px 0;user-select:all;overflow-wrap:anywhere}
+  .forgot{display:block;margin:10px auto 0;font-size:13px}
   .hidden{display:none!important}
 </style>
 </head>
@@ -372,7 +425,7 @@
       <h1>Crew</h1>
     </div>
     <div class="headright">
-    <div class="me hidden" id="me"><button class="avbtn" id="avBtn" type="button" aria-label="Change profile picture" title="Change profile picture"><span id="meAv"></span></button><div><div id="meName"></div><button class="link" id="signOut">Sign out</button></div></div>
+    <div class="me hidden" id="me"><button class="avbtn" id="avBtn" type="button" aria-label="Change profile picture" title="Change profile picture"><span id="meAv"></span></button><div><div id="meName"></div><button class="link" id="acctBtn" type="button">Account</button> · <button class="link" id="signOut">Sign out</button></div></div>
     <button class="gear" id="gearBtn" type="button" aria-label="Appearance settings" title="Theme &amp; background"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="13.5" cy="6.5" r="1.5" fill="currentColor"/><circle cx="17.5" cy="10.5" r="1.5" fill="currentColor"/><circle cx="8.5" cy="7.5" r="1.5" fill="currentColor"/><circle cx="6.5" cy="12.5" r="1.5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.9 0 1.6-.7 1.6-1.6 0-.4-.2-.8-.4-1.1-.3-.3-.4-.7-.4-1.1 0-.9.7-1.6 1.6-1.6H16c3.3 0 6-2.7 6-6 0-4.9-4.5-8.6-10-8.6z"/></svg></button>
     </div>
   </div>
@@ -381,16 +434,20 @@
   <div id="status" class="notice">Signing you in…</div>
   <div id="installBar" class="notice installbar hidden"><span class="grow">📲 Add Crew to your home screen so it opens like an app.</span><button class="btn primary" id="installGo" type="button">How</button><button class="btn" id="installX" type="button" aria-label="Dismiss">✕</button></div>
 
+  <div id="recBar" class="notice installbar hidden"><span class="grow">🔑 Set up a recovery code so you can get back in if you ever forget your password.</span><button class="btn primary" id="recGo" type="button">Set up</button><button class="btn" id="recX" type="button" aria-label="Dismiss">✕</button></div>
   <div id="signinView" class="signin hidden">
     <form class="authbox" id="authForm" novalidate>
       <div class="seg"><button type="button" data-mode="signup" class="on">Create account</button><button type="button" data-mode="signin">Sign in</button></div>
       <label for="uname">Username</label>
       <input id="uname" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="20" placeholder="e.g. anderson">
-      <label for="pw">Password</label>
+      <div id="codeRow" class="hidden"><label for="rcode">Recovery code</label>
+      <input id="rcode" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" maxlength="30" placeholder="XXXX-XXXX-XXXX-XXXX"></div>
+      <label for="pw" id="pwLabel">Password</label>
       <input id="pw" type="password" autocomplete="new-password" maxlength="100" placeholder="At least 6 characters">
       <button class="go" id="goBtn" type="submit">Create account</button>
       <div class="err" id="authErr"></div>
-      <div class="small" id="authNote">No email needed. Write your password down somewhere, because there's no way to reset it.</div>
+      <div class="small" id="authNote">No email needed. You'll get a recovery code after you sign up, so you can reset your password if you forget it.</div>
+      <button class="link forgot hidden" id="forgotBtn" type="button">Forgot your password?</button>
       <div class="or">or</div>
       <button class="gbtn" id="signIn" type="button"><svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>Continue with Google</button>
     </form>
@@ -407,7 +464,7 @@
 
     <div id="listsView">
       <div id="people" class="people hidden"></div>
-      <section class="card hidden" id="matchCard"><h2>Taste match</h2><div id="matchBody"></div></section>
+      <section class="card hidden" id="matchCard"><h2>Taste match <button class="sharebtn" id="cmpBtn" type="button">⚔️ Head to head</button></h2><div id="matchBody"></div></section>
 
       <div class="notice target hidden" id="targetBar"><span>Adding to <b id="targetName"></b></span><button class="btn" id="targetDone" type="button">Done</button></div>
       <div class="search editable">
@@ -441,7 +498,7 @@
       </section>
 
       <section class="card" id="watchCard">
-        <h2><span id="watchTitle">Watchlist</span> <span class="count" id="watchCount">0</span></h2>
+        <h2><span id="watchTitle">Watchlist</span> <span class="count" id="watchCount">0</span><button class="sharebtn hidden" id="spinWatch" type="button">🎲 Pick for me</button></h2>
         <p class="hint editable" id="watchHint">Tap ✓ when you finish one and it moves to Watched.</p>
         <ul class="list" id="watchList"></ul>
       </section>
@@ -464,6 +521,11 @@
         <p class="hint">Next episodes of currently airing shows on your lists, in your time zone.</p>
         <div id="airList"></div>
       </section>
+
+      <section class="card hidden" id="statsCard">
+        <h2 id="statsTitle">Your stats</h2>
+        <div id="statsBody"></div>
+      </section>
     </div>
 
     <div id="seasonView" class="hidden">
@@ -484,7 +546,7 @@
       </section>
       <div id="crewLists" class="hidden"></div>
       <section class="card" id="partyCard">
-        <h2>Watch party list <span class="typetag" id="partyCount"></span></h2>
+        <h2>Watch party list <span class="typetag" id="partyCount"></span><button class="sharebtn hidden" id="spinParty" type="button">🎲 Spin</button></h2>
         <p class="hint">The crew's shared list of things to watch (or read) together. Anyone can add to it. Tap "I'm in" on something you want to watch too.</p>
         <div class="search partysearch">
           <svg class="mag" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
@@ -595,6 +657,48 @@
     <p class="hint" style="margin-top:12px">These settings are saved on this device only.</p>
   </div>
 </div>
+<div class="sheet-bg hidden" id="spinSheet" role="dialog" aria-modal="true" aria-labelledby="spinTitle">
+  <div class="sheet">
+    <div class="head"><h3 id="spinTitle">Pick for me</h3><button class="ic" id="spinClose" type="button" aria-label="Close">✕</button></div>
+    <p class="hint" id="spinHint" style="margin:0"></p>
+    <div class="spinstage" id="spinStage"></div>
+    <div class="avbtns"><button class="btn" id="spinAgain" type="button">🎲 Spin again</button><button class="btn primary" id="spinAct" type="button"></button></div>
+  </div>
+</div>
+<div class="sheet-bg hidden" id="cmpSheet" role="dialog" aria-modal="true" aria-labelledby="cmpTitle">
+  <div class="sheet">
+    <div class="head"><h3 id="cmpTitle">Head to head</h3><button class="ic" id="cmpClose" type="button" aria-label="Close">✕</button></div>
+    <div class="seg" id="cmpSeg"><button type="button" data-m="anime">Anime</button><button type="button" data-m="manga">Manga</button><button type="button" data-m="overall">Overall</button></div>
+    <div id="cmpBody"></div>
+  </div>
+</div>
+<div class="sheet-bg hidden" id="acctSheet" role="dialog" aria-modal="true" aria-labelledby="acctTitle">
+  <div class="sheet acct">
+    <div class="head"><h3 id="acctTitle">Account</h3><button class="ic" id="acctClose" type="button" aria-label="Close">✕</button></div>
+    <div id="acctGoogle" class="hint hidden">You sign in with Google, so there's no Crew password to forget. Google handles that.</div>
+    <div id="acctPw">
+      <p class="hint" style="margin-top:0">Signed in as <b id="acctName"></b>. Enter your current password to make a recovery code or change your password.</p>
+      <label for="acctCur">Current password</label>
+      <input id="acctCur" type="password" autocomplete="current-password" maxlength="100">
+      <h4>Recovery code</h4>
+      <p class="hint" id="acctRecState" style="margin:0"></p>
+      <div class="row"><button class="btn primary" id="acctNewCode" type="button">Make a recovery code</button></div>
+      <h4>Change password</h4>
+      <label for="acctNew" style="margin-top:0">New password</label>
+      <input id="acctNew" type="password" autocomplete="new-password" maxlength="100" placeholder="At least 6 characters">
+      <div class="row"><button class="btn" id="acctChange" type="button">Change password</button></div>
+      <div class="err" id="acctErr"></div>
+    </div>
+  </div>
+</div>
+<div class="sheet-bg hidden" id="codeSheet" role="dialog" aria-modal="true" aria-labelledby="codeTitle">
+  <div class="sheet">
+    <div class="head"><h3 id="codeTitle">Your recovery code</h3></div>
+    <p class="hint" style="margin-top:0">If you forget your password, tap <b>Forgot your password?</b> on the sign-in screen and enter this code. Screenshot it or write it down somewhere safe. You won't see it again. Anyone with this code can reset your password, so don't share it.</p>
+    <div class="codebox" id="codeBox"></div>
+    <div class="avbtns"><button class="btn" id="codeCopy" type="button">Copy</button><button class="btn primary" id="codeDone" type="button">I saved it</button></div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -660,8 +764,8 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import { getFirestore, collection, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBoOyxhUbj8yLluCp9LWj4vvxmIMmxxYVE",
@@ -1230,12 +1334,14 @@ function renderActivity(){
     if(e.id===state.me.uid && e.extra) e.extra=e.extra.replace(/\btheir\b/,"your");
     const b=el("button","",e.x.title); b.type="button"; b.addEventListener("click",()=>openReviews(e.x)); t.append(b);
     if(e.extra) t.append(" "+e.extra);
+    t.append(socialEl(e.id, {k:actKey(e)}, true));
     row.append(t, el("span","when",ago(e.at))); box.append(row);
   });
 }
 
-// ---- reactions + replies on reviews (stored in the reactor's own doc) ----
-let reactIndex={}, replyIndex={}, replyOpen=null, replyDraft="";
+// ---- reactions + replies on reviews and activity (stored in the reactor's own doc) ----
+const actKey = e => ("a:"+e.at.slice(0,16)+":"+(e.x.media||"")+":"+norm(e.x.title)).slice(0,140);
+let reactIndex={}, replyIndex={}, replyOpen=null, replyDraft="", rxOpen=null;
 function buildSocialIndex(){
   reactIndex={}; replyIndex={};
   Object.entries(state.docs).forEach(([id,d])=>{
@@ -1246,11 +1352,15 @@ function buildSocialIndex(){
 function toggleReact(to,k,e){
   mutate(m=>{ const i=m.reacts.findIndex(v=>v.to===to&&v.k===k&&v.e===e); if(i>=0) m.reacts.splice(i,1); else { if(m.reacts.length>=MAX_REACTS) m.reacts.pop(); m.reacts.unshift({to,k,e,at:new Date().toISOString()}); } });
 }
-function socialEl(id, r){
+function socialEl(id, r, compact){
   const key=id+"|"+r.k, wrap=el("div","");
   const bar=el("div","reacts"), rx=reactIndex[key]||[];
+  const showAll = !compact || rxOpen===key;
   REACTS.forEach(e=>{ const c=rx.filter(v=>v.e===e).length, me=rx.some(v=>v.e===e&&v.from===state.me.uid);
-    const b=el("button","rx"+(me?" on":""), c?e+" "+c:e); b.type="button"; b.setAttribute("aria-label","React "+e); b.addEventListener("click",()=>toggleReact(id,r.k,e)); bar.append(b); });
+    if(!showAll && !c) return;
+    const b=el("button","rx"+(me?" on":""), c?e+" "+c:e); b.type="button"; b.setAttribute("aria-label","React "+e); b.title=rx.filter(v=>v.e===e).map(v=>nameOf(v.from)).join(", ");
+    b.addEventListener("click",()=>{ if(compact) rxOpen=null; toggleReact(id,r.k,e); }); bar.append(b); });
+  if(compact && !showAll){ const add=el("button","rx add","☺ +"); add.type="button"; add.setAttribute("aria-label","Add a reaction"); add.addEventListener("click",()=>{ rxOpen=key; render(); }); bar.append(add); }
   const rp=el("button","rp",replyOpen===key?"Cancel":"Reply"); rp.type="button";
   rp.addEventListener("click",()=>{ replyOpen = replyOpen===key?null:key; replyDraft=""; render(); if(replyOpen) setTimeout(()=>{ const i=document.querySelector('.replybox input'); if(i) i.focus(); },30); });
   bar.append(rp); wrap.append(bar);
@@ -1579,6 +1689,7 @@ function renderParty(){
   const items=partyItems();
   $("#partyCount").textContent = items.length ? String(items.length) : "";
   $("#partyCount").classList.toggle("hidden", !items.length);
+  $("#spinParty").classList.toggle("hidden", items.length<2);
   if(!items.length){ box.append(el("div","empty","Nothing here yet. Search above to add the first one.")); return; }
   items.forEach(e=>{
     const row=el("div","crewrow"); row.append(posterEl(e.x));
@@ -1766,6 +1877,7 @@ function render(){
   document.querySelectorAll(".editable").forEach(e=>e.classList.toggle("hidden",!editable));
   const std = state.mode==="anime" || state.mode==="manga";
   renderMatch(state.view==="friends" && showId!==ALL ? showId : null);
+  renderStats(showId);
   $("#filters").classList.toggle("hidden", !std || !showId);
   renderAiring(editable && state.mode==="anime");
   $("#nowCard").classList.toggle("hidden", !std);
@@ -1865,6 +1977,7 @@ function render(){
   if(std) noMatch(wl, d.watched);
 
   $("#watchCount").textContent = d.watchlist.length;
+  $("#spinWatch").classList.toggle("hidden", !editable || !std || sortF(d.watchlist).length<2);
   const ql=$("#watchList"); ql.replaceChildren();
   if(!d.watchlist.length) ql.append(el("div","empty", editable?W().myEmptyQ:W().emptyQ));
   (std?sortF(d.watchlist):d.watchlist).forEach(x=>{
@@ -1979,6 +2092,143 @@ function renderCrew(){
   });
 }
 
+
+// ---- roulette: "pick for me" from your watchlist or the watch party list ----
+let spin={pool:[], kind:null, pick:null, t:null};
+function spinCard(x, sub){ const st=$("#spinStage"); st.replaceChildren(posterEl(x,true), el("div","t",x.title)); if(sub) st.append(el("div","s",sub)); }
+function weightedPick(pool){ const tot=pool.reduce((p,e)=>p+(e.w||1),0); let r=Math.random()*tot; for(const e of pool){ r-=(e.w||1); if(r<=0) return e; } return pool[pool.length-1]; }
+function runSpin(){
+  clearTimeout(spin.t);
+  const pool=spin.pool, st=$("#spinStage"), act=$("#spinAct"), again=$("#spinAgain");
+  let pick=weightedPick(pool);
+  if(pool.length>1 && spin.pick && same(pick.x, spin.pick.x)){ const rest=pool.filter(e=>!same(e.x, spin.pick.x)); if(rest.length) pick=weightedPick(rest); }
+  spin.pick=null; act.classList.add("hidden"); again.disabled=true;
+  st.classList.remove("landed"); st.classList.add("rolling");
+  const steps=pool.length>1?16:1; let i=0, last=-1;
+  const tick=()=>{
+    if(i>=steps-1){
+      spin.pick=pick; st.classList.remove("rolling"); st.classList.add("landed");
+      const sub=[metaOf(pick.x).filter(Boolean).join(" · "), pick.sub].filter(Boolean).join(" · ");
+      spinCard(pick.x, sub); again.disabled=pool.length<2;
+      if(spin.kind==="watch"){ act.textContent="▶ "+W().start; act.classList.remove("hidden"); }
+      else if(spin.kind==="party" && !pick.who.includes(state.me.uid)){ act.textContent="+ I'm in"; act.classList.remove("hidden"); }
+      return;
+    }
+    let j; do{ j=Math.floor(Math.random()*pool.length); }while(pool.length>2 && j===last); last=j;
+    spinCard(pool[j].x); i++;
+    spin.t=setTimeout(tick, 50+Math.pow(i/steps,2)*260);
+  };
+  tick();
+}
+function openSpin(pool, kind, title, hint){
+  if(!pool.length){ toast("Nothing to pick from yet."); return; }
+  spin={pool, kind, pick:null, t:null};
+  $("#spinTitle").textContent=title; $("#spinHint").textContent=hint;
+  $("#spinSheet").classList.remove("hidden"); runSpin();
+}
+const closeSpin=()=>{ clearTimeout(spin.t); $("#spinSheet").classList.add("hidden"); };
+$("#spinClose").addEventListener("click",closeSpin);
+$("#spinSheet").addEventListener("click",e=>{ if(e.target===$("#spinSheet")) closeSpin(); });
+$("#spinAgain").addEventListener("click",runSpin);
+$("#spinAct").addEventListener("click",()=>{ const p=spin.pick; if(!p) return; closeSpin(); if(spin.kind==="watch") addWatching(p.x); else if(spin.kind==="party") addParty(p.x); });
+$("#spinWatch").addEventListener("click",()=>{
+  const k=K(); if(!k.watchlist) return;
+  const pool=sortF(mine()[k.watchlist]).map(x=>({x}));
+  openSpin(pool, "watch", "Pick for me", "A random pick from your "+W().watchlist.toLowerCase()+(state.genre?" ("+state.genre+" only)":"")+".");
+});
+$("#spinParty").addEventListener("click",()=>{
+  const pool=partyItems().map(e=>({x:e.x, who:e.who, w:e.who.length, sub:e.who.length+" in"}));
+  openSpin(pool, "party", "Spin the watch party list", "Things more people are in on have a better chance of coming up.");
+});
+
+// ---- head to head: your top 10 next to a friend's ----
+let cmp={id:null, mode:"anime"};
+function openCompare(id){ if(!id || id===ALL) return; cmp.id=id; cmp.mode=["anime","manga","overall"].includes(state.mode)?state.mode:"anime"; renderCompare(); $("#cmpSheet").classList.remove("hidden"); }
+function renderCompare(){
+  const id=cmp.id; if(!id) return;
+  document.querySelectorAll("#cmpSeg button").forEach(b=>b.classList.toggle("on", b.dataset.m===cmp.mode));
+  $("#cmpTitle").textContent="You vs "+nameOf(id);
+  const tk=KEYS[cmp.mode].top, mineT=mine()[tk], theirs=(state.docs[id]||blank())[tk];
+  const key=x=>(cmp.mode==="overall"?(x.media||"")+":":"")+norm(x.title);
+  const posA=new Map(mineT.map((x,i)=>[key(x),i])), posB=new Map(theirs.map((x,i)=>[key(x),i]));
+  const body=$("#cmpBody"); body.replaceChildren();
+  const head=el("div","cmphead"); const hA=el("div"), hB=el("div"); hA.append(avatarEl(state.me.uid,true), el("span","","You")); hB.append(avatarEl(id,true), el("span","",nameOf(id))); head.append(hA,hB); body.append(head);
+  if(!mineT.length && !theirs.length){ body.append(el("div","empty","Neither of you has a "+(cmp.mode==="overall"?"overall ":cmp.mode==="manga"?"manga ":"")+"top 10 yet.")); }
+  else {
+    const grid=el("div","cmpgrid");
+    const cell=(x,i,other)=>{ if(!x){ return el("div","cmpcell blank","—"); }
+      const j=other.get(key(x)); const c=el("div","cmpcell"+(j!=null?" both":""));
+      const nm=el("div","nm",x.title); if(j!=null){ const d=j-i; nm.append(el("small","", d===0?"Same spot!":"Their #"+(j+1))); }
+      c.append(el("span","rk",String(i+1)), posterEl(x), nm); c.addEventListener("click",()=>openReviews(x)); return c; };
+    for(let i=0;i<Math.max(mineT.length, theirs.length, 1);i++){
+      const a=cell(mineT[i],i,posB), b=cell(theirs[i],i,posA);
+      if(b.querySelector("small")){ const sm=b.querySelector("small"); sm.textContent=sm.textContent.replace("Their","Your"); }
+      grid.append(a,b);
+    }
+    body.append(grid);
+    const shared=[...posA.keys()].filter(k=>posB.has(k)).length;
+    body.append(el("p","cmpsum", shared ? shared+" title"+(shared>1?"s":"")+" in both top 10s (highlighted)." : "No titles in common. Totally different taste."));
+  }
+  const tm=tasteMatch(mine(), state.docs[id]||blank());
+  const far=tm.shared.filter(s=>Math.abs(s.me-s.them)>=3 && (cmp.mode==="overall" || s.x.media===cmp.mode)).sort((a,b)=>Math.abs(b.me-b.them)-Math.abs(a.me-a.them)).slice(0,6);
+  body.append(el("div","mh","Rated far apart"));
+  if(!far.length) body.append(el("div","empty", tm.shared.length ? "You two never disagree by 3 or more points. Respect." : "Rate some of the same titles to see where you disagree."));
+  far.forEach(s=>{ const r=el("div","mrow"); r.append(posterEl(s.x)); const g=el("div","grow"); g.append(el("div","",s.x.title)); r.append(g, el("div","sc","You "+s.me+" · "+nameOf(id)+" "+s.them)); body.append(r); });
+}
+document.querySelectorAll("#cmpSeg button").forEach(b=>b.addEventListener("click",()=>{ cmp.mode=b.dataset.m; renderCompare(); }));
+$("#cmpBtn").addEventListener("click",()=>openCompare(state.friend));
+$("#cmpClose").addEventListener("click",()=>$("#cmpSheet").classList.add("hidden"));
+$("#cmpSheet").addEventListener("click",e=>{ if(e.target===$("#cmpSheet")) $("#cmpSheet").classList.add("hidden"); });
+
+// ---- stats ----
+const MIN_PER = x => x.kind==="Movie" ? 100 : x.kind==="Music" ? 4 : 24;
+function statsOf(d){
+  const yr=String(new Date().getFullYear()), out={yr};
+  ["anime","manga"].forEach(md=>{
+    const k=MEDIA_KEYS[md], seen=new Set(), done=d[k.watched].filter(x=>{ const n=norm(x.title); if(seen.has(n)) return false; seen.add(n); return true; });
+    let units=0, mins=0;
+    done.forEach(x=>{ if(x.total){ units+=x.total; mins+=x.total*MIN_PER(x); } });
+    d[k.watching].forEach(x=>{ if(x.prog){ units+=x.prog; mins+=x.prog*MIN_PER(x); } });
+    out[md]={done:done.length, now:d[k.watching].length, queue:d[k.watchlist].length, units, hours:Math.round(mins/60), year:done.filter(x=>(x.at||"").startsWith(yr)).length};
+  });
+  const sc=[...ratingsOf(d).values()].map(v=>v.sc);
+  out.avg = sc.length ? Math.round(sc.reduce((p,c)=>p+c,0)/sc.length*10)/10 : null;
+  out.rated=sc.length; out.dist=Array.from({length:10},(_,i)=>sc.filter(v=>v===i+1).length);
+  const g={}, seenG=new Set();
+  ["anime","manga"].forEach(md=>{ const k=MEDIA_KEYS[md]; [...d[k.top],...d[k.watched],...d[k.watching]].forEach(x=>{ const key=md+":"+norm(x.title); if(seenG.has(key)) return; seenG.add(key); (x.genres||[]).forEach(n=>{ g[n]=(g[n]||0)+1; }); }); });
+  out.genres=Object.entries(g).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,6);
+  return out;
+}
+const fmtN = n => n>=10000 ? (Math.round(n/100)/10)+"k" : n.toLocaleString();
+function renderStats(showId){
+  const card=$("#statsCard");
+  if(!showId || showId===ALL || state.mode==="lists" || !state.me){ card.classList.add("hidden"); return; }
+  const d=state.docs[showId]||blank(), st=statsOf(d);
+  card.classList.remove("hidden");
+  $("#statsTitle").textContent = showId===state.me.uid ? "Your stats" : nameOf(showId)+"'s stats";
+  const body=$("#statsBody"); body.replaceChildren();
+  if(!st.anime.done && !st.manga.done && !st.anime.now && !st.manga.now && !st.rated){ body.append(el("div","empty","Stats show up once there's something in Watched or Read.")); return; }
+  const tiles=el("div","tiles");
+  const tile=(v,l)=>{ const t=el("div","tile"); t.append(el("b","",v), el("span","",l)); tiles.append(t); };
+  tile(fmtN(st.anime.done),"anime watched"); tile(fmtN(st.anime.units),"episodes"); tile(fmtN(st.anime.hours),"hours watched");
+  tile(fmtN(st.manga.done),"manga read"); tile(fmtN(st.manga.units),"chapters"); tile(st.avg!=null?st.avg:"–","avg rating");
+  body.append(tiles);
+  const yl=el("div","yearline"); yl.append("Finished in "+st.yr+": ", el("b","",st.anime.year+" anime"), " · ", el("b","",st.manga.year+" manga"));
+  if(st.anime.now||st.manga.now) yl.append(" · ", el("b","",(st.anime.now+st.manga.now)+" in progress"));
+  body.append(yl);
+  if(st.genres.length){
+    body.append(el("div","mh","Top genres"));
+    const max=st.genres[0][1];
+    st.genres.forEach(([n,c])=>{ const r=el("div","gbar"); const tr=el("div","gt"); const f=el("i"); f.style.width=Math.max(4,Math.round(c/max*100))+"%"; tr.append(f); r.append(el("span","gn",n), tr, el("span","gc",String(c))); body.append(r); });
+  }
+  if(st.rated){
+    body.append(el("div","mh","Ratings ("+st.rated+")"));
+    const h=el("div","hist"), mx=Math.max(...st.dist,1);
+    st.dist.forEach((c,i)=>{ const col=el("div"); if(c) col.append(el("em","",String(c))); const bar=el("i"); bar.style.height=Math.round(c/mx*58)+"px"; col.append(bar, el("span","",String(i+1))); h.append(col); });
+    body.append(h);
+  }
+  const note=el("p","hint","Hours are estimated at 24 min an episode (movies ~100 min). Only counts titles with a known episode or chapter count."); note.style.margin="10px 0 0"; body.append(note);
+}
 document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>{ state.view=b.dataset.view; render(); }));
 state.crewTab = (window.CrewLook && CrewLook.get("crewTab"))==="lists" ? "lists" : "picks";
 state.lastMode = state.mode==="lists" ? "anime" : state.mode;
@@ -1997,14 +2247,102 @@ document.querySelectorAll("#modeSeg button").forEach(b=>b.addEventListener("clic
 
 // ---- auth ----
 let authMode="signup";
-document.querySelectorAll("#authForm .seg button").forEach(b=>b.addEventListener("click",()=>{
-  authMode=b.dataset.mode;
-  document.querySelectorAll("#authForm .seg button").forEach(x=>x.classList.toggle("on",x===b));
-  $("#goBtn").textContent = authMode==="signup"?"Create account":"Sign in";
-  $("#pw").setAttribute("autocomplete", authMode==="signup"?"new-password":"current-password");
-  $("#authNote").classList.toggle("hidden", authMode!=="signup");
+function setAuthMode(mode){
+  authMode=mode;
+  document.querySelectorAll("#authForm .seg button").forEach(x=>x.classList.toggle("on",x.dataset.mode===mode));
+  $("#goBtn").textContent = ({signup:"Create account", signin:"Sign in", recover:"Reset password"})[mode];
+  $("#pw").setAttribute("autocomplete", mode==="signin"?"current-password":"new-password");
+  $("#pwLabel").textContent = mode==="recover" ? "New password" : "Password";
+  $("#codeRow").classList.toggle("hidden", mode!=="recover");
+  $("#authNote").classList.toggle("hidden", mode!=="signup");
+  $("#forgotBtn").classList.toggle("hidden", mode==="signup");
+  $("#forgotBtn").textContent = mode==="recover" ? "Back to sign in" : "Forgot your password?";
   $("#authErr").textContent="";
-}));
+}
+document.querySelectorAll("#authForm .seg button").forEach(b=>b.addEventListener("click",()=>setAuthMode(b.dataset.mode)));
+$("#forgotBtn").addEventListener("click",()=>{ setAuthMode(authMode==="recover"?"signin":"recover"); if(authMode==="recover") $("#rcode").focus(); });
+
+// ---- password recovery ----
+// There's no email and no server, so at signup your password is locked (AES-GCM) with a random recovery code
+// that only you see. The locked copy lives at recovery/{username}; without the code it's useless.
+const RC_ALPH="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const newCode = () => { const b=crypto.getRandomValues(new Uint8Array(16)); let s=""; b.forEach(v=>{ s+=RC_ALPH[v&31]; }); return s.match(/.{4}/g).join("-"); };
+const normCode = c => String(c||"").toUpperCase().replace(/[^A-Z0-9]/g,"");
+const b64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));
+const unb64 = s => Uint8Array.from(atob(s), c=>c.charCodeAt(0));
+async function rcKey(code, salt){
+  const base=await crypto.subtle.importKey("raw", new TextEncoder().encode(normCode(code)), "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2", salt, iterations:250000, hash:"SHA-256"}, base, {name:"AES-GCM", length:256}, false, ["encrypt","decrypt"]);
+}
+async function sealPw(pw, code){
+  const salt=crypto.getRandomValues(new Uint8Array(16)), iv=crypto.getRandomValues(new Uint8Array(12));
+  const ct=await crypto.subtle.encrypt({name:"AES-GCM", iv}, await rcKey(code, salt), new TextEncoder().encode(pw));
+  return {s:b64(salt), iv:b64(iv), ct:b64(ct)};
+}
+async function openPw(rec, code){
+  const pt=await crypto.subtle.decrypt({name:"AES-GCM", iv:unb64(rec.iv)}, await rcKey(code, unb64(rec.s)), unb64(rec.ct));
+  return new TextDecoder().decode(pt);
+}
+const usernameOf = u => u && u.email && u.email.endsWith(USER_DOMAIN) ? u.email.slice(0,-USER_DOMAIN.length) : null;
+async function storeRecovery(user, pw, code){
+  const u=usernameOf(user); if(!u) throw new Error("not a username account");
+  await setDoc(doc(db,"recovery",u), {uid:user.uid, ...(await sealPw(pw, code)), at:new Date().toISOString()});
+}
+let hasRecovery=null; // null = unknown (rules not set up yet, or not checked)
+function showCode(code){ $("#recBar").classList.add("hidden"); $("#codeBox").textContent=code; $("#codeSheet").classList.remove("hidden"); }
+$("#codeCopy").addEventListener("click",async()=>{ try{ await navigator.clipboard.writeText($("#codeBox").textContent); toast("Copied"); }catch(e){ toast("Press and hold the code to copy it."); } });
+$("#codeDone").addEventListener("click",()=>{ if(!confirm("Did you save the code somewhere? You won't be able to see it again.")) return; $("#codeSheet").classList.add("hidden"); });
+async function checkRecovery(){
+  const u=usernameOf(state.me); if(!u){ $("#recBar").classList.add("hidden"); return; }
+  try{ const snap=await getDoc(doc(db,"recovery",u)); const found=snap.exists() && snap.data().uid===state.me.uid; if(hasRecovery!==true) hasRecovery=found; }
+  catch(e){ hasRecovery=null; }
+  let dismissed=false; try{ dismissed=localStorage.getItem("crew.recX."+state.me.uid)==="1"; }catch(e){}
+  $("#recBar").classList.toggle("hidden", hasRecovery!==false || dismissed);
+}
+$("#recGo").addEventListener("click",()=>openAccount());
+$("#recX").addEventListener("click",()=>{ $("#recBar").classList.add("hidden"); try{ localStorage.setItem("crew.recX."+state.me.uid,"1"); }catch(e){} });
+const RC_RULES_ERR = "Recovery codes aren't switched on in the database yet. Ask whoever runs Crew to add the recovery rule in Firebase.";
+function openAccount(){
+  if(!state.me) return;
+  const u=usernameOf(state.me);
+  $("#acctGoogle").classList.toggle("hidden", !!u); $("#acctPw").classList.toggle("hidden", !u);
+  $("#acctName").textContent=u||""; $("#acctCur").value=""; $("#acctNew").value=""; $("#acctErr").textContent="";
+  $("#acctRecState").textContent = hasRecovery ? "You have a recovery code. Making a new one replaces the old one." : hasRecovery===false ? "You don't have a recovery code yet. If you forget your password, you'll be locked out." : "Make a recovery code so you can reset your password if you forget it.";
+  $("#acctNewCode").textContent = hasRecovery ? "Make a new recovery code" : "Make a recovery code";
+  $("#acctSheet").classList.remove("hidden");
+}
+async function reauth(){
+  const cur=$("#acctCur").value;
+  if(!cur){ $("#acctErr").textContent="Enter your current password first."; $("#acctCur").focus(); return null; }
+  try{ await reauthenticateWithCredential(state.me, EmailAuthProvider.credential(state.me.email, cur)); return cur; }
+  catch(ex){ $("#acctErr").textContent = AUTH_ERR[ex&&ex.code] || ("Couldn't check your password ("+((ex&&ex.code)||"error")+")."); return null; }
+}
+$("#acctNewCode").addEventListener("click",async e=>{
+  const btn=e.currentTarget; btn.disabled=true; $("#acctErr").textContent="";
+  try{
+    const cur=await reauth(); if(!cur) return;
+    const code=newCode();
+    try{ await storeRecovery(state.me, cur, code); }catch(ex){ $("#acctErr").textContent = ex&&ex.code==="permission-denied" ? RC_RULES_ERR : "Couldn't save the code ("+((ex&&ex.code)||"error")+")."; return; }
+    hasRecovery=true; $("#recBar").classList.add("hidden"); $("#acctSheet").classList.add("hidden"); showCode(code);
+  } finally { btn.disabled=false; }
+});
+$("#acctChange").addEventListener("click",async e=>{
+  const btn=e.currentTarget, nw=$("#acctNew").value; $("#acctErr").textContent="";
+  if(nw.length<6){ $("#acctErr").textContent="New password needs at least 6 characters."; return; }
+  btn.disabled=true;
+  try{
+    const cur=await reauth(); if(!cur) return;
+    try{ await updatePassword(state.me, nw); }catch(ex){ $("#acctErr").textContent = AUTH_ERR[ex&&ex.code] || ("Couldn't change it ("+((ex&&ex.code)||"error")+")."); return; }
+    $("#acctSheet").classList.add("hidden");
+    // the old recovery code unlocks the old password, so swap in a fresh one
+    const code=newCode();
+    try{ await storeRecovery(state.me, nw, code); hasRecovery=true; toast("Password changed"); showCode(code); }
+    catch(ex){ toast("Password changed"); if(hasRecovery) setStatus("Password changed, but your recovery code couldn't be updated, so it won't work anymore. Make a new one under Account.", true); }
+  } finally { btn.disabled=false; }
+});
+$("#acctBtn").addEventListener("click",openAccount);
+$("#acctClose").addEventListener("click",()=>$("#acctSheet").classList.add("hidden"));
+$("#acctSheet").addEventListener("click",e=>{ if(e.target===$("#acctSheet")) $("#acctSheet").classList.add("hidden"); });
 const AUTH_ERR = {
   "auth/email-already-in-use":"That username is taken. Try another, or tap Sign in.",
   "auth/invalid-credential":"Wrong username or password.",
@@ -2020,12 +2358,30 @@ $("#authForm").addEventListener("submit", async e=>{
   const u = $("#uname").value.trim().toLowerCase(), pw = $("#pw").value;
   const err=$("#authErr"); err.textContent="";
   if(!/^[a-z0-9_]{3,20}$/.test(u)){ err.textContent="Usernames are 3–20 letters, numbers or underscores."; return; }
-  if(pw.length<6){ err.textContent="Password needs at least 6 characters."; return; }
+  if(pw.length<6){ err.textContent=(authMode==="recover"?"New password":"Password")+" needs at least 6 characters."; return; }
   const btn=$("#goBtn"); btn.disabled=true;
   try{
+    if(authMode==="recover"){
+      const code=$("#rcode").value;
+      if(normCode(code).length!==16){ err.textContent="Recovery codes are 16 letters and numbers, like ABCD-EFGH-JKLM-NPQR."; return; }
+      let snap;
+      try{ snap=await getDoc(doc(db,"recovery",u)); }catch(ex){ err.textContent = ex&&ex.code==="permission-denied" ? "Password reset isn't switched on for Crew yet." : "Couldn't reach the database. Check your connection."; return; }
+      if(!snap.exists()){ err.textContent="That username doesn't have a recovery code set up."; return; }
+      let old;
+      try{ old=await openPw(snap.data(), code); }catch(ex){ err.textContent="That recovery code isn't right for this username."; return; }
+      let cred;
+      try{ cred=await signInWithEmailAndPassword(auth, u+USER_DOMAIN, old); }catch(ex){ err.textContent = ex&&ex.code==="auth/too-many-requests" ? AUTH_ERR[ex.code] : "That recovery code is out of date (the password was changed after it was made)."; return; }
+      await updatePassword(cred.user, pw);
+      try{ await storeRecovery(cred.user, pw, code); }catch(_){}
+      $("#pw").value=""; $("#rcode").value=""; setAuthMode("signin");
+      toast("Password reset. Your recovery code still works.");
+      return;
+    }
     if(authMode==="signup"){
       const cred = await createUserWithEmailAndPassword(auth, u+USER_DOMAIN, pw);
       try{ await updateProfile(cred.user, {displayName:u}); }catch(_){}
+      const code=newCode();
+      try{ await storeRecovery(cred.user, pw, code); hasRecovery=true; showCode(code); }catch(_){ /* rules not set up yet: the Account sheet will offer it later */ }
     } else {
       await signInWithEmailAndPassword(auth, u+USER_DOMAIN, pw);
     }
@@ -2044,8 +2400,9 @@ $("#signIn").addEventListener("click", async ()=>{
 $("#signOut").addEventListener("click", ()=>{ if((unsaved||writing) && !confirm("Some of your changes haven't saved yet. Sign out anyway? (They'll come back next time you sign in on this device.)")) return; signOut(auth); });
 getRedirectResult(auth).catch(()=>{});
 
+let recChecked=false;
 onAuthStateChanged(auth, user=>{
-  window.__authSeen=true;
+  window.__authSeen=true; recChecked=false; hasRecovery=null; $("#recBar").classList.add("hidden");
   if(state.unsub){ state.unsub(); state.unsub=null; }
   state.me = user; state.docs = {}; state.loaded=false; unsaved=false; dirty=false; clearTimeout(retryT);
   if(!user){
@@ -2068,7 +2425,7 @@ onAuthStateChanged(auth, user=>{
       if(b && b.at>serverAt){ next[user.uid]=sanitize(b.d); needDoc=true; toast("Restored changes that hadn't saved yet"); }
       else if(b) clearBackup();
     }
-    state.docs=next; state.loaded=true; clearTimeout(timer); if(!unsaved) setStatus(null); $("#app").classList.remove("hidden"); render(); renderMe(); if(needDoc) save(); afterLoad();
+    state.docs=next; state.loaded=true; clearTimeout(timer); if(!unsaved) setStatus(null); $("#app").classList.remove("hidden"); render(); renderMe(); if(needDoc) save(); afterLoad(); if(!recChecked){ recChecked=true; checkRecovery(); }
   }, err=>{
     clearTimeout(timer); console.error(err);
     setStatus(err && err.code==="permission-denied" ? "The database is blocking reads. Double-check the Firestore rules." : "Couldn't load the lists. Try refreshing.", true);
