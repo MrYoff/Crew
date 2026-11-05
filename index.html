@@ -255,6 +255,9 @@
 
   .crewrow{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
   .crewrow:first-child{border-top:0}
+  .crewrow .acts{display:flex;flex-direction:column;gap:5px;align-items:flex-end;flex:none}
+  .partysearch{margin-bottom:8px}
+  .partysearch .results{position:static}
   .crewrow .rank{width:30px;font-size:20px}
   .bar{height:6px;border-radius:6px;background:linear-gradient(90deg,var(--accent),var(--accent2));margin-top:6px}
   .who{color:var(--muted);font-size:12px;margin-top:4px;font-weight:500}
@@ -445,10 +448,21 @@
     </div>
 
     <div id="crewView" class="hidden">
-      <section class="card" id="recCard">
-        <h2>For you</h2>
-        <p class="hint">Stuff the crew rated 8 or higher that isn't on any of your lists yet.</p>
-        <div id="recList"></div>
+      <section class="card" id="crewTopCard">
+        <h2 id="crewTopTitle">Crew top 10</h2>
+        <p class="hint">Everyone's top 10s combined. A #1 pick is worth 10 points, #2 is worth 9, and so on down to 1 point for #10.</p>
+        <div id="crewTop"></div>
+      </section>
+      <div id="crewLists" class="hidden"></div>
+      <section class="card" id="partyCard">
+        <h2>Watch party list <span class="typetag" id="partyCount"></span></h2>
+        <p class="hint">The crew's shared list of things to watch (or read) together. Anyone can add to it. Tap "I'm in" on something you want to watch too.</p>
+        <div class="search partysearch">
+          <svg class="mag" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+          <input id="partyQ" type="search" placeholder="Add an anime to the watch party list…" aria-label="Add to the watch party list" autocomplete="off" maxlength="100">
+          <div class="results hidden" id="partyResults"></div>
+        </div>
+        <div id="partyList"></div>
       </section>
       <section class="card" id="pollCard">
         <h2>Polls <button class="sharebtn" id="pollNew" type="button">+ New poll</button></h2>
@@ -465,17 +479,11 @@
         <datalist id="pollSuggest"></datalist>
         <div id="pollList"></div>
       </section>
-      <section class="card" id="crewTopCard">
-        <h2 id="crewTopTitle">Crew top 10</h2>
-        <p class="hint">Everyone's top 10s combined. A #1 pick is worth 10 points, #2 is worth 9, and so on down to 1 point for #10.</p>
-        <div id="crewTop"></div>
+      <section class="card" id="recCard">
+        <h2>For you</h2>
+        <p class="hint">Stuff the crew rated 8 or higher that isn't on any of your lists yet.</p>
+        <div id="recList"></div>
       </section>
-      <section class="card" id="crewWatchCard">
-        <h2 id="crewWatchTitle">Watch party ideas</h2>
-        <p class="hint" id="crewWatchHint">Shows on more than one person's watchlist.</p>
-        <div id="crewWatch"></div>
-      </section>
-      <div id="crewLists" class="hidden"></div>
       <section class="card">
         <h2>Activity</h2>
         <p class="hint">What everyone's been up to.</p>
@@ -645,7 +653,7 @@ const state = { me:null, docs:{}, view:"me", friend:null, canWrite:true, loaded:
 // overall (anime + manga mixed) top 10 lives in otop; custom lists in custom[]
 const KEYS = { anime:{top:"top",watched:"watched",watchlist:"watchlist",watching:"watching"}, manga:{top:"mtop",watched:"mread",watchlist:"mlist",watching:"mreading"}, overall:{top:"otop"}, lists:{} };
 const MEDIA_KEYS = { anime:KEYS.anime, manga:KEYS.manga };
-const MAX_LISTS = 30, MAX_LIST_ITEMS = 100, MAX_REVIEWS = 300, MAX_REVIEW_LEN = 1000, MAX_REACTS = 1000, MAX_REPLIES = 500, MAX_REPLY_LEN = 300;
+const MAX_PARTY = 100, MAX_LISTS = 30, MAX_LIST_ITEMS = 100, MAX_REVIEWS = 300, MAX_REVIEW_LEN = 1000, MAX_REACTS = 1000, MAX_REPLIES = 500, MAX_REPLY_LEN = 300;
 const REACTS = ["🔥","😂","💀","😭","👍"];
 const K = () => KEYS[state.mode];
 const L = d => { const k=K(); return { top:(k.top&&d[k.top])||[], watched:(k.watched&&d[k.watched])||[], watchlist:(k.watchlist&&d[k.watchlist])||[], watching:(k.watching&&d[k.watching])||[] }; };
@@ -693,6 +701,7 @@ function sanitize(d){
   const votes = Array.isArray(d.votes) ? d.votes.filter(v=>v&&typeof v.p==="string"&&typeof v.o==="string").slice(0,200).map(v=>({p:v.p.slice(0,70), o:v.o.slice(0,20)})) : [];
   const reacts = Array.isArray(d.reacts) ? d.reacts.filter(v=>v&&typeof v.to==="string"&&typeof v.k==="string"&&REACTS.includes(v.e)).slice(0,MAX_REACTS).map(v=>({to:v.to.slice(0,40), k:v.k.slice(0,140), e:v.e, at:typeof v.at==="string"?v.at.slice(0,30):""})) : [];
   const replies = Array.isArray(d.replies) ? d.replies.filter(v=>v&&typeof v.to==="string"&&typeof v.k==="string"&&typeof v.text==="string"&&v.text.trim()).slice(0,MAX_REPLIES).map(v=>({id:String(v.id||uid()).slice(0,20), to:v.to.slice(0,40), k:v.k.slice(0,140), text:String(v.text).replace(/\r/g,"").trim().slice(0,MAX_REPLY_LEN), at:typeof v.at==="string"?v.at.slice(0,30):""})) : [];
+  const party = arr(d.party).slice(0,MAX_PARTY);
   const custom = Array.isArray(d.custom) ? d.custom.filter(l=>l&&typeof l.name==="string"&&clean(l.name)).slice(0,MAX_LISTS).map(l=>({
     id:String(l.id||uid()).slice(0,20), name:clean(l.name).slice(0,40),
     type:["anime","manga","both"].includes(l.type)?l.type:"both",
@@ -700,7 +709,7 @@ function sanitize(d){
   })) : [];
   const avatar = (typeof d.avatar==="string" && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(d.avatar) && d.avatar.length<80000) ? d.avatar : null;
   return { name:typeof d.name==="string"?d.name.slice(0,60):"", avatar, top:arr(d.top).slice(0,MAX_TOP), watched:arr(d.watched), watchlist:arr(d.watchlist),
-    mtop:arr(d.mtop).slice(0,MAX_TOP), mread:arr(d.mread), mlist:arr(d.mlist), otop:arr(d.otop).slice(0,MAX_TOP), custom, watching:arr(d.watching), mreading:arr(d.mreading), reacts, replies, polls, votes,
+    mtop:arr(d.mtop).slice(0,MAX_TOP), mread:arr(d.mread), mlist:arr(d.mlist), otop:arr(d.otop).slice(0,MAX_TOP), custom, watching:arr(d.watching), mreading:arr(d.mreading), reacts, replies, polls, votes, party,
     reviews: Array.isArray(d.reviews) ? d.reviews.filter(v=>v&&typeof v.k==="string"&&typeof v.text==="string"&&v.text.trim()&&typeof v.title==="string").slice(0,MAX_REVIEWS).map(v=>({
       k:v.k.slice(0,140), title:clean(v.title), media:v.media==="anime"||v.media==="manga"?v.media:null,
       text:String(v.text).replace(/\r/g,"").trim().slice(0,MAX_REVIEW_LEN),
@@ -708,7 +717,7 @@ function sanitize(d){
       img:IMG_OK(v.img)?v.img:null, at:typeof v.at==="string"?v.at.slice(0,30):""
     })) : [] };
 }
-const blank = () => ({name:"",avatar:null,top:[],watched:[],watchlist:[],mtop:[],mread:[],mlist:[],otop:[],custom:[],reviews:[],watching:[],mreading:[],reacts:[],replies:[],polls:[],votes:[]});
+const blank = () => ({name:"",avatar:null,top:[],watched:[],watchlist:[],mtop:[],mread:[],mlist:[],otop:[],custom:[],reviews:[],watching:[],mreading:[],reacts:[],replies:[],polls:[],votes:[],party:[]});
 const USER_DOMAIN = "@users.crew-fd928.firebaseapp.com";
 function displayNameOf(u){ if(!u) return "Someone"; if(u.displayName) return u.displayName; if(u.email && u.email.endsWith(USER_DOMAIN)) return u.email.slice(0,-USER_DOMAIN.length); return "Someone"; }
 function mine(){ return state.docs[state.me.uid] || (state.docs[state.me.uid] = blank()); }
@@ -729,7 +738,7 @@ async function save(){
     do{
       dirty=false;
       const m = mine();
-      await setDoc(doc(db,"lists",who), { name:displayNameOf(state.me).slice(0,60), avatar:m.avatar||null, top:m.top, watched:m.watched, watchlist:m.watchlist, mtop:m.mtop, mread:m.mread, mlist:m.mlist, otop:m.otop, custom:m.custom, reviews:m.reviews, watching:m.watching, mreading:m.mreading, reacts:m.reacts, replies:m.replies, polls:m.polls, votes:m.votes, updatedAt:new Date().toISOString() });
+      await setDoc(doc(db,"lists",who), { name:displayNameOf(state.me).slice(0,60), avatar:m.avatar||null, top:m.top, watched:m.watched, watchlist:m.watchlist, mtop:m.mtop, mread:m.mread, mlist:m.mlist, otop:m.otop, custom:m.custom, reviews:m.reviews, watching:m.watching, mreading:m.mreading, reacts:m.reacts, replies:m.replies, polls:m.polls, votes:m.votes, party:m.party, updatedAt:new Date().toISOString() });
     } while(dirty);
     if(state.me && state.me.uid===who){ clearBackup(); if(unsaved){ unsaved=false; setStatus(null); toast("Saved ✓"); } }
   }catch(e){
@@ -1048,7 +1057,7 @@ function renderResults(){
     const b=(label,done,fn)=>{ const x=el("button","pill"+(done?" done":""),done?"✓ "+label:"+ "+label); x.type="button"; if(!done) x.addEventListener("click",()=>{ fn(a); renderResults(); }); return x; };
     if(state.mode==="overall") adds.append(b("Top 10",has(m.top,a),addTop));
     else if(state.mode==="lists"){ const l=targetList(); if(l) adds.append(b("Add",has(l.items,a),addToList)); }
-    else adds.append(b("Top 10",has(m.top,a),addTop), b(W().watched,has(m.watched,a),addWatched), b(W().watching,has(m.watching,a),addWatching), b(W().watchlist,has(m.watchlist,a)||has(m.watched,a),addWatch));
+    else adds.append(b("Top 10",has(m.top,a),addTop), b(W().watched,has(m.watched,a),addWatched), b(W().watching,has(m.watching,a),addWatching), b(W().watchlist,has(m.watchlist,a)||has(m.watched,a),addWatch), b("Party",has(mine().party,a),addParty));
     r.append(adds); return r;
   };
   lastResults.forEach(a=>box.append(row(a, metaOf(a).concat(a.alt).filter(Boolean).join(" · "), false)));
@@ -1121,6 +1130,11 @@ function renderMatch(friendId){
 }
 
 // ---- recommendations ----
+function addWatchedFor(x, media){
+  const k=MEDIA_KEYS[media]; let ok=false;
+  mutate(m=>{ if(has(m[k.watched],{...x,media})){ toast(WORDS[media].alreadyW); return; } m[k.watched].unshift(mk({...x,media})); m[k.watchlist]=m[k.watchlist].filter(y=>norm(y.title)!==norm(x.title)); ok=true; toast(WORDS[media].addedW); });
+  if(ok) askRating({...x, media});
+}
 function addWatchFor(x, media){
   const k=MEDIA_KEYS[media]; let ok=false;
   mutate(m=>{ if(has(m[k.watchlist],{...x,media})||has(m[k.watched],{...x,media})){ toast(WORDS[media].alreadyQ); return; } m[k.watchlist].unshift(mk({...x,media})); ok=true; toast(WORDS[media].addedQ); });
@@ -1136,7 +1150,10 @@ function renderRecs(){
     const row=el("div","crewrow"); row.append(posterEl(a.x));
     const mid=el("div","title"); const tt=el("div","",a.x.title); if(medias.length>1) tt.append(el("span","typetag",a.x.media==="manga"?"Manga":"Anime"));
     mid.append(tt, el("div","who",a.who.join(" · ")), revLink(a.x)); row.append(mid);
-    const b=el("button","pill","+ "+WORDS[a.x.media].watchlist); b.type="button"; b.addEventListener("click",()=>addWatchFor(a.x,a.x.media)); row.append(b);
+    const acts=el("div","acts");
+    const b=el("button","pill","+ "+WORDS[a.x.media].watchlist); b.type="button"; b.addEventListener("click",()=>addWatchFor(a.x,a.x.media));
+    const w=el("button","pill","✓ "+WORDS[a.x.media].watched); w.type="button"; w.title="Already seen it? Mark it as "+WORDS[a.x.media].watched.toLowerCase(); w.addEventListener("click",()=>addWatchedFor(a.x,a.x.media));
+    acts.append(b, w); row.append(acts);
     box.append(row);
   });
 }
@@ -1482,6 +1499,89 @@ function renderSeason(){
   });
 }
 
+// ---- watch party list (each person's adds live in their own doc; the list is everyone's combined) ----
+const partyKey = x => (x.media||"anime")+":"+norm(x.title);
+function partyItems(){
+  const map=new Map();
+  Object.entries(state.docs).forEach(([id,d])=>(d.party||[]).forEach(x=>{
+    const k=partyKey(x); let e=map.get(k);
+    if(!e){ e={k, x, who:[], at:x.at||""}; map.set(k,e); }
+    if(!e.who.includes(id)) e.who.push(id);
+    if(!e.x.img && x.img) e.x=x;
+    if((x.at||"")<e.at) e.at=x.at||"";
+  }));
+  return [...map.values()].sort((a,b)=>b.who.length-a.who.length || (b.at||"").localeCompare(a.at||""));
+}
+function addParty(a){
+  mutate(m=>{
+    const it=mk(a); if(!it.title) return;
+    if(m.party.some(x=>partyKey(x)===partyKey(it))){ toast("Already on the watch party list"); return; }
+    if(m.party.length>=MAX_PARTY){ toast("You've added "+MAX_PARTY+" things. Remove one first."); return; }
+    const others=partyItems().find(e=>e.k===partyKey(it));
+    m.party.unshift(it); toast(others?"You're in for "+it.title:"Added "+it.title+" to the watch party list");
+  });
+}
+function leaveParty(k){ mutate(m=>{ m.party=m.party.filter(x=>partyKey(x)!==k); }); }
+function renderParty(){
+  const box=$("#partyList"); box.replaceChildren(); if(!state.me) return;
+  $("#partyQ").placeholder = "Add "+(state.mode==="manga"?"a manga":"an anime")+" to the watch party list…";
+  const items=partyItems();
+  $("#partyCount").textContent = items.length ? String(items.length) : "";
+  $("#partyCount").classList.toggle("hidden", !items.length);
+  if(!items.length){ box.append(el("div","empty","Nothing here yet. Search above to add the first one.")); return; }
+  items.forEach(e=>{
+    const row=el("div","crewrow"); row.append(posterEl(e.x));
+    const mid=el("div","title"); const tt=el("div","",e.x.title);
+    if(e.x.media==="manga") tt.append(el("span","typetag",e.x.kind||"Manga"));
+    const names=e.who.map(nameOf); const i=names.indexOf("You"); if(i>0){ names.splice(i,1); names.unshift("You"); }
+    mid.append(tt, el("div","who",(e.who.length>1?"In: ":"Added by ")+names.join(", ")), revLink(e.x));
+    const acts=el("div","acts"); acts.append(el("div","pts",e.who.length+"×"));
+    const inIt=e.who.includes(state.me.uid);
+    const b=el("button","pill",inIt?(e.who.length>1?"Leave":"Remove"):"+ I'm in"); b.type="button";
+    b.addEventListener("click",()=>inIt?leaveParty(e.k):addParty(e.x));
+    acts.append(b); row.append(mid, acts); box.append(row);
+  });
+}
+let pTimer=null, pSeq=0, pCtl=null, pResults=[], pState="idle";
+const partyType = () => state.mode==="manga" ? "manga" : "anime";
+function onPartyQuery(){
+  clearTimeout(pTimer); if(pCtl){ pCtl.abort(); pCtl=null; }
+  const q=clean($("#partyQ").value);
+  if(!q){ pResults=[]; pState="idle"; renderPartyResults(); return; }
+  const key=partyType()+":"+q.toLowerCase();
+  if(cache.has(key)){ pResults=cache.get(key); pState="done"; renderPartyResults(); return; }
+  pResults=localSearch(q, partyType()); pState="loading"; renderPartyResults();
+  if(q.length<2) return;
+  pTimer=setTimeout(async ()=>{
+    const seq=++pSeq; pCtl=new AbortController(); const signal=pCtl.signal, t=partyType(); let data=null;
+    try{ data=await anilist(q, signal, t); }catch(e){ if(signal.aborted) return; try{ data=await jikan(q, signal, t); }catch(e2){} }
+    if(seq!==pSeq) return;
+    if(data){ const seen=new Set(); data=data.filter(a=>{ const k=norm(a.title); if(seen.has(k)) return false; seen.add(k); return true; }); cache.set(t+":"+q.toLowerCase(), data); pResults=data; pState="done"; }
+    else pState = pResults.length ? "done" : "error";
+    renderPartyResults();
+  }, 200);
+}
+function renderPartyResults(){
+  const box=$("#partyResults"); const q=clean($("#partyQ").value); box.replaceChildren();
+  if(!q || !state.me){ box.classList.add("hidden"); return; }
+  const mineP=mine().party;
+  const row=(a, sub, custom)=>{
+    const r=el("div","res"+(custom?" custom":"")); r.append(posterEl(a));
+    const meta=el("div","meta"); meta.append(el("div","t",a.title)); if(sub) meta.append(el("div","y",sub)); r.append(meta);
+    const it={...a, media:a.media||partyType()}; const done=mineP.some(x=>partyKey(x)===partyKey(it));
+    const b=el("button","pill"+(done?" done":""),done?"✓ Added":"+ Add"); b.type="button";
+    if(!done) b.addEventListener("click",()=>{ addParty(it); $("#partyQ").value=""; onPartyQuery(); });
+    const adds=el("div","adds"); adds.append(b); r.append(adds); return r;
+  };
+  pResults.slice(0,8).forEach(a=>box.append(row(a, metaOf(a).concat(a.alt).filter(Boolean).join(" · "), false)));
+  if(pState==="loading") box.append(el("div","res msg","Loading more results and posters…"));
+  else if(pState==="error") box.append(el("div","res msg","Search isn't reachable right now. You can still add it as typed below."));
+  if(!pResults.some(a=>norm(a.title)===norm(q))) box.append(row({title:q, media:partyType()}, "Add it exactly as you typed it", true));
+  box.classList.remove("hidden");
+}
+$("#partyQ").addEventListener("input", onPartyQuery);
+$("#partyQ").addEventListener("keydown", e=>{ if(e.key==="Escape"){ $("#partyQ").value=""; onPartyQuery(); } });
+
 // ---- polls (poll lives in its creator's doc; each vote lives in the voter's doc) ----
 const MAX_POLLS=20, MAX_OPTS=6;
 function pollOptInput(v){ const i=el("input"); i.maxLength=80; i.placeholder="Option"; i.value=v||""; i.setAttribute("list","pollSuggest"); i.setAttribute("aria-label","Poll option"); return i; }
@@ -1490,7 +1590,7 @@ $("#pollNew").addEventListener("click",()=>{
   const f=$("#pollForm"); const opening=f.classList.contains("hidden"); f.classList.toggle("hidden");
   if(opening){ resetPollForm();
     const dl=$("#pollSuggest"); dl.replaceChildren(); const seen=new Set();
-    Object.values(state.docs).forEach(d=>[...d.watchlist,...d.watching,...d.mlist].forEach(x=>{ if(!seen.has(x.title)){ seen.add(x.title); dl.append(new Option(x.title)); } }));
+    Object.values(state.docs).forEach(d=>[...d.party,...d.watchlist,...d.watching,...d.mlist].forEach(x=>{ if(!seen.has(x.title)){ seen.add(x.title); dl.append(new Option(x.title)); } }));
     $("#pollQ").focus(); }
 });
 $("#pollCancel").addEventListener("click",()=>$("#pollForm").classList.add("hidden"));
@@ -1576,7 +1676,7 @@ function render(){
   $("#kana").textContent = ({anime:"アニメ ランキング", manga:"マンガ ランキング", overall:"総合 ランキング", lists:"マイ リスト"})[state.mode];
   if(state.target && !targetList()) state.target=null;
   $("#q").placeholder = state.mode==="lists" ? "Search "+({anime:"anime",manga:"manga",both:"anime or manga"})[searchType()]+" to add…" : w.search; $("#watchedTitle").textContent=w.watched; $("#watchTitle").textContent=w.watchlist; $("#watchHint").textContent=w.qHint;
-  $("#crewTopTitle").textContent=w.crewTop; $("#crewWatchTitle").textContent=w.party; $("#crewWatchHint").textContent=w.partyHint;
+  $("#crewTopTitle").textContent=w.crewTop;
   $("#listsView").classList.toggle("hidden", state.view==="crew" || state.view==="season");
   $("#crewView").classList.toggle("hidden", state.view!=="crew");
   $("#seasonView").classList.toggle("hidden", state.view!=="season");
@@ -1773,10 +1873,9 @@ function renderLatestReviews(){
   all.slice(0,15).forEach(v=>box.append(reviewEl(v.id, v.r, true)));
 }
 function renderCrew(){
-  renderLatestReviews(); renderRecs(); renderActivity(); renderPolls();
+  renderLatestReviews(); renderRecs(); renderActivity(); renderPolls(); renderParty();
   const isLists = state.mode==="lists";
   $("#crewTopCard").classList.toggle("hidden", isLists);
-  $("#crewWatchCard").classList.toggle("hidden", state.mode!=="anime" && state.mode!=="manga");
   $("#crewLists").classList.toggle("hidden", !isLists);
   if(isLists){
     const box=$("#crewLists"); box.replaceChildren();
@@ -1786,12 +1885,10 @@ function renderCrew(){
     return;
   }
   const keyOf = x => (state.mode==="overall" ? (x.media||"")+":" : "") + norm(x.title);
-  const pts={}, item={}, voters={}, wcount={}, witem={}, wwho={}, scores={};
+  const pts={}, item={}, voters={}, scores={};
   Object.entries(state.docs).forEach(([id,full])=>{
     const d=L(full);
     d.top.forEach((x,i)=>{ const k=keyOf(x); const sc=x.score||scoreOf(full,{...x, media:x.media||(state.mode==="manga"?"manga":"anime")}); if(sc) (scores[k]=scores[k]||[]).push(sc); pts[k]=(pts[k]||0)+(10-i); item[k]=item[k]||x; (voters[k]=voters[k]||[]).push(nameOf(id)+" #"+(i+1)); });
-    new Set(d.watchlist.map(x=>norm(x.title))).forEach(k=>{ wcount[k]=(wcount[k]||0)+1; (wwho[k]=wwho[k]||[]).push(nameOf(id)); });
-    d.watchlist.forEach(x=>{ const k=norm(x.title); witem[k]=witem[k]||x; });
   });
   const ranked=Object.keys(pts).sort((a,b)=>pts[b]-pts[a]||item[a].title.localeCompare(item[b].title)).slice(0,10);
   const ct=$("#crewTop"); ct.replaceChildren();
@@ -1808,14 +1905,6 @@ function renderCrew(){
     const pp=el("div","pts",pts[k]+" pts");
     if(scores[k]){ const a=scores[k].reduce((p,c)=>p+c,0)/scores[k].length; pp.append(el("span","avg","★ "+(Math.round(a*10)/10)+" avg")); }
     row.append(mid, pp); ct.append(row);
-  });
-  const shared=Object.keys(wcount).filter(k=>wcount[k]>1).sort((a,b)=>wcount[b]-wcount[a]);
-  const cw=$("#crewWatch"); cw.replaceChildren();
-  if(!shared.length) cw.append(el("div","empty",W().partyEmpty));
-  shared.forEach(k=>{
-    const row=el("div","crewrow"); row.append(posterEl(witem[k]));
-    const mid=el("div","title"); mid.append(el("div","",witem[k].title), el("div","who",wwho[k].join(", ")), revLink(witem[k]));
-    row.append(mid, el("div","pts",wcount[k]+"×")); cw.append(row);
   });
 }
 
