@@ -823,6 +823,8 @@ function sanitize(d){
     at:typeof x.at==="string"?x.at.slice(0,30):null,
     prog:(typeof x.prog==="number"&&x.prog>=0&&x.prog<100000)?Math.floor(x.prog):null,
     total:(typeof x.total==="number"&&x.total>0&&x.total<100000)?Math.floor(x.total):null,
+    sofar:(typeof x.sofar==="number"&&x.sofar>0&&x.sofar<100000)?Math.floor(x.sofar):null,
+    live:x.live===true?true:null,
     upd:typeof x.upd==="string"?x.upd.slice(0,30):null,
     genres:Array.isArray(x.genres)?x.genres.filter(g=>typeof g==="string").map(g=>g.slice(0,20)).slice(0,6):null
   })) : [];
@@ -907,7 +909,7 @@ function mutate(fn){ if(!state.me) return; fn(mine()); backupLocal(); render(); 
 const same = (x,t) => norm(x.title)===norm(t.title||t) && (!x.media||!t.media||x.media===t.media);
 const has = (arr,t) => arr.some(x=>same(x,t));
 const mediaOf = x => x.media || (state.mode==="manga" ? "manga" : state.mode==="anime" ? "anime" : null);
-function mk(a){ return {id:uid(), title:clean(a.title), score:null, year:a.year||null, kind:a.kind||null, malId:a.malId||null, img:IMG_OK(a.img)?a.img:null, media:mediaOf(a), at:new Date().toISOString(), total:(typeof a.total==="number"&&a.total>0)?a.total:null, genres:Array.isArray(a.genres)&&a.genres.length?a.genres.slice(0,6):null}; }
+function mk(a){ return {id:uid(), title:clean(a.title), score:null, year:a.year||null, kind:a.kind||null, malId:a.malId||null, img:IMG_OK(a.img)?a.img:null, media:mediaOf(a), at:new Date().toISOString(), total:(typeof a.total==="number"&&a.total>0)?a.total:null, sofar:(typeof a.sofar==="number"&&a.sofar>0)?a.sofar:null, live:a.live===true?true:null, genres:Array.isArray(a.genres)&&a.genres.length?a.genres.slice(0,6):null}; }
 function addTop(a){
   let ok=false; const media=mediaOf(a);
   mutate(m=>{
@@ -1143,7 +1145,16 @@ function localSearch(q, type){
 }
 const KIND = {TV:"TV",TV_SHORT:"TV",MOVIE:"Movie",OVA:"OVA",ONA:"ONA",SPECIAL:"Special",MUSIC:"Music",MANGA:"Manga",NOVEL:"Novel",ONE_SHOT:"One-shot"};
 const COUNTRY_KIND = {KR:"Manhwa",CN:"Manhua",TW:"Manhua"};
-const ANILIST_Q = `query($s:String,$t:MediaType){Page(perPage:8){media(search:$s,type:$t,isAdult:false,sort:[SEARCH_MATCH]){id idMal format countryOfOrigin seasonYear startDate{year} episodes chapters genres title{romaji english} coverImage{medium large}}}}`;
+const ANILIST_Q = `query($s:String,$t:MediaType){Page(perPage:8){media(search:$s,type:$t,isAdult:false,sort:[SEARCH_MATCH]){id idMal format countryOfOrigin seasonYear startDate{year} episodes chapters status nextAiringEpisode{episode} genres title{romaji english} coverImage{medium large}}}}`;
+// Episode/chapter counts. A finished title gets its final count. An ongoing one gets no fake final count:
+// anime with a planned length keep it, otherwise we track how many episodes are out so far.
+function countsFrom(a, media){
+  const done = a.status==="FINISHED" || a.status==="CANCELLED";
+  if(media==="manga") return done ? {total:a.chapters||null, sofar:null, live:false} : {total:null, sofar:a.chapters||null, live:true};
+  if(done) return {total:a.episodes||null, sofar:null, live:false};
+  const out = a.nextAiringEpisode && a.nextAiringEpisode.episode>1 ? a.nextAiringEpisode.episode-1 : null;
+  return {total:a.episodes||null, sofar:out, live:true};
+}
 async function anilist(q, signal, mode){
   const r = await fetch("https://graphql.anilist.co",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({query:ANILIST_Q,variables:{s:q,t:mode==="manga"?"MANGA":"ANIME"}}),signal});
   if(!r.ok) throw new Error("anilist "+r.status);
@@ -1152,7 +1163,7 @@ async function anilist(q, signal, mode){
   return list.map(a=>{
     const en=a.title&&a.title.english, ro=a.title&&a.title.romaji;
     const img=(a.coverImage&&(a.coverImage.large||a.coverImage.medium))||null;
-    return { malId:a.idMal||null, title:clean(en||ro||""), alt:en&&ro&&en!==ro?ro:"", year:a.seasonYear||(a.startDate&&a.startDate.year)||null, kind:(a.format==="MANGA"&&COUNTRY_KIND[a.countryOfOrigin])||KIND[a.format]||null, img:IMG_OK(img)?img:null, media:mode==="manga"?"manga":"anime", total:a.episodes||a.chapters||null, genres:(a.genres||[]).slice(0,6) };
+    return { malId:a.idMal||null, title:clean(en||ro||""), alt:en&&ro&&en!==ro?ro:"", year:a.seasonYear||(a.startDate&&a.startDate.year)||null, kind:(a.format==="MANGA"&&COUNTRY_KIND[a.countryOfOrigin])||KIND[a.format]||null, img:IMG_OK(img)?img:null, media:mode==="manga"?"manga":"anime", ...countsFrom(a, mode==="manga"?"manga":"anime"), genres:(a.genres||[]).slice(0,6) };
   }).filter(a=>a.title);
 }
 async function jikan(q, signal, mode){
@@ -1161,7 +1172,7 @@ async function jikan(q, signal, mode){
   const j = await r.json();
   return (j.data||[]).map(a=>{
     const img=(a.images&&a.images.webp&&a.images.webp.image_url)||(a.images&&a.images.jpg&&a.images.jpg.image_url)||null;
-    return { malId:a.mal_id, title:clean(a.title_english||a.title), alt:a.title_english&&a.title!==a.title_english?a.title:"", year:a.year||(a.aired&&a.aired.prop&&a.aired.prop.from&&a.aired.prop.from.year)||(a.published&&a.published.prop&&a.published.prop.from&&a.published.prop.from.year)||null, kind:a.type==="Light Novel"?"Novel":(a.type||null), img:IMG_OK(img)?img:null, media:mode==="manga"?"manga":"anime", total:a.episodes||a.chapters||null, genres:(a.genres||[]).map(g=>g&&g.name).filter(Boolean).slice(0,6) };
+    return { malId:a.mal_id, title:clean(a.title_english||a.title), alt:a.title_english&&a.title!==a.title_english?a.title:"", year:a.year||(a.aired&&a.aired.prop&&a.aired.prop.from&&a.aired.prop.from.year)||(a.published&&a.published.prop&&a.published.prop.from&&a.published.prop.from.year)||null, kind:a.type==="Light Novel"?"Novel":(a.type||null), img:IMG_OK(img)?img:null, media:mode==="manga"?"manga":"anime", ...(/airing|publishing|hiatus|not yet/i.test(a.status||"") ? {total:mode==="manga"?null:(a.episodes||null), sofar:null, live:true} : {total:a.episodes||a.chapters||null, sofar:null, live:false}), genres:(a.genres||[]).map(g=>g&&g.name).filter(Boolean).slice(0,6) };
   });
 }
 let searchTimer=null, searchSeq=0, controller=null, lastResults=[], searchState="idle";
@@ -1551,26 +1562,45 @@ let backfilled=false;
 async function afterLoad(){
   maybeShowInstall();
   if(backfilled || !state.me) return; backfilled=true;
-  const m=mine();
+  try{ await refreshCounts(); }catch(e){}
+}
+// Re-checks every title's episode/chapter count against AniList on each visit, so wrong or stale
+// numbers get fixed and ongoing shows keep up. Titles saved without an ID get matched by exact title first.
+const aniPost = async (query, variables) => { const r=await fetch("https://graphql.anilist.co",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({query,variables})}); if(!r.ok) throw new Error("anilist "+r.status); return r.json(); };
+async function refreshCounts(){
   for(const media of ["anime","manga"]){
     const k=MEDIA_KEYS[media];
     const itemsOf=mm=>[...mm[k.top],...mm[k.watched],...mm[k.watchlist],...mm[k.watching]].filter(x=>!x.media||x.media===media).concat(mm.otop.filter(x=>x.media===media), mm.custom.flatMap(l=>l.items).filter(x=>x.media===media));
-    const ids=[...new Set(itemsOf(m).filter(x=>x.malId && (!x.genres||!x.genres.length||!x.total)).map(x=>x.malId))];
-    for(let i=0;i<ids.length;i+=50){
-      try{
-        const r=await fetch("https://graphql.anilist.co",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({query:`query($ids:[Int],$t:MediaType){Page(perPage:50){media(idMal_in:$ids,type:$t){idMal genres episodes chapters}}}`,variables:{ids:ids.slice(i,i+50),t:media.toUpperCase()}})});
-        if(!r.ok) break;
-        const j=await r.json(), info={};
-        ((j.data&&j.data.Page&&j.data.Page.media)||[]).forEach(a=>{ info[a.idMal]=a; });
-        let changed=false;
-        itemsOf(mine()).forEach(x=>{ const a=info[x.malId]; if(a && (((!x.genres||!x.genres.length) && a.genres && a.genres.length) || (!x.total && (a.episodes||a.chapters)))) changed=true; });
-        if(changed) mutate(mm=>{ itemsOf(mm).forEach(x=>{
-          const a=info[x.malId]; if(!a) return;
-          if((!x.genres||!x.genres.length) && a.genres && a.genres.length) x.genres=a.genres.slice(0,6);
-          if(!x.total && (a.episodes||a.chapters)) x.total=a.episodes||a.chapters;
-        }); });
-      }catch(e){ break; }
+    const T=media.toUpperCase();
+    // 1) find IDs for titles that don't have one (exact title match only, so we never attach the wrong show)
+    const noId=[...new Set(itemsOf(mine()).filter(x=>!x.malId).map(x=>x.title))].slice(0,40), found={};
+    for(let i=0;i<noId.length;i+=10){
+      const chunk=noId.slice(i,i+10);
+      const q="query("+chunk.map((_,j)=>"$s"+j+":String").join(",")+"){"+chunk.map((_,j)=>"q"+j+":Page(perPage:5){media(search:$s"+j+",type:"+T+",isAdult:false){idMal title{romaji english} synonyms}}").join(" ")+"}";
+      const vars={}; chunk.forEach((t,j)=>{ vars["s"+j]=t; });
+      let j; try{ j=await aniPost(q, vars); }catch(e){ break; }
+      chunk.forEach((t,jx)=>{ const list=(j.data&&j.data["q"+jx]&&j.data["q"+jx].media)||[], n=norm(t);
+        const hit=list.find(a=>a.idMal && [a.title&&a.title.english, a.title&&a.title.romaji, ...(a.synonyms||[])].some(v=>v && norm(v)===n));
+        if(hit) found[n]=hit.idMal; });
     }
+    // 2) fetch fresh counts for every ID
+    const ids=[...new Set(itemsOf(mine()).map(x=>x.malId||found[norm(x.title)]).filter(Boolean))], info={};
+    for(let i=0;i<ids.length;i+=50){
+      let j; try{ j=await aniPost(`query($ids:[Int],$t:MediaType){Page(perPage:50){media(idMal_in:$ids,type:$t){idMal status genres episodes chapters nextAiringEpisode{episode}}}}`, {ids:ids.slice(i,i+50), t:T}); }catch(e){ break; }
+      ((j.data&&j.data.Page&&j.data.Page.media)||[]).forEach(a=>{ info[a.idMal]=a; });
+    }
+    const fix=x=>{
+      let ch=false;
+      if(!x.malId && found[norm(x.title)]){ x.malId=found[norm(x.title)]; ch=true; }
+      const a=info[x.malId]; if(!a) return ch;
+      if((!x.genres||!x.genres.length) && a.genres && a.genres.length){ x.genres=a.genres.slice(0,6); ch=true; }
+      const c=countsFrom(a, media);
+      if(c.live && !c.sofar && x.sofar) c.sofar=x.sofar; // between seasons: keep the last known "out so far"
+      if((x.total||null)!==c.total || (x.sofar||null)!==c.sofar || (x.live||null)!==(c.live||null)){ x.total=c.total; x.sofar=c.sofar; x.live=c.live||null; ch=true; }
+      return ch;
+    };
+    // dry run on a copy first so we only save when something actually changed
+    if(itemsOf(mine()).some(x=>fix({...x}))) mutate(mm=>{ itemsOf(mm).forEach(fix); });
   }
 }
 
@@ -1939,10 +1969,10 @@ function render(){
     sortF(d.watching).forEach(x=>{
       const li=el("li"); const t=titleBlock(x);
       const pr=el("div","prog"+(x._who?" hidden":"")), p=x.prog||0;
-      const lab=el("button","lab", w2.unit+" "+p+(x.total?" / "+x.total:"")); lab.type="button";
+      const lab=el("button","lab", w2.unit+" "+p+(x.total?" / "+x.total:x.sofar?" / "+x.sofar+" out":"")); lab.type="button";
       if(editable){ lab.title="Set "+w2.unitLong; lab.addEventListener("click",()=>{ const v=prompt("Which "+w2.unitLong+" are you on?", String(p)); if(v==null) return; const n=parseInt(v,10); if(isNaN(n)||n<0) return; setProg(x,n); }); } else lab.disabled=true;
       pr.append(lab);
-      if(x.total){ const tr=el("div","track"); const f=el("i"); f.style.width=Math.min(100,Math.round(p/x.total*100))+"%"; tr.append(f); pr.append(tr); }
+      if(x.total||x.sofar){ const tr=el("div","track"); const f=el("i"); f.style.width=Math.min(100,Math.round(p/(x.total||x.sofar)*100))+"%"; tr.append(f); pr.append(tr); }
       t.insertBefore(pr, t.lastChild);
       li.append(posterEl(x), t);
       if(editable){
@@ -2187,7 +2217,7 @@ function statsOf(d){
   ["anime","manga"].forEach(md=>{
     const k=MEDIA_KEYS[md], seen=new Set(), done=d[k.watched].filter(x=>{ const n=norm(x.title); if(seen.has(n)) return false; seen.add(n); return true; });
     let units=0, mins=0;
-    done.forEach(x=>{ if(x.total){ units+=x.total; mins+=x.total*MIN_PER(x); } });
+    done.forEach(x=>{ const n=x.total&&!(x.live&&x.sofar&&x.sofar<x.total) ? x.total : x.sofar; if(n){ units+=n; mins+=n*MIN_PER(x); } });
     d[k.watching].forEach(x=>{ if(x.prog){ units+=x.prog; mins+=x.prog*MIN_PER(x); } });
     out[md]={done:done.length, now:d[k.watching].length, queue:d[k.watchlist].length, units, hours:Math.round(mins/60), year:done.filter(x=>(x.at||"").startsWith(yr)).length};
   });
@@ -2227,7 +2257,7 @@ function renderStats(showId){
     st.dist.forEach((c,i)=>{ const col=el("div"); if(c) col.append(el("em","",String(c))); const bar=el("i"); bar.style.height=Math.round(c/mx*58)+"px"; col.append(bar, el("span","",String(i+1))); h.append(col); });
     body.append(h);
   }
-  const note=el("p","hint","Hours are estimated at 24 min an episode (movies ~100 min). Only counts titles with a known episode or chapter count."); note.style.margin="10px 0 0"; body.append(note);
+  const note=el("p","hint","Hours are estimated at 24 min an episode (movies ~100 min). Shows still airing count the episodes out so far. Ongoing manga only count once you've logged chapters in Reading."); note.style.margin="10px 0 0"; body.append(note);
 }
 document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>{ state.view=b.dataset.view; render(); }));
 state.crewTab = (window.CrewLook && CrewLook.get("crewTab"))==="lists" ? "lists" : "picks";
