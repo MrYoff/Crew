@@ -1710,7 +1710,14 @@ function socialEl(id, r, compact){
 }
 
 // ---- shareable image ----
-function loadImg(src){ return new Promise(res=>{ if(!src) return res(null); const i=new Image(); i.crossOrigin="anonymous"; const t=setTimeout(()=>res(null),5000); i.onload=()=>{clearTimeout(t);res(i);}; i.onerror=()=>{clearTimeout(t);res(null);}; i.src=src; }); }
+// Covers drawn onto a share image need CORS. MyAnimeList's CDN doesn't send it, so if the direct load
+// fails we retry through wsrv.nl, a free image proxy that adds the header.
+function loadImg1(src, ms){ return new Promise(res=>{ const i=new Image(); i.crossOrigin="anonymous"; i.referrerPolicy="no-referrer"; const t=setTimeout(()=>res(null),ms); i.onload=()=>{clearTimeout(t);res(i);}; i.onerror=()=>{clearTimeout(t);res(null);}; i.src=src; }); }
+async function loadImg(src){
+  if(!src) return null;
+  if(src.startsWith("data:")) return loadImg1(src, 5000);
+  return (await loadImg1(src, 5000)) || (await loadImg1("https://wsrv.nl/?url="+encodeURIComponent(src)+"&w=640&output=jpg", 8000));
+}
 function cssColor(v){ const s=el("span"); s.style.color="var("+v+")"; document.body.append(s); const c=getComputedStyle(s).color; s.remove(); return c; }
 function fit(g, text, max){ if(g.measureText(text).width<=max) return text; let t=text; while(t.length>1 && g.measureText(t+"…").width>max) t=t.slice(0,-1); return t+"…"; }
 let shareUrl=null, shareFile=null;
