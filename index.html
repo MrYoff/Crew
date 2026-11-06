@@ -477,7 +477,8 @@
   .rst{color:var(--accent2);font-weight:700}
   .rst.lvl0{color:var(--muted)}
   #inboxCard .seg{margin-bottom:6px}
-  #inboxCard .facts{margin-top:6px}
+  #inboxCard .facts{margin-top:6px;display:flex;flex-direction:row;flex-wrap:wrap;gap:6px}
+  #inboxCard .facts .pill{width:auto}
   .sendbox h4{margin-top:14px}
   .sendrow{display:grid;grid-template-columns:1fr 1.4fr auto;gap:6px}
   @media (max-width:480px){ .sendrow{grid-template-columns:1fr auto} .sendrow input{grid-column:1/-1;grid-row:2} }
@@ -503,6 +504,24 @@
   .dchar small{color:var(--muted)}
   .dlinks{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
   .dlinks a.btn{text-decoration:none;display:inline-block}
+
+  /* ---- reorganized layout: bottom nav + sub-tabs ---- */
+  .subhide{display:none!important}
+  .subtabs,.playtabs{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 10px;margin:0 -2px 6px;scrollbar-width:none;position:sticky;top:0;z-index:5;background:linear-gradient(var(--bg) 75%, transparent)}
+  .subtabs::-webkit-scrollbar{display:none}
+  .subtabs button{flex:none;border:1px solid var(--line);background:var(--panel);color:var(--muted);font:700 13px "Zen Kaku Gothic New";padding:8px 13px;border-radius:999px;cursor:pointer;white-space:nowrap;position:relative}
+  .subtabs button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .nbadge{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;margin-left:5px;border-radius:9px;background:var(--accent2);color:#111;font:700 11px "Zen Kaku Gothic New"}
+  body.authed .wrap{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+  body.authed .top-row{align-items:center}
+  body.authed h1{font-size:30px}
+  body.authed .kana{font-size:11px}
+  body.authed .top-row{margin-bottom:12px}
+  nav.tabs#bottomNav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom));top:auto;width:min(560px, calc(100% - 20px));margin:0;z-index:20;border-radius:22px;padding:5px;box-shadow:0 8px 30px rgba(0,0,0,.35);background:color-mix(in srgb, var(--panel) 92%, transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+  nav.tabs#bottomNav button{display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 2px 7px;border-radius:16px;font-size:11px;position:relative}
+  nav.tabs#bottomNav .ni{font-size:20px;line-height:1.1}
+  nav.tabs#bottomNav .nbadge{position:absolute;top:2px;left:calc(50% + 6px);margin:0}
+  .modeseg{margin-bottom:10px}
 </style>
 </head>
 <body>
@@ -586,20 +605,20 @@
   </div>
 
   <div id="app" class="hidden">
-    <nav class="tabs">
-      <button data-view="me" class="on">My lists</button>
-      <button data-view="friends">Friends</button>
-      <button data-view="season">Season</button>
-      <button data-view="crew">Crew picks</button>
-      <button data-view="play">Play</button>
+    <nav class="tabs" id="bottomNav">
+      <button data-view="me" class="on"><span class="ni">📚</span>Lists</button>
+      <button data-view="friends"><span class="ni">👥</span>Friends</button>
+      <button data-view="season"><span class="ni">📅</span>Season</button>
+      <button data-view="crew"><span class="ni">🏠</span>Crew<span class="nbadge hidden" id="crewBadge"></span></button>
+      <button data-view="play"><span class="ni">🎮</span>Play</button>
     </nav>
     <div class="modeseg" id="modeSeg"><button type="button" data-mode="anime" class="on">Anime</button><button type="button" data-mode="manga">Manga</button><button type="button" data-mode="overall">Overall</button><button type="button" data-mode="lists">Custom</button></div>
 
     <div id="listsView">
       <div id="people" class="people hidden"></div>
-      <section class="card hidden" id="inboxCard"><h2>Recommendations <span class="count" id="inboxCount"></span></h2><div class="seg" id="inboxSeg"><button type="button" data-ib="in" class="on">For you</button><button type="button" data-ib="sent">Sent</button></div><div id="inboxBody"></div></section>
-      <section class="card hidden" id="compatCard"><h2>Crew compatibility</h2><p class="hint">How close everyone's ratings are, pair by pair. Based on titles both people have rated.</p><div id="compatBody"></div></section>
-      <section class="card hidden" id="matchCard"><h2>Taste match <button class="sharebtn" id="cmpBtn" type="button">⚔️ Head to head</button></h2><div id="matchBody"></div></section>
+      <section class="card hidden" data-sub="match" id="compatCard"><h2>Crew compatibility</h2><p class="hint">How close everyone's ratings are, pair by pair. Based on titles both people have rated.</p><div id="compatBody"></div></section>
+      <div class="subtabs" id="listSub"></div>
+      <section class="card hidden" data-sub="match" id="matchCard"><h2>Taste match <button class="sharebtn" id="cmpBtn" type="button">⚔️ Head to head</button></h2><div id="matchBody"></div></section>
 
       <div class="notice target hidden" id="targetBar"><span>Adding to <b id="targetName"></b></span><button class="btn" id="targetDone" type="button">Done</button></div>
       <div class="search editable">
@@ -613,26 +632,26 @@
         <div class="layseg" id="laySeg" role="group" aria-label="Layout"><button type="button" data-lay="list" title="List view" aria-label="List view">☰</button><button type="button" data-lay="grid" title="Grid view" aria-label="Grid view">▦</button></div>
       </div>
 
-      <section class="card" id="topCard">
+      <section class="card" data-sub="top" id="topCard">
         <h2><span id="topTitle">Top 10</span> <span class="count" id="topCount">0/10</span><button class="sharebtn" id="shareTop" type="button">📤 Share</button></h2>
         <p class="hint" id="topHint"></p>
         <ol class="top" id="topList"></ol>
       </section>
 
 
-      <section class="card" id="watchedCard">
+      <section class="card" data-sub="watched" id="watchedCard">
         <h2><span id="watchedTitle">Watched</span> <span class="count" id="watchedCount">0</span></h2>
         <p class="hint editable">Score it out of 10, or tap ★ to add it to your top 10.</p>
         <ul class="list" id="watchedList"></ul>
       </section>
 
-      <section class="card" id="nowCard">
+      <section class="card" data-sub="now" id="nowCard">
         <h2><span id="nowTitle">Watching</span> <span class="count" id="nowCount">0</span></h2>
         <p class="hint editable" id="nowHint"></p>
         <ul class="list" id="nowList"></ul>
       </section>
 
-      <section class="card" id="watchCard">
+      <section class="card" data-sub="watch" id="watchCard">
         <h2><span id="watchTitle">Watchlist</span> <span class="count" id="watchCount">0</span><button class="sharebtn hidden" id="spinWatch" type="button">🎲 Pick for me</button></h2>
         <p class="hint editable" id="watchHint">Tap ✓ when you finish one and it moves to Watched.</p>
         <ul class="list" id="watchList"></ul>
@@ -651,13 +670,13 @@
         <div id="customLists"></div>
       </div>
 
-      <section class="card hidden" id="airCard">
+      <section class="card hidden" data-sub="now" id="airCard">
         <h2>Airing soon</h2>
         <p class="hint">Next episodes of currently airing shows on your lists, in your time zone.</p>
         <div id="airList"></div>
       </section>
 
-      <section class="card hidden" id="statsCard">
+      <section class="card hidden" data-sub="stats" id="statsCard">
         <h2><span id="statsTitle">Your stats</span><button class="sharebtn" id="cardBtn" type="button">🪪 Profile card</button></h2>
         <div id="statsBody"></div>
       </section>
@@ -673,19 +692,21 @@
     </div>
 
     <div id="playView" class="hidden">
-      <div class="playtabs" id="playTabs"><button type="button" data-pt="mup">⚔️ Matchups</button><button type="button" data-pt="brk">🏆 Brackets</button><button type="button" data-pt="takes">🌶️ Hot takes</button><button type="button" data-pt="pred">🔮 Predict</button><button type="button" data-pt="draft">📋 Draft</button><button type="button" data-pt="ops">🎵 OP/ED tiers</button><button type="button" data-pt="guess">❓ Guess</button></div>
+      <div class="subtabs" id="playTabs"><button type="button" data-pt="mup">⚔️ Matchups</button><button type="button" data-pt="brk">🏆 Brackets</button><button type="button" data-pt="takes">🌶️ Hot takes</button><button type="button" data-pt="pred">🔮 Predict</button><button type="button" data-pt="draft">📋 Draft</button><button type="button" data-pt="ops">🎵 OP/ED tiers</button><button type="button" data-pt="guess">❓ Guess</button></div>
       <div id="playBody"></div>
     </div>
 
     <div id="crewView" class="hidden">
-      <div class="seg crewtabs" id="crewTabs"><button type="button" data-ct="picks" class="on">Picks</button><button type="button" data-ct="lists">Custom lists</button></div>
-      <section class="card" id="crewTopCard">
+      <div class="subtabs" id="crewSub"></div>
+      <section class="card" data-csub="inbox" id="inboxCard"><h2>Recommendations <span class="count" id="inboxCount"></span></h2><div class="seg" id="inboxSeg"><button type="button" data-ib="in" class="on">For you</button><button type="button" data-ib="sent">Sent</button></div><div id="inboxBody"></div></section>
+
+      <section class="card" data-csub="top" id="crewTopCard">
         <h2 id="crewTopTitle">Crew top 10</h2>
         <p class="hint">Everyone's top 10s combined. A #1 pick is worth 10 points, #2 is worth 9, and so on down to 1 point for #10.</p>
         <div id="crewTop"></div>
       </section>
-      <div id="crewLists" class="hidden"></div>
-      <section class="card" id="partyCard">
+      <div id="crewLists" data-csub="lists"></div>
+      <section class="card" data-csub="party" id="partyCard">
         <h2>Watch party list <span class="typetag" id="partyCount"></span><button class="sharebtn hidden" id="spinParty" type="button">🎲 Spin</button></h2>
         <p class="hint">The crew's shared list of things to watch (or read) together. Anyone can add to it. Tap "I'm in" on something you want to watch too.</p>
         <div class="search partysearch">
@@ -695,7 +716,7 @@
         </div>
         <div id="partyList"></div>
       </section>
-      <section class="card" id="pollCard">
+      <section class="card" data-csub="polls" id="pollCard">
         <h2>Polls <button class="sharebtn" id="pollNew" type="button">+ New poll</button></h2>
         <p class="hint">Vote on what to watch next. Add a time to turn it into a watch party countdown.</p>
         <form class="pollform hidden" id="pollForm">
@@ -710,17 +731,17 @@
         <datalist id="pollSuggest"></datalist>
         <div id="pollList"></div>
       </section>
-      <section class="card" id="recCard">
+      <section class="card" data-csub="recs" id="recCard">
         <h2>For you<button class="sharebtn" id="recRefresh" type="button">↻ Refresh</button></h2>
         <p class="hint">Crew favorites you haven't added yet, plus picks based on what you rate highly and the genres you like.</p>
         <div id="recList"></div>
       </section>
-      <section class="card">
+      <section class="card" data-csub="feed">
         <h2>Activity</h2>
         <p class="hint">What everyone's been up to.</p>
         <div id="actList"></div>
       </section>
-      <section class="card">
+      <section class="card" data-csub="feed">
         <h2>Latest reviews</h2>
         <p class="hint">What the crew has been saying. Tap any title anywhere on the site to read or write reviews.</p>
         <div id="crewReviews"></div>
@@ -2601,14 +2622,13 @@ function recStatus(d, r){ const k=MEDIA_KEYS[r.media||"anime"], it={title:r.titl
   return {t:"Not started", lvl:0}; }
 state.inboxTab="in";
 document.querySelectorAll("#inboxSeg button").forEach(b=>b.addEventListener("click",()=>{ state.inboxTab=b.dataset.ib; render(); }));
+function inboxPending(){
+  const me=state.me.uid, inbox=[]; Object.entries(state.docs).forEach(([id,d])=>{ if(id!==me) (d.recs||[]).forEach(r=>{ if(r.to===me) inbox.push({id,r,ref:id+":"+r.id}); }); });
+  return inbox.filter(x=>!mine().recx.includes(x.ref) && recStatus(mine(),x.r).lvl<3).sort((a,b)=>(b.r.at||"").localeCompare(a.r.at||""));
+}
 function renderInbox(show){
-  const c=$("#inboxCard"); if(!show || !state.me){ c.classList.add("hidden"); return; }
-  const me=state.me.uid, inbox=[]; Object.entries(state.docs).forEach(([id,d])=>{ if(id!==me) d.recs.forEach(r=>{ if(r.to===me) inbox.push({id,r,ref:id+":"+r.id}); }); });
-  const pending=inbox.filter(x=>!mine().recx.includes(x.ref) && recStatus(mine(),x.r).lvl<3).sort((a,b)=>(b.r.at||"").localeCompare(a.r.at||""));
-  const sent=mine().recs;
-  if(!pending.length && !sent.length){ c.classList.add("hidden"); return; }
-  c.classList.remove("hidden"); $("#inboxCount").textContent=pending.length?String(pending.length):"";
-  if(!pending.length && state.inboxTab==="in" && sent.length) state.inboxTab="sent";
+  const c=$("#inboxCard"); if(!show || !state.me) return;
+  const pending=inboxPending(), sent=mine().recs; $("#inboxCount").textContent=pending.length?String(pending.length):"";
   document.querySelectorAll("#inboxSeg button").forEach(b=>{ b.classList.toggle("on", b.dataset.ib===state.inboxTab); if(b.dataset.ib==="in") b.textContent="For you"+(pending.length?" ("+pending.length+")":""); });
   const body=$("#inboxBody"); body.replaceChildren();
   if(state.inboxTab==="in"){
@@ -2799,6 +2819,7 @@ $("#gearBtn").addEventListener("click",updateInstallUI);
 // ---- render ----
 function render(){
   document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.toggle("on", b.dataset.view===state.view));
+  { const n=state.me&&state.loaded?inboxPending().length:0; const bd=$("#crewBadge"); bd.textContent=n?String(n):""; bd.classList.toggle("hidden",!n); }
   document.querySelectorAll("#modeSeg button").forEach(b=>b.classList.toggle("on", b.dataset.mode===state.mode));
   const w=W();
   $("#kana").textContent = ({anime:"アニメ ランキング", manga:"マンガ ランキング", overall:"総合 ランキング", lists:"マイ リスト"})[state.mode];
@@ -2846,9 +2867,20 @@ function render(){
   const std = state.mode==="anime" || state.mode==="manga";
   renderMatch(state.view==="friends" && showId!==ALL ? showId : null);
   renderCompat(state.view==="friends" && showId===ALL);
-  renderInbox(state.view==="me" && state.mode!=="lists");
+  { const std2 = state.mode==="anime"||state.mode==="manga";
+    let items = state.mode==="lists" ? [] : std2 ? LIST_SUBS.slice() : [LIST_SUBS[0], LIST_SUBS[4]];
+    if(state.view==="friends") items = showId===ALL ? (std2?[...items.slice(0,4),["match","💞 Compatibility"]]:[...items.slice(0,1),["match","💞 Compatibility"]]) : showId ? [...items, ["match","💞 Match"]] : [];
+    const key = state.view==="friends" ? "friends" : "me";
+    const sub = items.length ? pickSub(key, items) : null;
+    if(items.length) subBar("#listSub", key, items, sub); else $("#listSub").replaceChildren();
+    $("#listSub").classList.toggle("hidden", !items.length);
+    state.curSub = sub;
+    document.querySelectorAll("#listsView [data-sub]").forEach(c=>c.classList.toggle("subhide", !!sub && c.dataset.sub!==sub));
+    // the add-search only makes sense on list tabs, the filters only on long lists
+    document.querySelector("#listsView .search").classList.toggle("subhide", sub==="stats"||sub==="match");
+  }
   renderStats(showId);
-  $("#filters").classList.toggle("hidden", !std || !showId);
+  $("#filters").classList.toggle("hidden", !std || !showId || !["now","watched","watch"].includes(state.curSub));
   renderAiring(editable && state.mode==="anime");
   $("#nowCard").classList.toggle("hidden", !std);
   $("#topCard").classList.toggle("hidden", state.mode==="lists" || (state.view==="friends" && showId===ALL && state.mode!=="overall"));
@@ -3024,13 +3056,20 @@ function renderLatestReviews(){
   all.slice(0,15).forEach(v=>box.append(reviewEl(v.id, v.r, true)));
 }
 function renderCrew(){
-  if(state.mode==="lists") state.crewTab="lists";
-  const isLists = state.crewTab==="lists";
-  document.querySelectorAll("#crewTabs button").forEach(b=>b.classList.toggle("on", b.dataset.ct===state.crewTab));
-  document.querySelectorAll("#crewView > section").forEach(c=>c.classList.toggle("hidden", isLists));
-  $("#modeSeg").classList.toggle("hidden", isLists);
-  $("#crewLists").classList.toggle("hidden", !isLists);
-  if(!isLists){ renderLatestReviews(); renderRecs(); renderActivity(); renderPolls(); renderParty(); }
+  const inboxN = inboxPending().length;
+  const sub = pickSub("crew", CREW_SUBS);
+  subBar("#crewSub","crew",CREW_SUBS,sub,{inbox:inboxN});
+  if((sub==="top"||sub==="recs") && state.mode==="lists"){ state.mode=state.lastMode||"anime"; document.querySelectorAll("#modeSeg button").forEach(b=>b.classList.toggle("on", b.dataset.mode===state.mode)); }
+  state.crewTab = sub==="lists" ? "lists" : "picks";
+  const isLists = sub==="lists";
+  document.querySelectorAll("#crewView [data-csub]").forEach(c=>c.classList.toggle("subhide", c.dataset.csub!==sub));
+  $("#modeSeg").classList.toggle("hidden", !(sub==="top"||sub==="recs"));
+  if(sub==="feed"){ renderLatestReviews(); renderActivity(); }
+  if(sub==="recs") renderRecs();
+  if(sub==="polls") renderPolls();
+  if(sub==="party") renderParty();
+  if(sub==="inbox") renderInbox(true);
+  if(sub!=="top" && !isLists) return;
   if(isLists){
     const box=$("#crewLists"); box.replaceChildren();
     const ids=Object.keys(state.docs).filter(id=>state.docs[id].custom.length).sort((a,b)=>(a===state.me.uid?-1:b===state.me.uid?1:nameOf(a).localeCompare(nameOf(b))));
@@ -3203,13 +3242,20 @@ function renderStats(showId){
   const note=el("p","hint","Hours are estimated at 24 min an episode (movies ~100 min). Shows still airing count the episodes out so far. Ongoing manga only count once you've logged chapters in Reading."); note.style.margin="10px 0 0"; body.append(note);
 }
 document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>{ state.view=b.dataset.view; render(); }));
-state.crewTab = (window.CrewLook && CrewLook.get("crewTab"))==="lists" ? "lists" : "picks";
+state.crewTab = "picks";
 state.lastMode = state.mode==="lists" ? "anime" : state.mode;
-document.querySelectorAll("#crewTabs button").forEach(b=>b.addEventListener("click",()=>{
-  state.crewTab=b.dataset.ct; if(window.CrewLook) CrewLook.put("crewTab",state.crewTab);
-  if(state.crewTab==="picks" && state.mode==="lists"){ state.mode=state.lastMode||"anime"; if(window.CrewLook) CrewLook.put("mode",state.mode); }
-  if(state.me) render();
-}));
+// ---- sub-tabs: one section at a time instead of a long scroll ----
+const LIST_SUBS=[["top","🏆 Top 10"],["now","▶ Watching"],["watched","✓ Watched"],["watch","📝 Watchlist"],["stats","📊 Stats"]];
+const CREW_SUBS=[["feed","📰 Feed"],["top","🏆 Top 10"],["party","🍿 Watch party"],["polls","🗳️ Polls"],["recs","✨ For you"],["inbox","📨 Inbox"],["lists","📋 Lists"]];
+state.sub={};
+function pickSub(key, items){ let v=state.sub[key]; if(v==null && window.CrewLook) v=CrewLook.get("sub_"+key); if(!items.some(i=>i[0]===v)) v=items[0][0]; state.sub[key]=v; return v; }
+function subBar(boxSel, key, items, cur, badge){
+  const box=$(boxSel); box.replaceChildren();
+  items.forEach(([k,l])=>{ const b=el("button",k===cur?"on":"",l); b.type="button"; if(badge&&badge[k]) b.append(el("span","nbadge",String(badge[k])));
+    b.addEventListener("click",()=>{ if(state.sub[key]===k) return; state.sub[key]=k; if(window.CrewLook) CrewLook.put("sub_"+key,k); render(); window.scrollTo({top:0}); });
+    box.append(b); });
+  const on=box.querySelector(".on"); if(on) requestAnimationFrame(()=>{ const r=on.offsetLeft-box.clientWidth/2+on.clientWidth/2; box.scrollLeft=r; });
+}
 document.querySelectorAll("#modeSeg button").forEach(b=>b.addEventListener("click",()=>{
   if(state.mode===b.dataset.mode) return;
   state.mode=b.dataset.mode; if(state.mode!=="lists") state.lastMode=state.mode; state.target=null; state.genre=""; if(window.CrewLook) CrewLook.put("mode",state.mode);
@@ -3379,9 +3425,9 @@ onAuthStateChanged(auth, user=>{
   if(state.unsub){ state.unsub(); state.unsub=null; }
   state.me = user; state.docs = {}; state.loaded=false; Object.keys(disc).forEach(k=>delete disc[k]); unsaved=false; dirty=false; clearTimeout(retryT);
   if(!user){
-    $("#app").classList.add("hidden"); $("#me").classList.add("hidden"); $("#signinView").classList.remove("hidden"); setStatus(null); return;
+    $("#app").classList.add("hidden"); $("#me").classList.add("hidden"); $("#signinView").classList.remove("hidden"); $(".sub").classList.remove("hidden"); document.body.classList.remove("authed"); setStatus(null); return;
   }
-  $("#signinView").classList.add("hidden"); $("#app").classList.add("hidden"); $("#me").classList.remove("hidden");
+  $("#signinView").classList.add("hidden"); $("#app").classList.add("hidden"); $("#me").classList.remove("hidden"); $(".sub").classList.add("hidden"); document.body.classList.add("authed");
   $("#meName").textContent = displayNameOf(user);
   renderMe();
   setStatus("Loading lists…");
