@@ -2890,7 +2890,7 @@ function render(){
   $("#filters").classList.toggle("hidden", !std || !showId || !["now","watched","watch"].includes(state.curSub));
   renderAiring(editable && state.mode==="anime");
   $("#nowCard").classList.toggle("hidden", !std);
-  $("#topCard").classList.toggle("hidden", state.mode==="lists" || (state.view==="friends" && showId===ALL && state.mode!=="overall"));
+  $("#topCard").classList.toggle("hidden", state.mode==="lists");
   $("#watchedCard").classList.toggle("hidden", !std);
   $("#watchCard").classList.toggle("hidden", !std);
   $("#customArea").classList.toggle("hidden", state.mode!=="lists");
@@ -2900,7 +2900,8 @@ function render(){
   if(state.mode==="lists" && !tgt) $(".search").classList.add("hidden");
   if(editable) renderResults();
   if(state.mode==="lists"){ renderCustomLists(showId, editable); return; }
-  $("#topTitle").textContent = state.mode==="overall" ? "Overall top 10" : "Top 10";
+  $("#topTitle").textContent = (showId===ALL ? "Friends' combined " : "") + (state.mode==="overall" ? "overall top 10" : "top 10");
+  if(showId!==ALL) $("#topTitle").textContent = state.mode==="overall" ? "Overall top 10" : "Top 10";
   $("#topHint").textContent = editable
     ? (state.mode==="overall" ? "Anime and manga together. Search above to add either one, and use the arrows to reorder." : "Search above to add "+(state.mode==="manga"?"manga":"shows")+". Use the arrows to reorder.")
     : showId===ALL ? "Everyone's "+(state.mode==="overall"?"overall ":"")+"top 10s combined. A #1 pick is worth 10 points, #10 is worth 1."
