@@ -472,6 +472,62 @@
   .gopt.right{border-color:#3ecf8e;background:color-mix(in srgb, #3ecf8e 22%, var(--panel2))}
   .gopt.wrong{border-color:var(--accent);background:color-mix(in srgb, var(--accent) 22%, var(--panel2))}
   .gopt:disabled{cursor:default}
+  /* ---- more games ---- */
+  .hint.center{text-align:center}
+  .opstage{position:relative;width:100%;max-width:420px;aspect-ratio:16/9;margin:12px auto 8px;border-radius:14px;overflow:hidden;background:#000}
+  .opstage iframe{position:absolute;inset:-12%;width:124%;height:124%;border:0;filter:blur(22px) saturate(1.3);transition:filter .6s ease}
+  .opstage.clear iframe{inset:0;width:100%;height:100%;filter:none}
+  .opsong{text-align:center;font-size:13px;color:var(--muted);min-height:18px;margin-bottom:6px}
+  .clue{background:var(--panel2);border-radius:12px;padding:14px;margin:12px 0 4px}
+  .clue .cl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:6px}
+  .clue ol,.clue ul{margin:0;padding-left:22px;font-weight:700;line-height:1.6}
+  .clue .cq{font-size:16px;font-weight:700;overflow-wrap:anywhere}
+  .gopt.who{display:flex;align-items:center;justify-content:center;gap:8px}
+  .hlside{cursor:default}
+  .hlside .hlimg{width:100px;height:142px;object-fit:cover;border-radius:10px;display:block}
+  .hlside .hlv{font-family:"Dela Gothic One";font-size:18px;color:var(--accent2)}
+  .hlside.win{border-color:#3ecf8e}.hlside.lose{border-color:var(--accent)}
+  .chlist{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+  .chrow{background:var(--panel2);border-radius:12px;padding:8px}
+  .chrow.solved{outline:2px solid #3ecf8e}
+  .chh{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .chh img{width:34px;height:34px;border-radius:50%;object-fit:cover}
+  .chcells{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+  .chc{border-radius:8px;padding:5px 6px;background:var(--panel);border:1px solid var(--line);min-width:0}
+  .chc small{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
+  .chc span{display:block;font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .chc.ok{background:color-mix(in srgb, #3ecf8e 28%, var(--panel));border-color:#3ecf8e}
+  .chc.near{background:color-mix(in srgb, var(--accent2) 25%, var(--panel));border-color:var(--accent2)}
+  .chans{display:flex;align-items:center;gap:12px;background:var(--panel2);border-radius:12px;padding:10px;margin-top:10px}
+  .chans img{width:64px;height:64px;border-radius:12px;object-fit:cover}
+  .chans .lbl{font-size:12px;font-weight:700;color:var(--muted)}.chans .t{font-weight:700;font-size:17px}
+  .squad{background:var(--panel2);border-radius:12px;padding:10px;margin-top:10px;border:2px solid transparent}
+  .squad.mine{border-color:var(--accent)}.squad.win{border-color:var(--accent2)}
+  .squad .pill{margin-top:8px}.pill.on{border-color:var(--accent);color:var(--accent)}
+  .sqh{display:flex;align-items:center;gap:8px;font-size:14px}.sqh .grow{flex:1;min-width:0}
+  .cthumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .cthumb{position:relative;width:62px;text-align:center;flex:none}
+  .cthumb img,.cthumb .cph{width:56px;height:56px;border-radius:12px;object-fit:cover;display:grid;place-items:center;margin:0 auto;background:var(--panel);font-weight:700}
+  .cthumb .cn{font-size:11px;line-height:1.2;margin-top:3px;overflow-wrap:anywhere}
+  .cthumb .ic.del{position:absolute;top:-6px;right:-4px;width:24px;height:24px;font-size:11px}
+  .mrow .cthumb{width:48px}.mrow .cthumb img,.mrow .cthumb .cph{width:44px;height:44px}
+  .kdstack{display:flex;justify-content:center;margin:6px 0 14px}
+  .kdcard{position:relative;width:230px;height:326px;border-radius:16px;overflow:hidden;background:var(--panel2);touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  .kdcard img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+  .kdcard .kdt{position:absolute;left:0;right:0;bottom:0;padding:30px 12px 12px;background:linear-gradient(transparent,rgba(0,0,0,.85));color:#fff;font-weight:700;font-size:16px}
+  .kdbadge{position:absolute;top:16px;padding:4px 10px;border:3px solid;border-radius:8px;font-family:"Dela Gothic One";font-size:22px;opacity:0;background:rgba(0,0,0,.35)}
+  .kdbadge.keep{left:14px;color:#3ecf8e;transform:rotate(-12deg)}.kdbadge.drop{right:14px;color:var(--accent);transform:rotate(12deg)}
+  .gopt.kdyes{border-color:#3ecf8e}.gopt.kdno{border-color:var(--accent)}
+  small.kk,small.kdp{display:block;font-size:12px}small.kk{color:#3ecf8e}small.kdp{color:var(--accent)}
+  .emoq{font-size:34px;line-height:1.3;letter-spacing:2px;overflow-wrap:anywhere}
+  .emoa{font-weight:700;margin-top:4px}
+  .emo .grow2{margin-top:6px}
+  .pform input.emoin{font-size:22px}
+  .grow2{display:flex;gap:6px}.grow2 input{flex:1;min-width:0;width:100%;border:1px solid var(--line);background:var(--panel2);color:var(--text);font:500 15px "Zen Kaku Gothic New";padding:10px 12px;border-radius:10px}
+  .dq{font-weight:700;font-size:18px;text-align:center;margin:10px 0}
+  .dimg.sil img{filter:brightness(0) contrast(1.2)}.dimg.sil.shown img{filter:none;transition:filter .6s}
+  .gstage.dimg img{transition:transform .6s}
+  .gopts.one{grid-template-columns:1fr}
   /* ---- social ---- */
   .rnote{font-size:13px;font-style:italic;margin-top:2px;overflow-wrap:anywhere}
   .rst{color:var(--accent2);font-weight:700}
@@ -692,7 +748,7 @@
     </div>
 
     <div id="playView" class="hidden">
-      <div class="subtabs" id="playTabs"><button type="button" data-pt="mup">⚔️ Matchups</button><button type="button" data-pt="brk">🏆 Brackets</button><button type="button" data-pt="takes">🌶️ Hot takes</button><button type="button" data-pt="pred">🔮 Predict</button><button type="button" data-pt="draft">📋 Draft</button><button type="button" data-pt="ops">🎵 OP/ED tiers</button><button type="button" data-pt="guess">❓ Guess</button></div>
+      <div class="subtabs" id="playTabs"><button type="button" data-pt="mup">⚔️ Matchups</button><button type="button" data-pt="brk">🏆 Brackets</button><button type="button" data-pt="takes">🌶️ Hot takes</button><button type="button" data-pt="pred">🔮 Predict</button><button type="button" data-pt="draft">📋 Draft</button><button type="button" data-pt="ops">🎵 OP/ED tiers</button><button type="button" data-pt="guess">❓ Guess</button><button type="button" data-pt="daily">📅 Daily</button><button type="button" data-pt="chr">🧩 Anidle</button><button type="button" data-pt="gop">🎧 Guess the OP</button><button type="button" data-pt="who">🕵️ Who ranked it</button><button type="button" data-pt="hl">📈 Higher/Lower</button><button type="button" data-pt="kd">👍 Keep or drop</button><button type="button" data-pt="emo">😶 Emoji plot</button><button type="button" data-pt="sq">⚽ Squads</button></div>
       <div id="playBody"></div>
     </div>
 
@@ -1052,7 +1108,26 @@ function sanitizePlay(d){
   const recs=A(d.recs).filter(r=>r&&typeof r.to==="string"&&S(r.title,120)).slice(0,MAX_RECS).map(r=>({id:ID(r.id), to:r.to.slice(0,40), title:S(r.title,120), media:MD(r.media)||"anime", img:IM(r.img),
     malId:typeof r.malId==="number"?r.malId:null, kind:typeof r.kind==="string"?r.kind.slice(0,10):null, year:(typeof r.year==="number"&&r.year>1900&&r.year<2100)?r.year:null, note:S(r.note,140), at:AT(r.at)}));
   const recx=A(d.recx).filter(v=>typeof v==="string").slice(0,MAX_RECX).map(v=>v.slice(0,70));
-  return {takes, mups, brk, preds, drafts, ops, gbest, recs, recx, fchar:S(d.fchar,60)};
+  return {takes, mups, brk, preds, drafts, ops, gbest, recs, recx, fchar:S(d.fchar,60), gx:sanitizeGx(d.gx)};
+}
+// data for the extra Play games, all kept under one "gx" field
+function sanitizeGx(g){
+  g = g && typeof g==="object" && !Array.isArray(g) ? g : {};
+  const S=(v,n)=>typeof v==="string"?clean(v).slice(0,n):"", A=v=>Array.isArray(v)?v:[], D=v=>typeof v==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(v)?v:"";
+  const AT=v=>typeof v==="string"&&Date.parse(v)?v.slice(0,30):"", IM=v=>IMG_OK(v)?v:null, ID=v=>String(v||uid()).slice(0,20);
+  const N=(v,lo,hi)=>typeof v==="number"&&Number.isFinite(v)&&v>=lo&&v<=hi?Math.round(v):null;
+  const best={}; ["gop","who","hls","hlp"].forEach(k=>{ const v=N((g.best||{})[k],1,1000000); if(v) best[k]=v; });
+  const streak=s=>s&&D(s.last)?{n:N(s.n,0,100000)||0, last:s.last}:null;
+  const cq=g.chq, chq=cq&&D(cq.d)&&N(cq.id,1,1e9)?{d:cq.d, id:cq.id, n:S(cq.n,80), img:IM(cq.img), s:S(cq.s,120), g:S(cq.g,20), r:S(cq.r,20), st:S(cq.st,60), y:N(cq.y,1900,2100), rank:N(cq.rank,1,100000), at:AT(cq.at)}:null;
+  const cp=g.chp, chp=cp&&D(cp.d)?{d:cp.d, g:A(cp.g).filter(x=>Number.isInteger(x)&&x>0).slice(0,8), done:cp.done===true, ok:cp.ok===true}:null;
+  const sq=A(g.sq).filter(b=>b&&S(b.name,60)&&AT(b.lock)).slice(0,10).map(b=>({id:ID(b.id), name:S(b.name,60), lock:AT(b.lock), at:AT(b.at)}));
+  const sqp=A(g.sqp).filter(x=>x&&typeof x.b==="string").slice(0,20).map(x=>({b:x.b.slice(0,70), p:A(x.p).filter(p=>p&&S(p.n,80)&&N(p.id,1,1e9)).slice(0,5).map(p=>({n:S(p.n,80), id:p.id, img:IM(p.img), s:S(p.s,80), at:AT(p.at)}))}));
+  const kd=A(g.kd).filter(x=>x&&S(x.t,120)).slice(0,400).map(x=>({t:S(x.t,120), img:IM(x.img), v:x.v===1?1:0}));
+  const emo=A(g.emo).filter(x=>x&&typeof x.e==="string"&&x.e.trim()&&S(x.a,120)).slice(0,30).map(x=>({id:ID(x.id), e:Array.from(x.e.replace(/\s+/g," ").trim()).slice(0,40).join(""), a:S(x.a,120), alt:S(x.alt,160), at:AT(x.at)}));
+  const emg=A(g.emg).filter(x=>x&&typeof x.r==="string").slice(0,300).map(x=>({r:x.r.slice(0,70), g:A(x.g).filter(s=>typeof s==="string").slice(0,3).map(s=>clean(s).slice(0,80)), ok:x.ok===true}));
+  const q=g.dq, dq=q&&D(q.d)&&Array.isArray(q.opts)&&q.opts.length>=2?{d:q.d, ty:S(q.ty,10), q:S(q.q,160), img:IM(q.img), ox:N(q.ox,0,100), oy:N(q.oy,0,100), opts:q.opts.slice(0,4).map(o=>S(String(o),120)), a:N(q.a,0,3)||0, sub:S(q.sub,400), at:AT(q.at)}:null;
+  const p=g.dp, dp=p&&D(p.d)?{d:p.d, o:N(p.o,0,3)||0, ok:p.ok===true}:null;
+  return {best, chq, chp, chs:streak(g.chs), sq, sqp, kd, emo, emg, dq, dp, ds:streak(g.ds)};
 }
 const USER_DOMAIN = "@users.crew-fd928.firebaseapp.com";
 function displayNameOf(u){ if(!u) return "Someone"; if(u.displayName) return u.displayName; if(u.email && u.email.endsWith(USER_DOMAIN)) return u.email.slice(0,-USER_DOMAIN.length); return "Someone"; }
@@ -1092,7 +1167,7 @@ async function save(){
     do{
       dirty=false;
       const m = mine();
-      await setDoc(doc(db,"lists",who), { name:displayNameOf(state.me).slice(0,60), avatar:m.avatar||null, top:m.top, watched:m.watched, watchlist:m.watchlist, mtop:m.mtop, mread:m.mread, mlist:m.mlist, otop:m.otop, custom:m.custom, reviews:m.reviews, watching:m.watching, mreading:m.mreading, reacts:m.reacts, replies:m.replies, polls:m.polls, votes:m.votes, party:m.party, takes:m.takes, mups:m.mups, brk:m.brk, preds:m.preds, drafts:m.drafts, ops:m.ops, gbest:m.gbest||null, recs:m.recs, recx:m.recx, fchar:m.fchar||"", updatedAt:new Date().toISOString() });
+      await setDoc(doc(db,"lists",who), { name:displayNameOf(state.me).slice(0,60), avatar:m.avatar||null, top:m.top, watched:m.watched, watchlist:m.watchlist, mtop:m.mtop, mread:m.mread, mlist:m.mlist, otop:m.otop, custom:m.custom, reviews:m.reviews, watching:m.watching, mreading:m.mreading, reacts:m.reacts, replies:m.replies, polls:m.polls, votes:m.votes, party:m.party, takes:m.takes, mups:m.mups, brk:m.brk, preds:m.preds, drafts:m.drafts, ops:m.ops, gbest:m.gbest||null, recs:m.recs, recx:m.recx, fchar:m.fchar||"", gx:m.gx, updatedAt:new Date().toISOString() });
     } while(dirty);
     if(state.me && state.me.uid===who){ clearBackup(); if(unsaved){ unsaved=false; setStatus(null); toast("Saved ✓"); } }
   }catch(e){
@@ -2198,7 +2273,7 @@ function renderPlay(force){
   if(!PLAY[state.playTab]) state.playTab="mup";
   document.querySelectorAll("#playTabs button").forEach(b=>b.classList.toggle("on", b.dataset.pt===state.playTab));
   if(!force && typingInPlay()){ playPending=true; return; }
-  if(state.playTab==="guess" && gm.on && !force) return; // don't wipe a game in progress
+  if(!force && ((state.playTab==="guess" && gm.on) || (state.playTab==="gop" && go.on))) return; // don't wipe a game in progress
   buildVoteIdx();
   const box=$("#playBody"); box.replaceChildren();
   PLAY[state.playTab](box);
@@ -2592,6 +2667,529 @@ PLAY.guess = box => {
   box.append(lb);
 };
 
+// ================= MORE GAMES: guess the OP, who ranked it, higher/lower, anidle, squads, keep or drop, emoji plot, daily =================
+const dstr = d => d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const today = () => dstr(new Date());
+const yday = () => { const d=new Date(); d.setDate(d.getDate()-1); return dstr(d); };
+// a streak only counts while it's alive (played today or yesterday)
+const liveStreak = s => s && (s.last===today()||s.last===yday()) ? s.n : 0;
+function bumpStreak(m, key, ok){ const s=m.gx[key]; if(s && s.last===today()) return; m.gx[key]={n: ok ? ((s&&s.last===yday())?s.n:0)+1 : 0, last:today()}; }
+function saveBest(k, s){ const b=(mine().gx.best||{})[k]||0; if(s>b) mutate(m=>{ m.gx.best={...m.gx.best, [k]:s}; }); return s>b; }
+function bestCard(k, title, unit){
+  const c=card(head(title||"High scores"));
+  const rows=Object.entries(state.docs).filter(([,d])=>(d.gx.best||{})[k]).sort((a,b)=>b[1].gx.best[k]-a[1].gx.best[k]);
+  if(!rows.length) c.append(el("div","empty","No scores yet. Set the bar."));
+  rows.forEach(([id,d],i)=>{ const r=el("div","mrow"); r.append(el("div","rk",i===0?"👑":String(i+1)), avatarEl(id,true)); const g=el("div","grow"); g.append(el("div","",nameOf(id))); r.append(g, el("div","sc",d.gx.best[k].toLocaleString()+(unit||""))); c.append(r); });
+  return c;
+}
+// daily puzzles: whoever opens it first each day writes it to their doc, and the whole crew plays that one
+function sharedToday(key){ let best=null, owner=null; Object.entries(state.docs).forEach(([id,d])=>{ const q=d.gx[key]; if(!q||q.d!==today()) return; if(!best || (q.at||"")<(best.at||"") || ((q.at||"")===(best.at||"") && id<owner)){ best=q; owner=id; } }); return best; }
+const seeded = (arr, seed) => arr.map(x=>[hash(seed+"|"+(x.id||x.title||x.n||x)),x]).sort((a,b)=>a[0]-b[0]).map(p=>p[1]);
+const insertAt = (arr, x, i) => { const a=arr.slice(); a.splice(i%(a.length+1),0,x); return a; };
+
+// ---- AniList data used by the games (cached on this device for a day) ----
+const aniCache={};
+function aniData(key, loader){
+  if(aniCache[key]) return aniCache[key];
+  try{ const v=JSON.parse(localStorage.getItem("crew.ani."+key)||"null"); if(v && v.at>Date.now()-864e5 && Array.isArray(v.list) && v.list.length) return aniCache[key]={list:v.list}; }catch(e){}
+  aniCache[key]={loading:true, list:[]};
+  loader().then(list=>{ aniCache[key]={list}; try{ localStorage.setItem("crew.ani."+key, JSON.stringify({at:Date.now(), list})); }catch(e){} })
+    .catch(()=>{ aniCache[key]={error:true, list:[]}; })
+    .finally(()=>{ if(state.view==="play") renderPlay(); });
+  return aniCache[key];
+}
+function loadingCard(c, key){
+  if(c.loading){ return card(el("div","empty","Loading from AniList…")); }
+  if(c.error){ const cc=card(el("div","empty","Couldn't reach AniList right now.")); const r=el("div","r"); r.append(bt("btn","Try again",()=>{ delete aniCache[key]; renderPlay(true); })); cc.append(r); return cc; }
+  return null;
+}
+const POP_Q=`query($p:Int){Page(page:$p,perPage:50){media(type:ANIME,sort:POPULARITY_DESC,isAdult:false){id title{english romaji} coverImage{large} averageScore popularity seasonYear format studios(isMain:true){nodes{name}}}}}`;
+const popAnime = () => aniData("pop", async()=>{
+  const out=[], seen=new Set();
+  for(const p of [1,2,3]){ const j=await aniPost(POP_Q,{p});
+    ((j.data&&j.data.Page&&j.data.Page.media)||[]).forEach(a=>{ const img=a.coverImage&&a.coverImage.large, t=clean(a.title.english||a.title.romaji||""); if(!t||seen.has(norm(t))) return; seen.add(norm(t));
+      out.push({id:a.id, title:t, img:IMG_OK(img)?img:null, score:a.averageScore||0, pop:a.popularity||0, year:a.seasonYear||null, studio:(((a.studios&&a.studios.nodes)||[])[0]||{}).name||null}); }); }
+  if(!out.length) throw new Error("empty"); return out; });
+const ROLE={MAIN:"Main", SUPPORTING:"Supporting", BACKGROUND:"Background"};
+const CHAR_Q=`query($p:Int){Page(page:$p,perPage:50){characters(sort:FAVOURITES_DESC){id name{full} image{large} gender media(sort:POPULARITY_DESC,perPage:1){edges{characterRole node{title{english romaji} seasonYear startDate{year} studios(isMain:true){nodes{name}}}}}}}}`;
+const charPool = () => aniData("chars", async()=>{
+  const out=[];
+  for(const p of [1,2,3,4]){ const j=await aniPost(CHAR_Q,{p});
+    ((j.data&&j.data.Page&&j.data.Page.characters)||[]).forEach(c=>{ const e=((c.media&&c.media.edges)||[])[0]; if(!e||!e.node) return; const n=e.node, img=c.image&&c.image.large, s=clean(n.title.english||n.title.romaji||""), nm=clean((c.name&&c.name.full)||"");
+      if(!s||!nm||!IMG_OK(img)) return;
+      out.push({id:c.id, n:nm, img, g:c.gender||"Unknown", s, r:ROLE[e.characterRole]||"Supporting", st:(((n.studios&&n.studios.nodes)||[])[0]||{}).name||"Unknown", y:n.seasonYear||(n.startDate&&n.startDate.year)||null}); }); }
+  out.forEach((x,i)=>x.rank=i+1);
+  if(!out.length) throw new Error("empty"); return out; });
+
+// ---------- 🎧 guess the OP ----------
+var go={on:false, qs:[], i:0, score:0, picked:null, t0:null, last:0, timer:null, player:null, ui:null};
+const GOP_SECS=20, GOP_ROUNDS=8;
+function opSongs(){ const m=new Map(); Object.values(state.docs).forEach(d=>d.ops.forEach(o=>{ if(!o.yt) return; const k=opKey(o); if(!m.has(k)) m.set(k,{show:o.show, t:o.t, kind:o.kind, yt:o.yt}); })); return [...m.values()]; }
+let ytApi=null;
+function loadYT(){
+  if(ytApi) return ytApi;
+  ytApi=new Promise((res,rej)=>{
+    if(window.YT && window.YT.Player) return res(window.YT);
+    const prev=window.onYouTubeIframeAPIReady; window.onYouTubeIframeAPIReady=()=>{ if(prev) try{ prev(); }catch(e){} res(window.YT); };
+    const s=document.createElement("script"); s.src="https://www.youtube.com/iframe_api"; s.onerror=()=>{ ytApi=null; rej(); }; document.head.append(s);
+    setTimeout(()=>{ if(!(window.YT&&window.YT.Player)){ ytApi=null; rej(); } }, 8000);
+  });
+  return ytApi;
+}
+function stopGop(){ clearTimeout(go.timer); if(go.player){ try{ go.player.destroy(); }catch(e){} go.player=null; } go.on=false; const f=document.getElementById("gopFrame"); if(f) f.remove(); }
+function startGop(){
+  const songs=opSongs(); if(songs.length<3){ toast("Need at least 3 songs with YouTube links on the OP/ED tier list."); return; }
+  const shows=[...new Map([...songs.map(s=>s.show), ...crewPool().map(x=>x.title)].map(t=>[norm(t),t])).values()];
+  if(shows.length<4){ toast("Need at least 4 different shows across the crew's lists."); return; }
+  go.qs=shuffle(songs).slice(0,GOP_ROUNDS).map(s=>({s, opts:shuffle([s.show, ...shuffle(shows.filter(t=>norm(t)!==norm(s.show))).slice(0,3)])}));
+  go.on=true; go.i=0; go.score=0; go.picked=null; drawGop();
+}
+function gopClock(){
+  if(go.t0!=null || go.picked!=null || !go.ui) return;
+  go.t0=Date.now(); const tf=go.ui.tf; tf.style.transition="width "+GOP_SECS+"s linear"; requestAnimationFrame(()=>{ tf.style.width="0%"; });
+  go.ui.hint.textContent="Name that anime! Faster = more points.";
+  go.timer=setTimeout(()=>{ if(go.picked==null) gopPick(-1); }, GOP_SECS*1000);
+}
+function gopPick(i){
+  if(go.picked!=null || !go.ui) return; clearTimeout(go.timer);
+  const q=go.qs[go.i], right=i>=0 && q.opts[i]===q.s.show;
+  // guessing before the song even starts only earns the minimum
+  const secs = go.t0==null ? GOP_SECS : (Date.now()-go.t0)/1000;
+  go.picked=i; go.last = right ? Math.max(100, Math.round(1000-secs*(900/GOP_SECS))) : 0; go.score+=go.last;
+  gopShowResult();
+}
+function gopShowResult(){
+  const q=go.qs[go.i], u=go.ui, i=go.picked;
+  u.stage.classList.add("clear"); u.tf.style.transition="none"; u.score.textContent=go.score+" pts";
+  u.hint.textContent = i===-1 ? "⏰ Time's up! It was "+q.s.show : i===-2 ? "Skipped. It was "+q.s.show : q.opts[i]===q.s.show ? "✅ Nice! +"+go.last : "❌ It was "+q.s.show;
+  u.song.textContent = q.s.t+" · "+q.s.show+" "+q.s.kind;
+  u.btns.forEach((b,j)=>{ b.disabled=true; if(q.opts[j]===q.s.show) b.classList.add("right"); else if(j===i) b.classList.add("wrong"); });
+  u.skip.remove();
+  const r=el("div","r"); r.append(bt("btn primary", go.i+1<go.qs.length?"Next song →":"See score", ()=>{ go.i++; go.picked=null; if(go.i>=go.qs.length) endGop(); else drawGop(); })); u.card.insertBefore(r, u.quit);
+}
+function drawGop(){
+  clearTimeout(go.timer); go.t0=null; if(go.player){ try{ go.player.destroy(); }catch(e){} go.player=null; }
+  const box=$("#playBody"); box.replaceChildren();
+  const q=go.qs[go.i], c=card(), top=el("div","gtop"), score=el("b","",go.score+" pts");
+  top.append(el("span","","Song "+(go.i+1)+"/"+go.qs.length), score); c.append(top);
+  const stage=el("div","opstage"), fr=el("iframe"); fr.id="gopFrame"; fr.title="Mystery song";
+  fr.src="https://www.youtube.com/embed/"+q.s.yt+"?autoplay=1&playsinline=1&rel=0&controls=0&disablekb=1&fs=0&iv_load_policy=3&enablejsapi=1&origin="+encodeURIComponent(location.origin);
+  fr.allow="autoplay; encrypted-media"; stage.append(fr);
+  const song=el("div","opsong",""), tbar=el("div","gtime"), tf=el("i"); tbar.append(tf);
+  const hint=el("div","ghint","▶ Tap the blurry video to start the song");
+  c.append(stage, song, tbar, hint);
+  const g=el("div","gopts"), btns=q.opts.map((o,i)=>{ const b=bt("gopt",o,()=>gopPick(i)); g.append(b); return b; }); c.append(g);
+  const skip=bt("link","Video won't play? Skip it",()=>gopPick(-2)); skip.style.cssText="display:block;margin:10px auto 0;font-size:12px"; c.append(skip);
+  const quit=bt("link","Quit game",()=>{ if(confirm("Quit this game?")){ stopGop(); renderPlay(true); } }); quit.style.cssText="display:block;margin:6px auto 0;font-size:12px"; c.append(quit);
+  box.append(c);
+  go.ui={card:c, stage, tf, hint, btns, skip, quit, score, song};
+  if(go.picked!=null){ gopShowResult(); return; }
+  const round=go.i;
+  loadYT().then(YT=>{ if(!go.on||go.i!==round||!document.getElementById("gopFrame")) return;
+    go.player=new YT.Player("gopFrame",{events:{onStateChange:e=>{ if(e.data===1 && go.i===round) gopClock(); }}}); })
+    .catch(()=>{ if(go.on && go.i===round) gopClock(); });
+}
+function endGop(){ const sc=go.score; stopGop(); const nb=saveBest("gop",sc); toast(nb ? "🎉 New personal best: "+sc : "You scored "+sc); renderPlay(true); }
+PLAY.gop = box => {
+  if(go.on){ drawGop(); return; }
+  const n=opSongs().length;
+  const c=card(head("Guess the OP"), el("p","hint","Up to "+GOP_ROUNDS+" openings and endings from the crew's OP/ED tier lists. The video stays blurred, so you go by ear. Name the anime fast for up to 1,000 points a song."));
+  const r=el("div","r"); r.append(bt("btn primary","▶ Play", startGop)); c.append(r);
+  c.append(el("p","hint", n>=3 ? n+" songs with YouTube links in the pool. Turn your sound on!" : "Add at least 3 songs with YouTube links on the 🎵 OP/ED tiers tab to unlock this."));
+  box.append(c, bestCard("gop"));
+};
+
+// ---------- 🕵️ who ranked it? ----------
+const wh={on:false, qs:[], i:0, score:0, combo:0, picked:null, last:0};
+function whoClues(){
+  const me=state.me.uid, out=[];
+  Object.entries(state.docs).forEach(([id,d])=>{ if(id===me) return;
+    const list=(arr,label,n)=>{ if(arr.length>=3) out.push({id, label, list:arr.slice(0,n||5).map(x=>x.title), ol:true}); };
+    list(d.top,"Their top anime"); list(d.mtop,"Their top manga"); list(d.otop,"Their all-time top");
+    d.takes.slice(0,5).forEach(t=>out.push({id, label:"Hot take", quote:t.text}));
+    d.reviews.slice(0,5).forEach(v=>out.push({id, label:"Review of "+v.title+(v.score?" · "+v.score+"/10":""), quote:v.text.length>180?v.text.slice(0,177)+"…":v.text}));
+    const done=[...d.watched,...d.mread];
+    const tens=done.filter(x=>x.score===10).map(x=>x.title); if(tens.length>=2) out.push({id, label:"Rated these 10/10", list:shuffle(tens).slice(0,4)});
+    const lows=done.filter(x=>x.score&&x.score<=4).map(x=>x.title+" ("+x.score+"/10)"); if(lows.length) out.push({id, label:"Rated these low", list:shuffle(lows).slice(0,3)});
+    if(d.watching.length>=2) out.push({id, label:"Currently watching", list:d.watching.slice(0,4).map(x=>x.title)});
+    if(d.watchlist.length>=3) out.push({id, label:"On their watchlist", list:shuffle(d.watchlist).slice(0,4).map(x=>x.title)});
+    if(d.fchar) out.push({id, label:"Favorite character", quote:d.fchar});
+  });
+  return out;
+}
+const whoOthers = () => Object.keys(state.docs).filter(id=>id!==state.me.uid);
+function startWho(){
+  const others=whoOthers(), clues=whoClues();
+  if(others.length<2){ toast("Needs at least 2 friends in the crew."); return; }
+  if(clues.length<3){ toast("Your friends need a few more rankings, takes or reviews first."); return; }
+  // spread the rounds across people instead of letting one busy list dominate
+  const by={}; shuffle(clues).forEach(c=>(by[c.id]=by[c.id]||[]).push(c)); const picks=[]; let k=0;
+  while(picks.length<8 && Object.values(by).some(a=>a.length)){ const ids=Object.keys(by).filter(id=>by[id].length); picks.push(by[ids[k%ids.length]].shift()); k++; }
+  wh.qs=shuffle(picks).map(c=>({c, opts:shuffle([c.id, ...shuffle(others.filter(o=>o!==c.id)).slice(0,3)])}));
+  wh.on=true; wh.i=0; wh.score=0; wh.combo=0; wh.picked=null; renderPlay(true);
+}
+function drawWho(box){
+  const q=wh.qs[wh.i], c=card(), top=el("div","gtop"); top.append(el("span","","Clue "+(wh.i+1)+"/"+wh.qs.length+(wh.combo>1?" · 🔥"+wh.combo+" in a row":"")), el("b","",wh.score+" pts")); c.append(top);
+  const cl=el("div","clue"); cl.append(el("div","cl",q.c.label));
+  if(q.c.list){ const l=el(q.c.ol?"ol":"ul",""); q.c.list.forEach(t=>l.append(el("li","",t))); cl.append(l); } else cl.append(el("div","cq","“"+q.c.quote+"”"));
+  c.append(cl, el("div","ghint", wh.picked==null ? "Who's this?" : q.opts[wh.picked]===q.c.id ? "✅ Got it! +"+wh.last : "❌ That was "+nameOf(q.c.id)));
+  const g=el("div","gopts");
+  q.opts.forEach((id,i)=>{ const b=bt("gopt who"+(wh.picked!=null&&id===q.c.id?" right":"")+(wh.picked===i&&id!==q.c.id?" wrong":""),"",()=>{
+      if(wh.picked!=null) return; wh.picked=i; if(id===q.c.id){ wh.combo++; wh.last=100+50*(wh.combo-1); wh.score+=wh.last; } else { wh.combo=0; wh.last=0; } renderPlay(true); });
+    b.append(avatarEl(id,true), el("span","",nameOf(id))); if(wh.picked!=null) b.disabled=true; g.append(b); });
+  c.append(g);
+  if(wh.picked!=null){ const r=el("div","r"); r.append(bt("btn primary", wh.i+1<wh.qs.length?"Next →":"See score",()=>{ wh.picked=null; wh.i++;
+    if(wh.i>=wh.qs.length){ wh.on=false; const nb=saveBest("who",wh.score); toast(nb?"🎉 New personal best: "+wh.score:"You scored "+wh.score); } renderPlay(true); })); c.append(r); }
+  box.append(c);
+}
+PLAY.who = box => {
+  if(wh.on){ drawWho(box); return; }
+  const c=card(head("Who ranked it?"), el("p","hint","You get an anonymous top list, hot take, review or rating from someone in the crew. Guess who it belongs to. 100 points a clue, plus 50 more for every one you get in a row."));
+  const r=el("div","r"); r.append(bt("btn primary","▶ Play", startWho)); c.append(r);
+  const n=whoClues().length; c.append(el("p","hint", whoOthers().length<2 ? "Needs at least 2 friends in the crew." : n+" clues to pull from right now."));
+  box.append(c, bestCard("who"));
+};
+
+// ---------- 📈 higher or lower ----------
+const hl={on:false, a:null, b:null, streak:0, res:null, stat:(window.CrewLook&&CrewLook.get("hlStat"))==="pop"?"pop":"score", seen:new Set()};
+const hlVal = (x,s) => s==="score" ? x.score : x.pop;
+const hlFmt = (x,s) => s==="score" ? (x.score/10).toFixed(1)+" ★" : x.pop>=1e6 ? (x.pop/1e6).toFixed(2).replace(/\.?0+$/,"")+"M fans" : Math.round(x.pop/1000)+"K fans";
+const hlPool = () => (popAnime().list||[]).filter(x=>x.img && hlVal(x,hl.stat));
+function hlNext(){ const p=hlPool(); let b, n=0; do{ b=p[Math.floor(Math.random()*p.length)]; n++; } while(n<80 && (b.id===hl.a.id || hlVal(b,hl.stat)===hlVal(hl.a,hl.stat) || hl.seen.has(b.id))); hl.seen.add(b.id); hl.b=b; hl.res=null; }
+function startHl(){ const p=hlPool(); if(p.length<10){ toast("Still loading shows…"); return; } hl.on=true; hl.streak=0; hl.seen=new Set(); hl.a=p[Math.floor(Math.random()*p.length)]; hl.seen.add(hl.a.id); hlNext(); renderPlay(true); }
+function hlGuess(up){
+  if(hl.res) return;
+  const a=hlVal(hl.a,hl.stat), b=hlVal(hl.b,hl.stat), ok = up ? b>a : b<a; hl.res=ok?"ok":"no";
+  if(ok){ hl.streak++; renderPlay(true); setTimeout(()=>{ if(!hl.on || hl.res!=="ok") return; hl.a=hl.b; hlNext(); if(state.playTab==="hl") renderPlay(true); }, 1200); }
+  else { const nb=saveBest(hl.stat==="score"?"hls":"hlp", hl.streak); toast(nb ? "🎉 New best streak: "+hl.streak : "Streak over: "+hl.streak); renderPlay(true); }
+}
+function hlSide(x, show, cls){ const s=el("div","mside hlside"+(cls?" "+cls:"")); const im=new Image(); im.alt=""; im.referrerPolicy="no-referrer"; im.src=x.img; im.className="hlimg"; s.append(im, el("div","mt",x.title), el("div","hlv", show ? hlFmt(x,hl.stat) : "?")); return s; }
+PLAY.hl = box => {
+  const st=popAnime(), wait=loadingCard(st,"pop");
+  const statName = hl.stat==="score" ? "AniList score" : "fan count";
+  if(hl.on && !wait){
+    const c=card(), top=el("div","gtop"); top.append(el("span","","Streak"), el("b","",String(hl.streak))); c.append(top);
+    c.append(el("p","hint center","Does the right one have a higher or lower "+statName+"?"));
+    const row=el("div","mrow2"); row.append(hlSide(hl.a,true), el("div","vs","VS"), hlSide(hl.b, !!hl.res, hl.res==="ok"?"win":hl.res==="no"?"lose":"")); c.append(row);
+    if(!hl.res){ const g=el("div","gopts"); g.append(bt("gopt","▲ Higher",()=>hlGuess(true)), bt("gopt","▼ Lower",()=>hlGuess(false))); c.append(g); }
+    else if(hl.res==="ok") c.append(el("div","ghint","✅ Correct!"));
+    else { c.append(el("div","ghint","❌ Game over. Your streak: "+hl.streak)); const r=el("div","r"); r.append(bt("btn primary","Play again",startHl), bt("btn","Done",()=>{ hl.on=false; renderPlay(true); })); c.append(r); }
+    box.append(c); return;
+  }
+  hl.on=false;
+  const c=card(head("Higher or lower"), el("p","hint","Two of the most popular anime ever. Guess whether the next one has a higher or lower number than the last, and see how long a streak you can build."));
+  const seg=el("div","seg"); [["score","★ AniList score"],["pop","👥 Fans"]].forEach(([k,l])=>seg.append(bt(hl.stat===k?"on":"",l,()=>{ hl.stat=k; if(window.CrewLook) CrewLook.put("hlStat",k); renderPlay(true); }))); c.append(seg);
+  if(wait) c.append(el("div","empty", st.loading ? "Loading shows from AniList…" : "Couldn't reach AniList right now."));
+  const r=el("div","r"); r.append(bt("btn primary","▶ Play", startHl)); if(st.error) r.append(bt("btn","Try again",()=>{ delete aniCache.pop; renderPlay(true); })); c.append(r);
+  box.append(c, bestCard(hl.stat==="score"?"hls":"hlp", "Best streaks · "+(hl.stat==="score"?"score":"fans")));
+};
+
+// ---------- 🧩 anidle (daily character guess) ----------
+const CHR_MAX=8;
+const pc={a:null, g:[]}; // practice round, kept on this device only
+function chrAnswer(pool){
+  const q=sharedToday("chq"); if(q) return q;
+  if(!pool.length) return null;
+  const top=pool.slice(0,150), a=top[hash("chr"+today())%top.length];
+  return {d:today(), id:a.id, n:a.n, img:a.img, s:a.s, g:a.g, r:a.r, st:a.st, y:a.y, rank:a.rank, at:nowIso(), local:true};
+}
+function chrCells(gu, ans){
+  const eq=(a,b)=>norm(a)===norm(b);
+  const num=(gv,av,close,fmt)=> gv==null||av==null ? {c:"no", t:"?"} : gv===av ? {c:"ok", t:fmt(gv)} : {c:Math.abs(gv-av)<=close?"near":"no", t:fmt(gv)+(av>gv?" ↑":" ↓")};
+  return [
+    {k:"Series", c:eq(gu.s,ans.s)?"ok":"no", t:gu.s},
+    {k:"Gender", c:eq(gu.g,ans.g)?"ok":"no", t:gu.g},
+    {k:"Role", c:eq(gu.r,ans.r)?"ok":"no", t:gu.r},
+    {k:"Studio", c:eq(gu.st,ans.st)?"ok":"no", t:gu.st},
+    {k:"Debut", ...num(gu.y, ans.y, 3, v=>String(v))},
+    // rank 1 = most favorited, so "↑" means the answer is more popular
+    {k:"Popularity", ...num(ans.rank?-gu.rank:null, ans.rank?-ans.rank:null, 15, v=>"#"+(-v))}
+  ];
+}
+function chrRow(gu, ans){
+  const w=el("div","chrow"+(gu.id===ans.id?" solved":"")); const h=el("div","chh"); const im=new Image(); im.alt=""; im.referrerPolicy="no-referrer"; im.src=gu.img; h.append(im, el("b","",gu.n)); w.append(h);
+  const cells=el("div","chcells"); chrCells(gu,ans).forEach(x=>{ const d=el("div","chc "+x.c); d.append(el("small","",x.k), el("span","",x.t)); cells.append(d); }); w.append(cells); return w;
+}
+function findChar(pool, text){ const t=norm(text); if(!t) return null; return pool.find(x=>norm(x.n)===t) || (()=>{ const s=pool.filter(x=>norm(x.n).startsWith(t)); return s.length===1?s[0]:null; })() || (()=>{ const s=pool.filter(x=>norm(x.n).split(" ").includes(t)); return s.length===1?s[0]:null; })(); }
+PLAY.chr = box => {
+  const st=charPool(), wait=loadingCard(st,"chars"), pool=st.list||[];
+  if(!ui.chrMode) ui.chrMode="daily";
+  const c=card(head("Anidle"), el("p","hint","Guess the mystery anime character in "+CHR_MAX+" tries. Every guess shows what matches: green is right, yellow is close. ↑ means the answer debuted later or is more popular, ↓ means earlier or less popular."));
+  const seg=el("div","seg"); [["daily","📅 Today's character"],["practice","🔁 Practice"]].forEach(([k,l])=>seg.append(bt(ui.chrMode===k?"on":"",l,()=>{ ui.chrMode=k; renderPlay(true); }))); c.append(seg);
+  box.append(c);
+  const shared=sharedToday("chq");
+  if(wait && !(ui.chrMode==="daily" && shared)){ box.append(wait); return; }
+  const daily=ui.chrMode==="daily";
+  if(!daily && !pc.a && pool.length){ pc.a=pool[Math.floor(Math.random()*Math.min(200,pool.length))]; pc.g=[]; }
+  const ans = daily ? chrAnswer(pool) : pc.a; if(!ans){ c.append(el("div","empty","Couldn't load characters.")); return; }
+  const myP = daily ? (()=>{ const p=mine().gx.chp; return p&&p.d===today() ? p : {d:today(), g:[], done:false, ok:false}; })() : {g:pc.g.map(x=>x.id), done:pc.g.some(x=>x.id===ans.id)||pc.g.length>=CHR_MAX, ok:pc.g.some(x=>x.id===ans.id)};
+  const byId=new Map(pool.map(x=>[x.id,x])); if(!byId.has(ans.id)) byId.set(ans.id,{...ans});
+  const guesses = daily ? myP.g.map(id=>byId.get(id)).filter(Boolean) : pc.g;
+  const g=card(); const top=el("div","gtop"); top.append(el("span","", daily ? "Today · "+new Date().toLocaleDateString([], {month:"short", day:"numeric"}) : "Practice"), el("b","",guesses.length+"/"+CHR_MAX)); g.append(top);
+  if(myP.done){ const a=el("div","chans"); const im=new Image(); im.alt=""; im.referrerPolicy="no-referrer"; im.src=ans.img; const t=el("div",""); t.append(el("div","lbl",myP.ok?"✅ Solved in "+guesses.length:"❌ Out of guesses"), el("div","t",ans.n), el("small","muted",ans.s)); a.append(im,t); g.append(a);
+    if(!daily){ const r=el("div","r"); r.append(bt("btn primary","New character",()=>{ pc.a=null; renderPlay(true); })); g.append(r); } }
+  else if(!pool.length){ g.append(el("div","empty","Characters are still loading…")); }
+  else {
+    const f=el("form","pform"), dl=document.getElementById("chrDL")||el("datalist"); dl.id="chrDL"; dl.replaceChildren(); pool.forEach(x=>dl.append(new Option(x.n, x.n)));
+    const inp=field("chrIn","input",{maxLength:80, placeholder:"Type a character name…", autocomplete:"off"}); inp.setAttribute("list","chrDL");
+    const row=el("div","grow2"); row.append(inp); const go2=bt("btn primary","Guess"); go2.type="submit"; row.append(go2); f.append(dl,row);
+    f.addEventListener("submit",ev=>{ ev.preventDefault(); const x=findChar(pool, formVals.chrIn||inp.value); if(!x){ toast("Pick a name from the list."); return; } if(guesses.some(y=>y.id===x.id)){ toast("Already guessed "+x.n); return; }
+      clearForm("chrIn"); blurActive(); const ok=x.id===ans.id;
+      if(daily){ mutate(m=>{ if(ans.local) m.gx.chq={d:ans.d, id:ans.id, n:ans.n, img:ans.img, s:ans.s, g:ans.g, r:ans.r, st:ans.st, y:ans.y, rank:ans.rank, at:ans.at};
+          const p=m.gx.chp&&m.gx.chp.d===today() ? m.gx.chp : {d:today(), g:[], done:false, ok:false}; if(p.done) return; p.g.push(x.id); if(ok){ p.done=true; p.ok=true; } else if(p.g.length>=CHR_MAX) p.done=true; m.gx.chp=p; if(p.done) bumpStreak(m,"chs",p.ok); }); }
+      else { pc.g.push(x); renderPlay(true); }
+      if(ok) toast("🎉 It's "+x.n+"!"); });
+    g.append(f);
+  }
+  const list=el("div","chlist"); guesses.slice().reverse().forEach(x=>list.append(chrRow(x,ans))); g.append(list);
+  box.append(g);
+  if(!daily) return;
+  const lb=card(head("Crew today"), el("p","hint","Everyone gets the same character each day. Solve it on consecutive days to build a streak."));
+  const ids=Object.keys(state.docs).sort((a,b)=>liveStreak(state.docs[b].gx.chs)-liveStreak(state.docs[a].gx.chs)||nameOf(a).localeCompare(nameOf(b)));
+  let any=false;
+  ids.forEach(id=>{ const d=state.docs[id], p=d.gx.chp&&d.gx.chp.d===today()?d.gx.chp:null, s=liveStreak(d.gx.chs); if(!p && !s) return; any=true;
+    const r=el("div","mrow"); r.append(avatarEl(id,true)); const gg=el("div","grow"); gg.append(el("div","",nameOf(id)), el("small","muted", !p ? "Hasn't played today" : p.done ? (p.ok ? "✅ Solved in "+p.g.length : "❌ Didn't get it") : "Playing · "+p.g.length+"/"+CHR_MAX)); r.append(gg, el("div","sc", s ? "🔥 "+s : "")); lb.append(r); });
+  if(!any) lb.append(el("div","empty","Nobody has played today yet."));
+  box.append(lb);
+};
+
+// ---------- ⚽ squad battles ----------
+const SQ_N=5, SQ_VOTE_MS=3*864e5;
+const CSEARCH_Q=`query($q:String){Page(perPage:10){characters(search:$q,sort:SEARCH_MATCH){id name{full} image{large} media(sort:POPULARITY_DESC,perPage:1){nodes{title{english romaji}}}}}}`;
+const sqSearch={q:"", loading:false, list:[], err:false};
+async function runSqSearch(q){
+  sqSearch.q=q; sqSearch.loading=true; sqSearch.err=false; sqSearch.list=[]; renderPlay(true);
+  try{ const j=await aniPost(CSEARCH_Q,{q}); if(sqSearch.q!==q) return;
+    sqSearch.list=((j.data&&j.data.Page&&j.data.Page.characters)||[]).map(c=>{ const n=((c.media&&c.media.nodes)||[])[0], img=c.image&&c.image.large; return {id:c.id, n:clean((c.name&&c.name.full)||""), img:IMG_OK(img)?img:null, s:n?clean(n.title.english||n.title.romaji||""):""}; }).filter(x=>x.n);
+  }catch(e){ sqSearch.err=true; }
+  sqSearch.loading=false; if(state.view==="play" && state.playTab==="sq") renderPlay(true);
+}
+function allSq(){ const out=[]; Object.entries(state.docs).forEach(([id,d])=>d.gx.sq.forEach(b=>out.push({owner:id, b, key:id+":"+b.id}))); return out.sort((x,y)=>(y.b.at||"").localeCompare(x.b.at||"")); }
+const sqPhase = b => { const l=Date.parse(b.lock); return Date.now()<l ? "pick" : Date.now()<l+SQ_VOTE_MS ? "vote" : "done"; };
+function sqSquads(key){
+  const all=[]; Object.entries(state.docs).forEach(([id,d])=>{ const x=d.gx.sqp.find(z=>z.b===key); if(x) x.p.forEach(p=>all.push({id,p})); });
+  all.sort((a,b)=>(a.p.at||"").localeCompare(b.p.at||"")||a.id.localeCompare(b.id));
+  const owner=new Map(), by={}; all.forEach(e=>{ if(owner.has(e.p.id)) return; owner.set(e.p.id,e.id); (by[e.id]=by[e.id]||[]).push(e.p); }); // first to pick a character keeps them
+  return {owner, by};
+}
+const sqOpt = id => id.slice(0,20);
+function cthumb(p){ const t=el("div","cthumb"); if(p.img){ const im=new Image(); im.alt=""; im.referrerPolicy="no-referrer"; im.loading="lazy"; im.src=p.img; t.append(im); } else t.append(el("span","cph",(p.n[0]||"?").toUpperCase())); t.append(el("div","cn",p.n)); return t; }
+function sqView(e){
+  const b=e.b, key=e.key, phase=sqPhase(b), {owner, by}=sqSquads(key), ref="q:"+key, vs=vt(ref), me=state.me.uid;
+  const c=card(); const h=head(b.name); if(e.owner===me) h.append(sbtn("Delete",()=>{ if(confirm('Delete "'+b.name+'"?')){ ui.sq=null; mutate(m=>{ m.gx.sq=m.gx.sq.filter(x=>x.id!==b.id); }); } })); c.append(h);
+  const by2=el("div","by"); by2.append(avatarEl(e.owner,true), el("span","","by "+nameOf(e.owner))); c.append(by2);
+  const lock=Date.parse(b.lock);
+  c.append(el("div","dstat", phase==="pick" ? "🟢 Picking · closes "+untilText((lock-Date.now())/1000) : phase==="vote" ? "🗳️ Voting · ends "+untilText((lock+SQ_VOTE_MS-Date.now())/1000) : "🏁 Final results"));
+  c.append(el("p","hint", phase==="pick" ? "Build a squad of "+SQ_N+" characters for this. Once someone picks a character, nobody else can take them." : phase==="vote" ? "Vote for the squad that wins it (not your own)." : ""));
+  const ids=Object.keys(by).sort((x,y)=>vs.filter(v=>v.o===sqOpt(y)).length-vs.filter(v=>v.o===sqOpt(x)).length||nameOf(x).localeCompare(nameOf(y)));
+  const top=phase==="done" && ids.length ? Math.max(...ids.map(id=>vs.filter(v=>v.o===sqOpt(id)).length)) : -1;
+  if(!ids.length) c.append(el("div","empty", phase==="pick" ? "No squads yet. Search below to make the first pick." : "Nobody built a squad."));
+  ids.forEach(id=>{ const n=vs.filter(v=>v.o===sqOpt(id)).length, won=top>0&&n===top;
+    const s=el("div","squad"+(myVote(ref)===sqOpt(id)?" mine":"")+(won?" win":"")); const hh=el("div","sqh"); hh.append(avatarEl(id,true), el("b","grow",(won?"🏆 ":"")+(id===me?"Your squad":nameOf(id)+"'s squad")), el("span","muted",by[id].length+"/"+SQ_N));
+    if(phase!=="pick") hh.append(el("span","sc",n+" vote"+(n===1?"":"s")));
+    s.append(hh); const row=el("div","cthumbs"); by[id].forEach(p=>{ const t=cthumb(p); if(phase==="pick" && id===me) t.append(icon("Drop "+p.n,"✕",()=>mutate(m=>{ const x=m.gx.sqp.find(z=>z.b===key); if(x) x.p=x.p.filter(q=>q.id!==p.id); }),{cls:"del"})); row.append(t); }); s.append(row);
+    if(phase!=="pick"){ const who=vs.filter(v=>v.o===sqOpt(id)).map(v=>nameOf(v.from)); if(who.length) s.append(el("div","who3",who.join(", "))); }
+    if(phase==="vote" && id!==me) s.append(bt("pill"+(myVote(ref)===sqOpt(id)?" on":""), myVote(ref)===sqOpt(id)?"✓ Your vote":"Vote for this squad",()=>vote(ref,sqOpt(id))));
+    c.append(s); });
+  if(phase!=="pick") return c;
+  const mineP=(by[me]||[]);
+  c.append(el("div","mh","Add to your squad · "+(SQ_N-mineP.length)+" left"));
+  const f=el("form","pform"), row=el("div","grow2"), inp=field("sqQ","input",{maxLength:60, placeholder:"Search a character (e.g. Isagi)"}); const go3=bt("btn","Search"); go3.type="submit"; row.append(inp, go3); f.append(row);
+  f.addEventListener("submit",ev=>{ ev.preventDefault(); const q=clean(formVals.sqQ||inp.value); if(q.length<2){ toast("Type at least 2 letters."); return; } blurActive(); runSqSearch(q); });
+  c.append(f);
+  if(sqSearch.loading) c.append(el("div","empty small","Searching…")); else if(sqSearch.err) c.append(el("div","empty small","Search failed. Try again."));
+  else if(sqSearch.q && !sqSearch.list.length) c.append(el("div","empty small","No characters found."));
+  sqSearch.list.forEach(x=>{ const o=owner.get(x.id), r=el("div","mrow"); r.append(cthumb({...x, n:""})); const gg=el("div","grow"); gg.append(el("div","",x.n), el("small","muted",x.s)); r.append(gg);
+    if(o){ const t=el("span","owned"); t.append(avatarEl(o,true), el("span","",o===me?"Yours":nameOf(o))); r.append(t); }
+    else r.append(bt("pill","Pick",()=>{ if(mineP.length>=SQ_N){ toast("Your squad is full ("+SQ_N+")."); return; }
+      mutate(m=>{ let s=m.gx.sqp.find(z=>z.b===key); if(!s){ s={b:key, p:[]}; m.gx.sqp.unshift(s); if(m.gx.sqp.length>20) m.gx.sqp.length=20; }
+        s.p=s.p.filter(q=>owner.get(q.id)===me||!owner.has(q.id)); if(s.p.length<SQ_N && !s.p.some(q=>q.id===x.id)) s.p.push({n:x.n, id:x.id, img:x.img, s:x.s, at:nowIso()}); }); toast("Picked "+x.n); }));
+    c.append(r); });
+  return c;
+}
+PLAY.sq = box => {
+  const list=allSq();
+  const c=card(head("Squad battles", sbtn(ui.sqForm?"Cancel":"+ New battle",()=>{ ui.sqForm=!ui.sqForm; renderPlay(true); })),
+    el("p","hint","Set a challenge, everyone drafts a squad of "+SQ_N+" characters from any anime, then the crew votes on which squad wins."));
+  if(ui.sqForm){
+    const f=el("form","pform");
+    f.append(field("sqName","input",{maxLength:60, placeholder:"e.g. Survive a zombie apocalypse"}), el("label","","Picks close in"));
+    const sel=field("sqLock","select"); [["1","1 day"],["2","2 days"],["3","3 days"],["7","1 week"]].forEach(([v,l])=>sel.append(new Option(l,v))); sel.value=formVals.sqLock||"2"; f.append(sel);
+    const go4=bt("btn primary","Start battle"); go4.type="submit"; const r=el("div","r"); r.append(go4); f.append(r);
+    f.addEventListener("submit",ev=>{ ev.preventDefault(); blurActive(); const name=clean(formVals.sqName||"").slice(0,60); if(!name){ toast("Give the battle a challenge."); return; }
+      if(mine().gx.sq.length>=10){ toast("Delete an old battle first (max 10)."); return; }
+      const days=Number(formVals.sqLock||"2")||2, id=uid(); ui.sqForm=false; clearForm("sqName","sqLock"); ui.sq=state.me.uid+":"+id;
+      mutate(m=>{ m.gx.sq.unshift({id, name, lock:new Date(Date.now()+days*864e5).toISOString(), at:nowIso()}); }); toast("Battle started"); });
+    c.append(f);
+  }
+  if(!list.length && !ui.sqForm) c.append(el("div","empty","No battles yet. Start the first one!"));
+  if(list.length){ if(!ui.sq || !list.some(e=>e.key===ui.sq)) ui.sq=list[0].key;
+    const chips=el("div","people"); list.forEach(e=>{ const ph=sqPhase(e.b), ch=bt("chip"+(e.key===ui.sq?" on":""),"",()=>{ ui.sq=e.key; sqSearch.q=""; sqSearch.list=[]; renderPlay(true); }); ch.append(el("span","",(ph==="pick"?"🟢 ":ph==="vote"?"🗳️ ":"🏆 ")+e.b.name)); chips.append(ch); }); c.append(chips); }
+  box.append(c);
+  const sel=list.find(e=>e.key===ui.sq); if(sel) box.append(sqView(sel));
+};
+
+// ---------- 👍 keep or drop ----------
+const KD_MAX=400;
+function kdDeck(){
+  const mineSet=new Set(mine().gx.kd.map(x=>norm(x.t))), seen=new Map();
+  const add=(t,img,pri)=>{ if(!t||!img) return; const k=norm(t); if(mineSet.has(k)||seen.has(k)) return; seen.set(k,{t,img,pri}); };
+  Object.entries(state.docs).forEach(([id,d])=>{ if(id!==state.me.uid) d.gx.kd.forEach(x=>add(x.t,x.img,0)); }); // what friends judged first, so results overlap
+  crewPool().forEach(x=>add(x.title, x.img||poolImg(x.title), 1));
+  const s=nowSeason(); ((seasonCache[seaKey(s)]||{}).list||[]).forEach(x=>add(x.title,x.img,2));
+  (popAnime().list||[]).forEach(x=>add(x.title,x.img,3));
+  const d=today(); return [...seen.values()].sort((a,b)=>a.pri-b.pri||hash(d+a.t)-hash(d+b.t));
+}
+function kdChoose(x, v){ mutate(m=>{ m.gx.kd=m.gx.kd.filter(y=>norm(y.t)!==norm(x.t)); m.gx.kd.unshift({t:x.t, img:x.img, v}); if(m.gx.kd.length>KD_MAX) m.gx.kd.length=KD_MAX; }); }
+function kdResults(){
+  const m=new Map(); Object.entries(state.docs).forEach(([id,d])=>d.gx.kd.forEach(x=>{ const k=norm(x.t); let e=m.get(k); if(!e){ e={t:x.t, img:x.img, keep:[], drop:[]}; m.set(k,e); } (x.v?e.keep:e.drop).push(id); }));
+  return [...m.values()];
+}
+function kdRow(e){ const r=el("div","mrow"); r.append(posterEl({title:e.t, img:e.img, media:"anime"})); const g=el("div","grow"); g.append(el("div","",e.t));
+  if(e.keep.length) g.append(el("small","kk","👍 "+e.keep.map(nameOf).join(", "))); if(e.drop.length) g.append(el("small","kdp","👎 "+e.drop.map(nameOf).join(", ")));
+  r.append(g); return r; }
+PLAY.kd = box => {
+  if(!ui.kdTab) ui.kdTab="swipe";
+  popAnime(); const s=nowSeason(); loadSeason(seaKey(s), SEASONS[s.i], s.y);
+  const c=card(head("Keep or drop"), el("p","hint","Swipe right to keep, left to drop. No overthinking. Then see where the crew agrees and where it splits."));
+  const seg=el("div","seg"); [["swipe","👆 Swipe"],["res","📊 Crew results"]].forEach(([k,l])=>seg.append(bt(ui.kdTab===k?"on":"",l,()=>{ ui.kdTab=k; renderPlay(true); }))); c.append(seg);
+  box.append(c);
+  const mineK=mine().gx.kd;
+  if(ui.kdTab==="swipe"){
+    const deck=kdDeck(), x=deck[0];
+    if(!x){ c.append(el("div","empty", popAnime().loading ? "Shuffling the deck…" : "You've judged everything in the deck. Check the crew results!")); }
+    else {
+      const stack=el("div","kdstack"), cardEl=el("div","kdcard"), im=new Image(); im.alt=""; im.referrerPolicy="no-referrer"; im.draggable=false; im.src=x.img;
+      const bk=el("div","kdbadge keep","KEEP"), bd=el("div","kdbadge drop","DROP"); cardEl.append(im, bk, bd, el("div","kdt",x.t)); stack.append(cardEl); c.append(stack);
+      let sx=null, done=false;
+      const fly=v=>{ if(done) return; done=true; cardEl.style.transition="transform .25s ease, opacity .25s ease"; cardEl.style.transform="translateX("+(v?420:-420)+"px) rotate("+(v?20:-20)+"deg)"; cardEl.style.opacity="0"; setTimeout(()=>kdChoose(x,v),200); };
+      cardEl.addEventListener("pointerdown",e=>{ if(done) return; sx=e.clientX; cardEl.setPointerCapture(e.pointerId); cardEl.style.transition="none"; });
+      cardEl.addEventListener("pointermove",e=>{ if(sx==null) return; const dx=e.clientX-sx; cardEl.style.transform="translateX("+dx+"px) rotate("+(dx/18)+"deg)"; bk.style.opacity=Math.max(0,Math.min(1,dx/90)); bd.style.opacity=Math.max(0,Math.min(1,-dx/90)); });
+      const end=e=>{ if(sx==null) return; const dx=e.clientX-sx; sx=null; if(Math.abs(dx)>90) fly(dx>0?1:0); else { cardEl.style.transition="transform .2s ease"; cardEl.style.transform=""; bk.style.opacity=0; bd.style.opacity=0; } };
+      cardEl.addEventListener("pointerup",end); cardEl.addEventListener("pointercancel",end);
+      const g=el("div","gopts"); g.append(bt("gopt kdno","👎 Drop",()=>fly(0)), bt("gopt kdyes","👍 Keep",()=>fly(1))); c.append(g);
+      c.append(el("p","hint center", deck.length+" left in the deck"));
+    }
+    if(mineK.length){ const r=el("div","r"); r.append(bt("btn","↩ Undo last",()=>mutate(m=>{ m.gx.kd.shift(); }))); c.append(r); }
+    return;
+  }
+  const all=kdResults(), kept=mineK.filter(x=>x.v).length;
+  if(mineK.length) c.append(el("p","hint","You've kept "+kept+" of "+mineK.length+" ("+Math.round(kept/mineK.length*100)+"%)."));
+  const splits=all.filter(e=>e.keep.length&&e.drop.length).sort((a,b)=>Math.min(b.keep.length,b.drop.length)-Math.min(a.keep.length,a.drop.length)||(b.keep.length+b.drop.length)-(a.keep.length+a.drop.length));
+  const keeps=all.filter(e=>e.keep.length>=2&&!e.drop.length).sort((a,b)=>b.keep.length-a.keep.length);
+  const drops=all.filter(e=>e.drop.length>=2&&!e.keep.length).sort((a,b)=>b.drop.length-a.drop.length);
+  const sec=(title,hint,arr,empty)=>{ const cc=card(head(title), el("p","hint",hint)); if(!arr.length) cc.append(el("div","empty",empty)); arr.slice(0,12).forEach(e=>cc.append(kdRow(e))); box.append(cc); };
+  sec("⚡ Crew splits","Where the crew disagrees the most.",splits,"No disagreements yet. Keep swiping.");
+  sec("💚 Everyone keeps","Kept by at least 2 people, dropped by nobody.",keeps,"Nothing unanimous yet.");
+  sec("🗑️ Everyone drops","Dropped by at least 2 people, kept by nobody.",drops,"Nothing unanimous yet.");
+};
+
+// ---------- 😶 emoji plot ----------
+function allEmo(){ const out=[]; Object.entries(state.docs).forEach(([id,d])=>d.gx.emo.forEach(p=>out.push({owner:id, p, ref:id+":"+p.id}))); return out.sort((a,b)=>(b.p.at||"").localeCompare(a.p.at||"")); }
+function emoMatch(p, guess){
+  const strip=s=>norm(s).replace(/^the /,""), G=strip(guess); if(G.length<2) return false;
+  return [p.a, ...String(p.alt||"").split(",")].map(strip).filter(Boolean).some(A=>A===G || (G.length>=4 && A.includes(G) && G.length>=A.length*0.6));
+}
+const emoPts = r => r && r.ok ? Math.max(1, 4-r.g.length) : 0;
+const EMO_TRIES=3;
+PLAY.emo = box => {
+  const c=card(head("Emoji plot", sbtn(ui.emoForm?"Cancel":"+ New puzzle",()=>{ ui.emoForm=!ui.emoForm; renderPlay(true); })),
+    el("p","hint","Describe an anime using only emojis. Everyone else gets "+EMO_TRIES+" tries to name it: 3 points on the first try, 2 on the second, 1 on the third."));
+  if(ui.emoForm){
+    const f=el("form","pform"), dl=titleList("emoDL");
+    const e=field("emoE","input",{maxLength:60, placeholder:"Emojis only, e.g. ⚽👁️🔒🧬"}); e.classList.add("emoin");
+    const a=field("emoA","input",{maxLength:120, placeholder:"The answer (e.g. Blue Lock)"}); a.setAttribute("list","emoDL");
+    f.append(dl, e, a, field("emoAlt","input",{maxLength:160, placeholder:"Also accept (optional, comma separated)"}));
+    const go5=bt("btn primary","Post puzzle"); go5.type="submit"; const r=el("div","r"); r.append(go5); f.append(r);
+    f.addEventListener("submit",ev=>{ ev.preventDefault(); blurActive();
+      const em=Array.from(String(formVals.emoE||"").replace(/\s+/g," ").trim()).slice(0,40).join(""), ans=clean(formVals.emoA||"").slice(0,120), alt=clean(formVals.emoAlt||"").slice(0,160);
+      if(!em){ toast("Add some emojis."); return; } if(/[A-Za-z0-9]/.test(em)){ toast("Emojis only, no letters or numbers!"); return; } if(!/\p{Extended_Pictographic}/u.test(em)){ toast("Use at least one emoji."); return; }
+      if(!ans){ toast("Add the answer."); return; } if(mine().gx.emo.length>=30){ toast("Delete an old puzzle first (max 30)."); return; }
+      ui.emoForm=false; clearForm("emoE","emoA","emoAlt"); mutate(m=>{ m.gx.emo.unshift({id:uid(), e:em, a:ans, alt, at:nowIso()}); }); toast("😶 Posted"); });
+    c.append(f);
+  }
+  const all=allEmo(), me=state.me.uid, myG=ref=>mine().gx.emg.find(x=>x.r===ref);
+  const solvers=ref=>{ const o=[]; Object.entries(state.docs).forEach(([id,d])=>{ const r=d.gx.emg.find(x=>x.r===ref); if(r&&(r.ok||r.g.length>=EMO_TRIES)) o.push({id,r}); }); return o; };
+  if(!all.length && !ui.emoForm) c.append(el("div","empty","No puzzles yet. Post the first one!"));
+  // unsolved ones first
+  const state2=x=>{ if(x.owner===me) return 2; const r=myG(x.ref); return r&&(r.ok||r.g.length>=EMO_TRIES) ? 1 : 0; };
+  all.sort((a,b)=>state2(a)-state2(b)).slice(0,25).forEach(x=>{
+    const it=el("div","poll emo"), r=myG(x.ref), mineP=x.owner===me, done=mineP || (r&&(r.ok||r.g.length>=EMO_TRIES));
+    it.append(el("div","emoq",x.p.e));
+    const meta=el("div","meta2"); meta.append(avatarEl(x.owner,true), el("span","",nameOf(x.owner)+" · "+ago(x.p.at)));
+    const sv=solvers(x.ref), ok=sv.filter(s=>s.r.ok); meta.append(el("span","cd",ok.length+" solved"));
+    if(mineP) meta.append(bt("link del2","Delete",()=>{ if(confirm("Delete this puzzle?")) mutate(m=>{ m.gx.emo=m.gx.emo.filter(y=>y.id!==x.p.id); }); }));
+    it.append(meta);
+    if(done){ it.append(el("div","emoa", (mineP ? "Answer: " : r.ok ? "✅ "+(r.g.length===1?"First try! ":"")+"+"+emoPts(r)+" · " : "❌ ")+x.p.a));
+      if(sv.length) it.append(el("div","who3", sv.map(s=>nameOf(s.id)+(s.r.ok?" ✅":" ❌")).join(" · "))); }
+    else {
+      if(r&&r.g.length) it.append(el("div","who3","Tried: "+r.g.join(", ")));
+      const fid="emoG"+x.p.id+x.owner.slice(0,6), f=el("form","grow2"), inp=field(fid,"input",{maxLength:80, placeholder:"Your guess ("+(EMO_TRIES-(r?r.g.length:0))+" left)"}); inp.setAttribute("list","emoDL2");
+      const b=bt("btn primary","Guess"); b.type="submit"; f.append(inp,b);
+      f.addEventListener("submit",ev=>{ ev.preventDefault(); const gs=clean(formVals[fid]||inp.value).slice(0,80); if(!gs) return; clearForm(fid); blurActive(); const right=emoMatch(x.p,gs);
+        mutate(m=>{ let y=m.gx.emg.find(z=>z.r===x.ref); if(!y){ y={r:x.ref, g:[], ok:false}; m.gx.emg.unshift(y); if(m.gx.emg.length>300) m.gx.emg.length=300; } if(y.ok||y.g.length>=EMO_TRIES) return; y.g.push(gs); if(right) y.ok=true; });
+        toast(right ? "✅ Got it!" : "❌ Nope"); });
+      it.append(f);
+    }
+    c.append(it);
+  });
+  box.append(titleList("emoDL2"), c);
+  const pts={}; Object.entries(state.docs).forEach(([id,d])=>d.gx.emg.forEach(r=>{ if(r.ok) pts[id]=(pts[id]||0)+emoPts(r); }));
+  const lb=card(head("Leaderboard")), ids=Object.keys(pts).sort((a,b)=>pts[b]-pts[a]||nameOf(a).localeCompare(nameOf(b)));
+  if(!ids.length) lb.append(el("div","empty","Points show up once someone solves a puzzle."));
+  ids.forEach((id,i)=>{ const r=el("div","mrow"); r.append(el("div","rk",i===0?"👑":String(i+1)), avatarEl(id,true)); const g=el("div","grow"); g.append(el("div","",nameOf(id))); r.append(g, el("div","sc",pts[id]+" pts")); lb.append(r); });
+  box.append(lb);
+};
+
+// ---------- 📅 daily question ----------
+const DAILY_TYPES=["sil","year","studio","crop","score"];
+const dailyType = () => DAILY_TYPES[hash("daily"+today())%DAILY_TYPES.length];
+function makeDaily(pop, chars){
+  const d=today(); let ty=dailyType(); const R=n=>hash(d+ty+n), P=pop.filter(x=>x.img).slice(0,120);
+  if(ty==="sil" && chars.length<10) ty="crop";
+  const base={d, at:nowIso(), local:true, ox:null, oy:null};
+  if(ty==="sil"){ const C=chars.slice(0,100), a=C[R("a")%C.length], same=seeded(C.filter(x=>x.id!==a.id && x.g===a.g),d), rest=seeded(C.filter(x=>x.id!==a.id && x.g!==a.g),d);
+    const others=[...same,...rest].map(x=>x.n).filter((n,i,arr)=>arr.indexOf(n)===i && n!==a.n).slice(0,3), opts=insertAt(others,a.n,R("p"));
+    return {...base, ty, q:"Who's that character?", img:a.img, opts, a:opts.indexOf(a.n), sub:a.s}; }
+  if(ty==="year"){ const Y=P.filter(x=>x.year), a=Y[R("a")%Y.length], cur=new Date().getFullYear();
+    const offs=seeded([-4,-3,-2,-1,1,2,3,4],d+"y").map(o=>a.year+o).filter(y=>y<=cur).slice(0,3), opts=insertAt(offs.map(String),String(a.year),R("p")).sort();
+    return {...base, ty, q:"What year did "+a.title+" first air?", img:a.img, opts, a:opts.indexOf(String(a.year))}; }
+  if(ty==="studio"){ const S=P.filter(x=>x.studio), a=S[R("a")%S.length], others=seeded([...new Set(S.map(x=>x.studio))].filter(s=>s!==a.studio),d).slice(0,3), opts=insertAt(others,a.studio,R("p"));
+    return {...base, ty, q:"Which studio made "+a.title+"?", img:a.img, opts, a:opts.indexOf(a.studio)}; }
+  if(ty==="score"){ const S=seeded(P.filter(x=>x.score),d), four=[]; S.forEach(x=>{ if(four.length<4 && !four.some(y=>y.score===x.score)) four.push(x); }); const best=four.reduce((a,b)=>b.score>a.score?b:a);
+    return {...base, ty, q:"Which of these has the highest AniList score?", img:null, opts:four.map(x=>x.title), a:four.indexOf(best), sub:four.map(x=>x.title+" "+(x.score/10).toFixed(1)).join(" · ")}; }
+  const a=P[R("a")%P.length], others=seeded(P.filter(x=>x.id!==a.id),d).slice(0,3).map(x=>x.title), opts=insertAt(others,a.title,R("p"));
+  return {...base, ty:"crop", q:"Which anime's poster is this?", img:a.img, ox:15+R("x")%70, oy:15+R("y")%60, opts, a:opts.indexOf(a.title)};
+}
+PLAY.daily = box => {
+  let q=sharedToday("dq");
+  const c=card(head("Daily question"), el("p","hint","One quick question a day, the same for the whole crew. Answer it right on consecutive days to keep your streak alive."));
+  box.append(c);
+  if(!q){ const pop=popAnime(), needChars=dailyType()==="sil", ch=needChars?charPool():{list:[]};
+    const wait=loadingCard(pop,"pop")||(needChars&&ch.loading?loadingCard(ch,"chars"):null); if(wait){ box.append(wait); return; }
+    q=makeDaily(pop.list, ch.list||[]); }
+  const p=mine().gx.dp, answered=p&&p.d===today();
+  const g=card(), top=el("div","gtop"); top.append(el("span","",new Date().toLocaleDateString([], {weekday:"long", month:"short", day:"numeric"})), el("b","","🔥 "+liveStreak(mine().gx.ds))); g.append(top);
+  g.append(el("div","dq",q.q));
+  if(q.img){ const st=el("div","gstage dimg"+(q.ty==="sil"?" sil":"")+(answered?" shown":"")), im=new Image(); im.alt=""; im.referrerPolicy="no-referrer"; im.src=q.img;
+    if(q.ty==="crop" && !answered){ im.style.transformOrigin=q.ox+"% "+q.oy+"%"; im.style.transform="scale(3.2)"; } st.append(im); g.append(st); }
+  const opts=el("div","gopts"+(q.opts.some(o=>o.length>18)?" one":""));
+  q.opts.forEach((o,i)=>{ const b=bt("gopt"+(answered&&i===q.a?" right":"")+(answered&&p.o===i&&i!==q.a?" wrong":""), o, ()=>{
+      if(answered) return; const ok=i===q.a;
+      mutate(m=>{ if(q.local){ const {local, sub, ...keep}=q; m.gx.dq={...keep, sub:sub||""}; } m.gx.dp={d:today(), o:i, ok}; bumpStreak(m,"ds",ok); });
+      toast(ok?"✅ Correct!":"❌ Not quite"); });
+    if(answered) b.disabled=true; opts.append(b); });
+  g.append(opts);
+  if(answered){ g.append(el("div","ghint", p.ok ? "✅ You got it. Come back tomorrow!" : "❌ It was "+q.opts[q.a]+". New question tomorrow.")); if(q.sub) g.append(el("p","hint center",q.sub)); }
+  box.append(g);
+  const lb=card(head("Crew today")); let any=false;
+  Object.keys(state.docs).sort((a,b)=>liveStreak(state.docs[b].gx.ds)-liveStreak(state.docs[a].gx.ds)||nameOf(a).localeCompare(nameOf(b))).forEach(id=>{
+    const d=state.docs[id], dp=d.gx.dp&&d.gx.dp.d===today()?d.gx.dp:null, s=liveStreak(d.gx.ds); if(!dp&&!s) return; any=true;
+    const r=el("div","mrow"); r.append(avatarEl(id,true)); const gg=el("div","grow"); gg.append(el("div","",nameOf(id)), el("small","muted", !dp ? "Hasn't answered yet" : !answered && id!==state.me.uid ? "Answered · answer to see" : dp.ok ? "✅ Right" : "❌ Wrong")); r.append(gg, el("div","sc", s ? "🔥 "+s : "")); lb.append(r); });
+  if(!any) lb.append(el("div","empty","Nobody has answered today yet."));
+  box.append(lb);
+};
+
 // ================= SOCIAL: compatibility, recommendations, profile cards =================
 function renderCompat(show){
   const cardE=$("#compatCard"); if(!show){ cardE.classList.add("hidden"); return; }
@@ -2835,6 +3433,7 @@ function render(){
   $("#crewTopTitle").textContent=w.crewTop;
   $("#listsView").classList.toggle("hidden", state.view==="crew" || state.view==="season" || state.view==="play");
   $("#playView").classList.toggle("hidden", state.view!=="play");
+  if(state.view!=="play" && go && go.on) stopGop();
   $("#crewView").classList.toggle("hidden", state.view!=="crew");
   $("#seasonView").classList.toggle("hidden", state.view!=="season");
   $("#modeSeg").classList.toggle("hidden", state.view==="season" || state.view==="play");
