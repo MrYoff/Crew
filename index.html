@@ -475,8 +475,9 @@
   /* ---- more games ---- */
   .hint.center{text-align:center}
   .opstage{position:relative;width:100%;max-width:420px;aspect-ratio:16/9;margin:12px auto 8px;border-radius:14px;overflow:hidden;background:#000}
-  .opstage iframe{position:absolute;inset:-12%;width:124%;height:124%;border:0;filter:blur(22px) saturate(1.3);transition:filter .6s ease}
-  .opstage.clear iframe{inset:0;width:100%;height:100%;filter:none}
+  .opstage iframe,.opstage video{position:absolute;inset:-12%;width:124%;height:124%;border:0;object-fit:cover;filter:blur(22px) saturate(1.3);transition:filter .6s ease}
+  .opstage.clear iframe,.opstage.clear video{inset:0;width:100%;height:100%;filter:none}
+  details.emodone{margin-top:12px}details.emodone summary{cursor:pointer;color:var(--muted);font-size:13px;font-weight:700}
   .opsong{text-align:center;font-size:13px;color:var(--muted);min-height:18px;margin-bottom:6px}
   .clue{background:var(--panel2);border-radius:12px;padding:14px;margin:12px 0 4px}
   .clue .cl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:6px}
@@ -503,7 +504,7 @@
   .chans .lbl{font-size:12px;font-weight:700;color:var(--muted)}.chans .t{font-weight:700;font-size:17px}
   .squad{background:var(--panel2);border-radius:12px;padding:10px;margin-top:10px;border:2px solid transparent}
   .squad.mine{border-color:var(--accent)}.squad.win{border-color:var(--accent2)}
-  .squad .pill{margin-top:8px}.pill.on{border-color:var(--accent);color:var(--accent)}
+  .squad .pill{margin-top:8px}.squad .pill.on{border-color:var(--accent);color:var(--accent)}
   .sqh{display:flex;align-items:center;gap:8px;font-size:14px}.sqh .grow{flex:1;min-width:0}
   .cthumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
   .cthumb{position:relative;width:62px;text-align:center;flex:none}
@@ -1099,7 +1100,8 @@ function sanitizePlay(d){
     return {id:ID(b.id), name:S(b.name,60), ents, wins, at:AT(b.at)}; }).filter(b=>b.ents.length===8||b.ents.length===16);
   const preds=A(d.preds).filter(p=>p&&typeof p.q==="string"&&Array.isArray(p.opts)).slice(0,MAX_PREDS).map(p=>({id:ID(p.id), q:S(p.q,120),
     opts:p.opts.filter(o=>o&&S(o.t,80)).slice(0,6).map(o=>({id:ID(o.id), t:S(o.t,80)})),
-    lock:AT(p.lock), ans:typeof p.ans==="string"?p.ans.slice(0,20):null, at:AT(p.at)})).filter(p=>p.q&&p.opts.length>=2&&p.lock);
+    lock:AT(p.lock), ans:typeof p.ans==="string"?p.ans.slice(0,20):null, at:AT(p.at),
+    auto:p.auto===true, w:typeof p.w==="string"&&/^\d{4}-W\d{2}$/.test(p.w)?p.w:null, ids:A(p.ids).filter(Number.isInteger).slice(0,6), base:A(p.base).filter(Number.isFinite).slice(0,6)})).filter(p=>p.q&&p.opts.length>=2&&p.lock);
   const drafts=A(d.drafts).filter(x=>x&&typeof x.s==="string"&&/^(WINTER|SPRING|SUMMER|FALL)\d{4}$/.test(x.s)).slice(0,16).map(x=>({s:x.s,
     picks:A(x.picks).filter(p=>p&&S(p.title,120)).slice(0,5).map(p=>({title:S(p.title,120), malId:typeof p.malId==="number"?p.malId:null, img:IM(p.img), at:AT(p.at)}))}));
   const ops=A(d.ops).filter(o=>o&&S(o.t,80)&&S(o.show,80)).slice(0,MAX_OPS).map(o=>({id:ID(o.id), t:S(o.t,80), show:S(o.show,80), kind:o.kind==="ED"?"ED":"OP",
@@ -1120,14 +1122,15 @@ function sanitizeGx(g){
   const streak=s=>s&&D(s.last)?{n:N(s.n,0,100000)||0, last:s.last}:null;
   const cq=g.chq, chq=cq&&D(cq.d)&&N(cq.id,1,1e9)?{d:cq.d, id:cq.id, n:S(cq.n,80), img:IM(cq.img), s:S(cq.s,120), g:S(cq.g,20), r:S(cq.r,20), st:S(cq.st,60), y:N(cq.y,1900,2100), rank:N(cq.rank,1,100000), at:AT(cq.at)}:null;
   const cp=g.chp, chp=cp&&D(cp.d)?{d:cp.d, g:A(cp.g).filter(x=>Number.isInteger(x)&&x>0).slice(0,8), done:cp.done===true, ok:cp.ok===true}:null;
-  const sq=A(g.sq).filter(b=>b&&S(b.name,60)&&AT(b.lock)).slice(0,10).map(b=>({id:ID(b.id), name:S(b.name,60), lock:AT(b.lock), at:AT(b.at)}));
+  const sq=A(g.sq).filter(b=>b&&S(b.name,60)&&AT(b.lock)).slice(0,10).map(b=>{ const w=typeof b.w==="string"&&/^\d{4}-W\d{2}$/.test(b.w)?b.w:null; return {id:ID(b.id), name:S(b.name,60), lock:AT(b.lock), at:AT(b.at), w, auto:b.auto===true&&!!w}; });
+  const pres=A(g.pres).filter(x=>x&&typeof x.r==="string"&&typeof x.a==="string").slice(0,40).map(x=>({r:x.r.slice(0,70), a:x.a.slice(0,20), g:A(x.g).filter(Number.isFinite).slice(0,6), at:AT(x.at)}));
   const sqp=A(g.sqp).filter(x=>x&&typeof x.b==="string").slice(0,20).map(x=>({b:x.b.slice(0,70), p:A(x.p).filter(p=>p&&S(p.n,80)&&N(p.id,1,1e9)).slice(0,5).map(p=>({n:S(p.n,80), id:p.id, img:IM(p.img), s:S(p.s,80), at:AT(p.at)}))}));
   const kd=A(g.kd).filter(x=>x&&S(x.t,120)).slice(0,400).map(x=>({t:S(x.t,120), img:IM(x.img), v:x.v===1?1:0}));
   const emo=A(g.emo).filter(x=>x&&typeof x.e==="string"&&x.e.trim()&&S(x.a,120)).slice(0,30).map(x=>({id:ID(x.id), e:Array.from(x.e.replace(/\s+/g," ").trim()).slice(0,40).join(""), a:S(x.a,120), alt:S(x.alt,160), at:AT(x.at)}));
   const emg=A(g.emg).filter(x=>x&&typeof x.r==="string").slice(0,300).map(x=>({r:x.r.slice(0,70), g:A(x.g).filter(s=>typeof s==="string").slice(0,3).map(s=>clean(s).slice(0,80)), ok:x.ok===true}));
   const q=g.dq, dq=q&&D(q.d)&&Array.isArray(q.opts)&&q.opts.length>=2?{d:q.d, ty:S(q.ty,10), q:S(q.q,160), img:IM(q.img), ox:N(q.ox,0,100), oy:N(q.oy,0,100), opts:q.opts.slice(0,4).map(o=>S(String(o),120)), a:N(q.a,0,3)||0, sub:S(q.sub,400), at:AT(q.at)}:null;
   const p=g.dp, dp=p&&D(p.d)?{d:p.d, o:N(p.o,0,3)||0, ok:p.ok===true}:null;
-  return {best, chq, chp, chs:streak(g.chs), sq, sqp, kd, emo, emg, dq, dp, ds:streak(g.ds)};
+  return {best, chq, chp, chs:streak(g.chs), sq, sqp, kd, emo, emg, dq, dp, ds:streak(g.ds), pres};
 }
 const USER_DOMAIN = "@users.crew-fd928.firebaseapp.com";
 function displayNameOf(u){ if(!u) return "Someone"; if(u.displayName) return u.displayName; if(u.email && u.email.endsWith(USER_DOMAIN)) return u.email.slice(0,-USER_DOMAIN.length); return "Someone"; }
@@ -2403,7 +2406,12 @@ PLAY.brk = box => {
     f.append(field("brkName","input",{maxLength:60, placeholder:"e.g. Best anime of all time"}));
     const sz=el("div","seg"); [8,16].forEach(n=>{ const b2=bt(ui.brkSize===n?"on":"",n+" entries",()=>{ ui.brkSize=n; renderPlay(true); }); sz.append(b2); }); f.append(sz);
     const fill=bt("btn","✨ Fill with crew favorites",()=>{ crewPool().slice(0,ui.brkSize).forEach((x,i)=>{ formVals["brkE"+i]=x.title; }); renderPlay(true); });
-    const fillR=el("div","r"); fillR.append(fill); f.append(fillR, el("label","","Entries, best seed first"), dl);
+    const preset=(name, list)=>{ if(list.length<ui.brkSize){ toast("Still loading, try again in a sec."); return; } if(!clean(formVals.brkName||"")) formVals.brkName=name; list.slice(0,ui.brkSize).forEach((t,i)=>{ formVals["brkE"+i]=t; }); renderPlay(true); };
+    const popT=()=>(popAnime().list||[]).map(x=>x.title), sea=nowSeason(); loadSeason(seaKey(sea), SEASONS[sea.i], sea.y);
+    const fillR=el("div","r"); fillR.append(fill,
+      bt("btn","🔥 Most popular anime",()=>preset("Most popular anime ever", popT())),
+      bt("btn","📺 This season",()=>preset("Best of "+SEASON_NAME[SEASONS[sea.i]]+" "+sea.y, ((seasonCache[seaKey(sea)]||{}).list||[]).map(x=>x.title))),
+      bt("btn","🎲 Random mix",()=>preset("Random anime showdown", shuffle(popT().slice(0,150))))); f.append(fillR, el("label","","Entries, best seed first"), dl);
     const grid=el("div","egrid"); for(let i=0;i<ui.brkSize;i++){ const inp=field("brkE"+i,"input",{maxLength:80, placeholder:"#"+(i+1)}); inp.setAttribute("list","brkDL"); grid.append(inp); } f.append(grid);
     const go=bt("btn primary","Start bracket"); go.type="submit"; const r=el("div","r"); r.append(go); f.append(r);
     f.addEventListener("submit",ev=>{ ev.preventDefault(); blurActive();
@@ -2440,11 +2448,20 @@ PLAY.takes = box => {
   const seg=el("div","seg"); [["hot","🔥 Most divisive"],["new","🆕 Newest"],["agree","👍 Most agreed"]].forEach(([k,l])=>seg.append(bt(ui.takeSort===k?"on":"",l,()=>{ ui.takeSort=k; renderPlay(true); }))); c.append(seg);
   const all=[]; Object.entries(state.docs).forEach(([id,d])=>d.takes.forEach(t=>{ const ref="t:"+id+":"+t.id, vs=vt(ref), a=vs.filter(v=>v.o==="a").length, n=vs.length; all.push({id,t,ref,a,d:n-a,n,div:n?n*(1-Math.abs(a-(n-a))/n):0}); }));
   const sorter={hot:(x,y)=>y.div-x.div||y.n-x.n||(y.t.at||"").localeCompare(x.t.at||""), new:(x,y)=>(y.t.at||"").localeCompare(x.t.at||""), agree:(x,y)=>(y.a-y.d)-(x.a-x.d)||y.a-x.a};
+  // built-in takes from earlier days stay in the feed once someone has voted on them
+  const todays=seeded(TAKE_BANK,"takes"+today()).slice(0,3), todayIds=new Set(todays.map(t=>t.id));
+  TAKE_BANK.forEach(t=>{ if(todayIds.has(t.id)) return; const ref="t:bank:"+t.id, vs=vt(ref); if(!vs.length) return; const a=vs.filter(v=>v.o==="a").length, n=vs.length; all.push({id:"bank",t,ref,a,d:n-a,n,div:n*(1-Math.abs(a-(n-a))/n)}); });
   all.sort(sorter[ui.takeSort]);
-  if(!all.length) c.append(el("div","empty","No takes yet. Be brave."));
-  all.slice(0,40).forEach(x=>{
+  const tc=card(head("🎲 Takes of the day"), el("p","hint","Three new takes every day for the whole crew. Agree or disagree?"));
+  todays.forEach(t=>{ const ref="t:bank:"+t.id, vs=vt(ref), a=vs.filter(v=>v.o==="a").length, n=vs.length; tc.append(takeEl({id:"bank",t,ref,a,d:n-a,n,div:n?n*(1-Math.abs(a-(n-a))/n):0})); });
+  box.append(tc);
+  if(!all.length) c.append(el("div","empty","No takes from the crew yet. Be brave."));
+  all.slice(0,40).forEach(x=>c.append(takeEl(x)));
+  box.append(c);
+};
+function takeEl(x){
     const it=el("div","take"); const mv=myVote(x.ref);
-    const m=el("div","meta2"); m.append(avatarEl(x.id,true), el("span","",nameOf(x.id)+" · "+ago(x.t.at)));
+    const m=el("div","meta2"); if(x.id==="bank") m.append(el("span","","🎲 Built-in take")); else m.append(avatarEl(x.id,true), el("span","",nameOf(x.id)+" · "+ago(x.t.at)));
     if(x.n>=2 && x.div/x.n>=0.8) m.append(el("span","cd","🔥 Split"));
     if(x.id===state.me.uid) m.append(bt("link del2","Delete",()=>{ if(confirm("Delete this take?")) mutate(mm=>{ mm.takes=mm.takes.filter(y=>y.id!==x.t.id); }); }));
     it.append(m, el("div","tt","“"+x.t.text+"”"));
@@ -2452,17 +2469,47 @@ PLAY.takes = box => {
     const row=el("div","tbtns");
     const ag=bt("pill"+(mv==="a"?" on":""),"👍 Agree"+(x.n?" · "+x.a:""),()=>vote(x.ref,"a")); const di=bt("pill"+(mv==="d"?" on":""),"👎 Disagree"+(x.n?" · "+x.d:""),()=>vote(x.ref,"d"));
     ag.title=vt(x.ref).filter(v=>v.o==="a").map(v=>nameOf(v.from)).join(", "); di.title=vt(x.ref).filter(v=>v.o==="d").map(v=>nameOf(v.from)).join(", ");
-    row.append(ag,di); it.append(row); c.append(it);
-  });
-  box.append(c);
-};
+    row.append(ag,di); it.append(row); return it;
+}
 
 // ---------- 🔮 predictions ----------
 const qOf = iso => { const d=new Date(iso); return {i:Math.floor(d.getMonth()/3), y:d.getFullYear()}; };
-function allPreds(){ const out=[]; Object.entries(state.docs).forEach(([id,d])=>d.preds.forEach(p=>out.push({owner:id,p,ref:"p:"+id+":"+p.id}))); return out; }
+function allPreds(){ const out=[]; Object.entries(state.docs).forEach(([id,d])=>d.preds.forEach(p=>{ const ref="p:"+id+":"+p.id; out.push({owner:id, ref, p: p.auto&&!p.ans ? {...p, ans:autoAns(ref)} : p}); })); return out; }
+// weekly auto prediction: whoever opens Predict first each week creates it, and anyone's app grades it after the week ends
+function autoRes(ref){ let best=null; Object.values(state.docs).forEach(d=>(d.gx.pres||[]).forEach(r=>{ if(r.r===ref && (!best||(r.at||"")<(best.at||""))) best=r; })); return best; }
+const autoAns = ref => (autoRes(ref)||{}).a||null;
+const autoGains = ref => (autoRes(ref)||{}).g||null;
+const AIR_POP_Q=`query{Page(perPage:20){media(type:ANIME,status:RELEASING,sort:POPULARITY_DESC,isAdult:false,format_in:[TV,TV_SHORT,ONA]){id title{english romaji} popularity}}}`;
+let predBusy=false;
+async function autoPreds(){
+  if(predBusy || !state.loaded) return; predBusy=true;
+  try{
+    const w=isoWeek(), all=allPreds();
+    // grade last week's
+    const due=all.filter(x=>x.p.auto && !x.p.ans && x.p.w && x.p.w<w && x.p.ids.length===x.p.opts.length);
+    if(due.length){
+      const ids=[...new Set(due.flatMap(x=>x.p.ids))], j=await aniPost(`query($ids:[Int]){Page(perPage:50){media(id_in:$ids){id popularity}}}`,{ids});
+      const pop=new Map(((j.data&&j.data.Page&&j.data.Page.media)||[]).map(a=>[a.id,a.popularity]));
+      const res=due.map(x=>{ const g=x.p.ids.map((id,i)=>pop.has(id)?pop.get(id)-(x.p.base[i]||0):null); if(g.some(v=>v==null)) return null; return {r:x.ref, a:x.p.opts[g.indexOf(Math.max(...g))].id, g, at:nowIso()}; }).filter(Boolean);
+      if(res.length) mutate(m=>{ res.forEach(r=>{ if(!m.gx.pres.some(y=>y.r===r.r)) m.gx.pres.unshift(r); }); if(m.gx.pres.length>40) m.gx.pres.length=40; });
+    }
+    // make this week's
+    if(!all.some(x=>x.p.auto && x.p.w===w)){
+      const end=nextMonday().getTime(), lock=Math.min(Date.now()+2*864e5, end-864e5);
+      if(lock>Date.now()+3600e3){
+        const j=await aniPost(AIR_POP_Q,{}), list=((j.data&&j.data.Page&&j.data.Page.media)||[]).filter(a=>a.popularity).slice(0,15).map(a=>({id:a.id, pop:a.popularity, title:clean(a.title.english||a.title.romaji||"")})).filter(a=>a.title);
+        if(list.length>=3 && !allPreds().some(x=>x.p.auto && x.p.w===w)){
+          const pick=seeded(list,"pred"+w).slice(0,3);
+          mutate(m=>{ m.preds.unshift({id:uid(), q:"Which will gain the most new AniList fans by Monday?", opts:pick.map((a,i)=>({id:"abc"[i], t:a.title})), lock:new Date(lock).toISOString(), ans:null, at:nowIso(), auto:true, w, ids:pick.map(a=>a.id), base:pick.map(a=>a.pop)}); if(m.preds.length>MAX_PREDS) m.preds.length=MAX_PREDS; });
+        }
+      }
+    }
+  }catch(e){} finally{ predBusy=false; }
+}
 PLAY.pred = box => {
+  setTimeout(autoPreds,0);
   const c=card(head("Predictions", sbtn(ui.predForm?"Cancel":"+ New prediction",()=>{ ui.predForm=!ui.predForm; renderPlay(true); })),
-    el("p","hint","Lock in your guesses before a chapter or episode drops. Whoever asked marks the right answer after, and every correct call is worth 10 points."));
+    el("p","hint","Lock in your guesses before a chapter or episode drops. Whoever asked marks the right answer after, and every correct call is worth 10 points. A 🎲 weekly prediction shows up on its own and grades itself."));
   if(ui.predForm){
     const f=el("form","pform");
     f.append(field("prQ","input",{maxLength:120, placeholder:"e.g. Who scores first in the next Blue Lock chapter?"}), el("label","","Options"));
@@ -2486,18 +2533,19 @@ PLAY.pred = box => {
   all.slice(0,20).forEach(x=>{
     const p=x.p, isL=locked(x), vs=vt(x.ref), mineV=myVote(x.ref), it=el("div","poll");
     it.append(el("div","q",p.q));
-    const meta=el("div","meta2"); meta.append(avatarEl(x.owner,true), el("span","",nameOf(x.owner)+" · "+vs.length+" guess"+(vs.length===1?"":"es")));
-    meta.append(el("span","cd", p.ans ? "✅ Answered" : isL ? "🔒 Locked · waiting on the answer" : "⏳ Locks "+untilText((Date.parse(p.lock)-Date.now())/1000)));
-    if(x.owner===state.me.uid) meta.append(bt("link del2","Delete",()=>{ if(confirm("Delete this prediction?")) mutate(m=>{ m.preds=m.preds.filter(y=>y.id!==p.id); }); }));
+    const meta=el("div","meta2"); if(p.auto) meta.append(el("span","","🎲 Weekly · "+vs.length+" guess"+(vs.length===1?"":"es"))); else meta.append(avatarEl(x.owner,true), el("span","",nameOf(x.owner)+" · "+vs.length+" guess"+(vs.length===1?"":"es")));
+    meta.append(el("span","cd", p.ans ? "✅ Answered" : isL ? (p.auto ? "🔒 Locked · results after Monday" : "🔒 Locked · waiting on the answer") : "⏳ Locks "+untilText((Date.parse(p.lock)-Date.now())/1000)));
+    if(x.owner===state.me.uid && !p.auto) meta.append(bt("link del2","Delete",()=>{ if(confirm("Delete this prediction?")) mutate(m=>{ m.preds=m.preds.filter(y=>y.id!==p.id); }); }));
     it.append(meta);
     p.opts.forEach(o=>{
       const who=vs.filter(v=>v.o===o.id), right=p.ans===o.id;
       const b=el("button","opt"+(mineV===o.id?" mine":"")+(right?" right":"")+(p.ans&&!right?" wrong":"")); b.type="button";
       const row=el("div","row2"); row.append(el("span","lbl2",(right?"✅ ":"")+o.t), el("span","c", isL||p.ans ? String(who.length) : mineV===o.id ? "Your pick" : "")); b.append(row);
+      if(p.auto && p.ans){ const gn=autoGains(x.ref), oi=p.opts.indexOf(o); if(gn && gn[oi]!=null) b.append(el("div","who3","+"+gn[oi].toLocaleString()+" fans this week")); }
       if(isL||p.ans){ if(who.length) b.append(el("div","who3",who.map(v=>nameOf(v.from)).join(", "))); }
       if(!isL && !p.ans) b.addEventListener("click",()=>vote(x.ref,o.id)); else b.disabled=true;
       it.append(b);
-      if(isL && !p.ans && x.owner===state.me.uid){ const mk2=bt("link","Mark “"+o.t+"” as the answer",()=>{ if(confirm("Mark “"+o.t+"” as correct? This is final.")) mutate(m=>{ const y=m.preds.find(z=>z.id===p.id); if(y) y.ans=o.id; }); }); mk2.style.cssText="display:block;margin:4px 0 0 4px;font-size:12px"; it.append(mk2); }
+      if(isL && !p.ans && !p.auto && x.owner===state.me.uid){ const mk2=bt("link","Mark “"+o.t+"” as the answer",()=>{ if(confirm("Mark “"+o.t+"” as correct? This is final.")) mutate(m=>{ const y=m.preds.find(z=>z.id===p.id); if(y) y.ans=o.id; }); }); mk2.style.cssText="display:block;margin:4px 0 0 4px;font-size:12px"; it.append(mk2); }
     });
     if(!isL && !p.ans && !mineV) it.append(el("div","who3","Others' picks stay hidden until it locks."));
     c.append(it);
@@ -2667,6 +2715,52 @@ PLAY.guess = box => {
   box.append(lb);
 };
 
+// ---- built-in content so nobody has to make their own first ----
+// emoji puzzles: [id, emojis, answer, also accept]
+const EMO_BANK=[
+ ["b1","⚽👁️🔒🧬","Blue Lock",""],["b2","🏐🦅🧡","Haikyu!!","Haikyuu"],["b3","🧱👹🗡️🦵","Attack on Titan","Shingeki no Kyojin, AOT"],["b4","🍜🦊🍥👊","Naruto",""],
+ ["b5","🏴‍☠️👒🍖🌊","One Piece",""],["b6","⚔️👹🌸🎴","Demon Slayer","Kimetsu no Yaiba"],["b7","🤞👁️🫴💜","Jujutsu Kaisen","JJK"],["b8","🪚🐶😈🩸","Chainsaw Man",""],
+ ["b9","🕵️‍♂️🔫👧🥜🐕","Spy x Family","Spy Family"],["b10","🧝‍♀️⏳💐🧙","Frieren","Frieren: Beyond Journey's End, Sousou no Frieren"],["b11","⚗️🦾👦🛡️","Fullmetal Alchemist: Brotherhood","Fullmetal Alchemist, FMA, FMAB"],["b12","📓🍎💀✍️","Death Note",""],
+ ["b13","🦸‍♂️🏫💥🥦","My Hero Academia","Boku no Hero Academia, MHA"],["b14","👊🥚🦲","One Punch Man","One-Punch Man, OPM"],["b15","🐉🟠⭐👦","Dragon Ball","Dragon Ball Z, DBZ, Dragon Ball Super"],["b16","🎣🃏🟢🔴","Hunter x Hunter","HxH"],
+ ["b17","⛵🪓❄️👑","Vinland Saga",""],["b18","🎻🎹🌸😢","Your Lie in April","Shigatsu wa Kimi no Uso"],["b19","☄️🔄👫🏮","Your Name","Kimi no Na wa"],["b20","🐉🛁👧🏮","Spirited Away",""],
+ ["b21","🌳🐱🚌☔","My Neighbor Totoro","Totoro"],["b22","🧹🐈‍⬛📦🍞","Kiki's Delivery Service",""],["b23","🏰🚶‍♂️🔥👵","Howl's Moving Castle",""],["b24","🐟👧🌊🍜","Ponyo",""],
+ ["b25","🤠🚀🐕🎷","Cowboy Bebop","Bebop"],["b26","🤖👦😭🚪","Neon Genesis Evangelion","Evangelion, Eva"],["b27","⚔️🎮🔒🏰","Sword Art Online","SAO"],["b28","💀🔁🏰👧","Re:Zero","Re Zero, Re:Zero - Starting Life in Another World"],
+ ["b29","🟦💧👑🐉","That Time I Got Reincarnated as a Slime","Tensura, Slime"],["b30","💯👦🔮💥","Mob Psycho 100","Mob Psycho"],["b31","🍳🔥👅🏆","Food Wars!","Shokugeki no Soma"],["b32","🏀👻🔵🔴","Kuroko's Basketball","Kuroko no Basket"],
+ ["b33","⚔️💀🍓☠️","Bleach",""],["b34","🎰💸👄🏫","Kakegurui",""],["b35","🗿🧪🔬🌍","Dr. Stone","Dr Stone"],["b36","🐯🐉🏫❤️","Toradora!","Toradora"],
+ ["b37","🎸😰🎤🌸","Bocchi the Rock!","Bocchi"],["b38","🔬📱⏳🍌","Steins;Gate","Steins Gate"],["b39","☕👁️🩸🎭","Tokyo Ghoul",""],["b40","📖🍀🗡️🧙","Black Clover",""],
+ ["b41","🧍‍♂️💪⭐🗿","JoJo's Bizarre Adventure","JoJo, Jojos Bizarre Adventure"],["b42","🌟👁️🎤👶","Oshi no Ko",""],["b43","❤️🧠⚔️🏫","Kaguya-sama: Love is War","Kaguya-sama, Love is War, Kaguya sama"],["b44","💊🧪🏯🐸","The Apothecary Diaries","Apothecary Diaries, Kusuriya no Hitorigoto"],
+ ["b45","⬆️⚔️🕳️👤","Solo Leveling",""],["b46","🍙🐭🐄🐯","Fruits Basket",""],["b47","👶🪄📖🔁","Mushoku Tensei","Jobless Reincarnation"],["b48","🚒🔥😁⛪","Fire Force",""],
+ ["b49","🦖8️⃣🧹","Kaiju No. 8","Kaiju No 8, Kaiju Number 8"],["b50","👽👻🏍️👵","Dandadan",""],["b51","🐉👩‍💻🧹🏠","Miss Kobayashi's Dragon Maid","Dragon Maid"],["b52","👁️♟️👑🍕","Code Geass",""],
+ ["b53","🗡️🗡️🌻🎧","Samurai Champloo",""],["b54","🐙🏫🔫🌙","Assassination Classroom","Ansatsu Kyoushitsu"],["b55","🐺🍎💰🛒","Spice and Wolf",""],["b56","🎮♟️🎲👫","No Game No Life",""],
+ ["b57","💀👑🏰🎮","Overlord",""],["b58","💧🤡💥🎮","KonoSuba","Konosuba: God's Blessing on This Wonderful World!"],["b59","🗡️🌸🩸👧","Akame ga Kill!","Akame ga Kill"],["b60","✉️🤖✋💜","Violet Evergarden",""],
+ ["b61","🌺🏝️🥷🗡️","Hell's Paradise","Jigokuraku"],["b62","🕳️⬇️🤖🐰","Made in Abyss",""],["b63","🏠👧🔢👹","The Promised Neverland","Promised Neverland, Yakusoku no Neverland"],["b64","🖐️👁️👽","Parasyte","Parasyte -the maxim-, Kiseijuu"],
+ ["b65","🌃🦾🌙🚀","Cyberpunk: Edgerunners","Edgerunners"],["b66","🏀👨‍🦰💪🏫","Slam Dunk",""],["b67","🐻🪙🔫❄️","Golden Kamuy",""],["b68","🩺🔪🧒🇩🇪","Monster",""],
+ ["b69","⏪🧒❄️🔍","Erased","Boku dake ga Inai Machi"],["b70","🍡👨‍👩‍👧🌸","Clannad","Clannad After Story"],["b71","👻👧🌼🎐","Anohana","Anohana: The Flower We Saw That Day"],["b72","🤟👂💔🌉","A Silent Voice","Koe no Katachi"],
+ ["b73","☀️🙏🌧️👧","Weathering with You","Tenki no Ko"],["b74","🚪🪑🐈🌏","Suzume","Suzume no Tojimari"],["b75","🌀🕶️🤖⬆️","Gurren Lagann","Tengen Toppa Gurren Lagann"],["b76","🏍️🔴💊💥","Akira",""],
+ ["b77","🌙👧💄✨","Sailor Moon",""],["b78","⚡🐭🧢🔴","Pokemon","Pokémon"],["b79","🃏🔺👑🐉","Yu-Gi-Oh!","Yugioh, Yu-Gi-Oh"],["b80","🦖📟👦🌐","Digimon",""],
+ ["b81","🃏🪄🌸🐻","Cardcaptor Sakura",""],["b82","⛸️🥇🐷","Yuri!!! on Ice","Yuri on Ice"],["b83","🔫🏪🧔🍭","Sakamoto Days",""],["b84","💀🍀👊🌕","Undead Unluck",""],
+ ["b85","💪🧁🧙","Mashle","Mashle: Magic and Muscles"],["b86","🛡️🦝👧⚔️","The Rising of the Shield Hero","Shield Hero"],["b87","⏪🏍️👊🧑‍🦳","Tokyo Revengers",""],["b88","💇‍♀️🏫🧷❤️","Horimiya",""],
+ ["b89","📚🐯🧥🔫","Bungo Stray Dogs",""],["b90","🧟💯📋🏄","Zom 100","Zom 100: Bucket List of the Dead"],["b91","🔫☕👧👧","Lycoris Recoil",""],["b92","🤖8️⃣6️⃣🎖️","86","Eighty-Six, Eighty Six"],
+ ["b93","🥊🎣🐢","Hajime no Ippo","Fighting Spirit, Ippo"],["b94","🍓🥛🗡️👨‍🦳","Gintama",""],["b95","👑🧏‍♂️🐸⚔️","Ranking of Kings","Ousama Ranking"]
+].map(([id,e,a,alt])=>({id,e,a,alt,at:""}));
+// hot takes the crew can vote on, three new ones a day
+const TAKE_BANK=["Filler episodes are underrated","Subs over dubs, no exceptions","Dubs are better for action shows","Naruto's ending was perfect","Attack on Titan's ending was actually good",
+ "One Piece is too long to recommend to anyone new","The manga is always better than the anime","Skipping the opening is a crime","Isekai is the most overrated genre","Sports anime are better than battle shonen",
+ "Movies hit harder than full series","Death Note should have ended with L","Gojo is overrated","Sasuke is a better character than Naruto","Zoro would beat Sanji",
+ "Studio Ghibli is overrated","2000s anime looked better than today's","CGI in anime is never okay","Binge-watching beats weekly episodes","Rewatching a favorite beats starting something new",
+ "Slice of life is boring","Power scaling ruins shonen","The main character is usually the weakest part of the show","Villains are more interesting than heroes","12-episode anime are better than long ones",
+ "Recap episodes should be banned","Demon Slayer is all animation, no story","Bleach's final arc is better than the original run","Dragon Ball Z hasn't aged well","Fullmetal Alchemist: Brotherhood is the greatest anime ever",
+ "Chainsaw Man's anime was better than people say","Watching anime at 1.5x speed is fine","Endings are better than openings","Season 2 is usually better than season 1","Blue Lock is better than Haikyu!!",
+ "Haikyu!! is the best sports anime ever","Harem anime need to go","Mecha anime are slept on","The 90s were the golden age of anime","Romance anime take way too long to get together",
+ "Anime-only fans have it better than manga readers","A great OP can carry a mid show","Light novel adaptations are mostly skippable","Every long-running shonen should end sooner","Best girl debates are pointless"
+].map((t,i)=>({id:"k"+(i+1), text:t, at:""}));
+// squad battle challenges: one is picked for the crew every week
+const SQ_BANK=["Survive a zombie apocalypse","Win a beach volleyball tournament","Pull off a bank heist","Win a cooking competition","Survive a week on a deserted island",
+ "Win a game of dodgeball","Run a ramen shop for a week","Break out of prison","Win a karaoke battle","Defend Earth from an alien invasion","Win a 5v5 soccer match",
+ "Survive a horror movie","Throw the perfect surprise party","Win a battle royale","Win a school talent show","Babysit a toddler for a day","Win a game of Mafia",
+ "Go on a road trip without killing each other","Win pub quiz night","Survive the Hunger Games","Form the best band","Win a relay race","Pass a high school final exam",
+ "Make it through a haunted house","Win a Mario Kart tournament","Steal a painting from a museum","Clear a dungeon raid","Win a dance battle","Protect a celebrity for a week","Win a snowball fight"];
+
 // ================= MORE GAMES: guess the OP, who ranked it, higher/lower, anidle, squads, keep or drop, emoji plot, daily =================
 const dstr = d => d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 const today = () => dstr(new Date());
@@ -2703,12 +2797,12 @@ function loadingCard(c, key){
   if(c.error){ const cc=card(el("div","empty","Couldn't reach AniList right now.")); const r=el("div","r"); r.append(bt("btn","Try again",()=>{ delete aniCache[key]; renderPlay(true); })); cc.append(r); return cc; }
   return null;
 }
-const POP_Q=`query($p:Int){Page(page:$p,perPage:50){media(type:ANIME,sort:POPULARITY_DESC,isAdult:false){id title{english romaji} coverImage{large} averageScore popularity seasonYear format studios(isMain:true){nodes{name}}}}}`;
-const popAnime = () => aniData("pop", async()=>{
+const POP_Q=`query($p:Int){Page(page:$p,perPage:50){media(type:ANIME,sort:POPULARITY_DESC,isAdult:false){id idMal title{english romaji} coverImage{large} averageScore popularity seasonYear format studios(isMain:true){nodes{name}}}}}`;
+const popAnime = () => aniData("pop2", async()=>{
   const out=[], seen=new Set();
   for(const p of [1,2,3]){ const j=await aniPost(POP_Q,{p});
     ((j.data&&j.data.Page&&j.data.Page.media)||[]).forEach(a=>{ const img=a.coverImage&&a.coverImage.large, t=clean(a.title.english||a.title.romaji||""); if(!t||seen.has(norm(t))) return; seen.add(norm(t));
-      out.push({id:a.id, title:t, img:IMG_OK(img)?img:null, score:a.averageScore||0, pop:a.popularity||0, year:a.seasonYear||null, studio:(((a.studios&&a.studios.nodes)||[])[0]||{}).name||null}); }); }
+      out.push({id:a.id, mal:a.idMal||null, title:t, img:IMG_OK(img)?img:null, score:a.averageScore||0, pop:a.popularity||0, year:a.seasonYear||null, studio:(((a.studios&&a.studios.nodes)||[])[0]||{}).name||null}); }); }
   if(!out.length) throw new Error("empty"); return out; });
 const ROLE={MAIN:"Main", SUPPORTING:"Supporting", BACKGROUND:"Background"};
 const CHAR_Q=`query($p:Int){Page(page:$p,perPage:50){characters(sort:FAVOURITES_DESC){id name{full} image{large} gender media(sort:POPULARITY_DESC,perPage:1){edges{characterRole node{title{english romaji} seasonYear startDate{year} studios(isMain:true){nodes{name}}}}}}}}`;
@@ -2724,7 +2818,27 @@ const charPool = () => aniData("chars", async()=>{
 // ---------- 🎧 guess the OP ----------
 var go={on:false, qs:[], i:0, score:0, picked:null, t0:null, last:0, timer:null, player:null, ui:null};
 const GOP_SECS=20, GOP_ROUNDS=8;
+if(!ui.gopSrc) ui.gopSrc=(window.CrewLook&&CrewLook.get("gopSrc"))==="crew"?"crew":"pop";
 function opSongs(){ const m=new Map(); Object.values(state.docs).forEach(d=>d.ops.forEach(o=>{ if(!o.yt) return; const k=opKey(o); if(!m.has(k)) m.set(k,{show:o.show, t:o.t, kind:o.kind, yt:o.yt}); })); return [...m.values()]; }
+// built-in songs: openings of popular anime, streamed from AnimeThemes
+const AT_OK = u => typeof u==="string" && /^https:\/\/[av]\.animethemes\.moe\/[\w.\-~%]+\.(webm|ogg)$/.test(u);
+function themeBank(){
+  const pop=popAnime().list||[]; if(!pop.length) return popAnime().error ? {error:true, list:[]} : {loading:true, list:[]};
+  return aniData("themes", async()=>{
+    const pick=shuffle(pop.filter(x=>x.mal).slice(0,150)).slice(0,30), byMal=new Map(pick.map(x=>[x.mal,x])), out=[];
+    for(let i=0;i<pick.length;i+=15){
+      const ids=pick.slice(i,i+15).map(x=>x.mal).join(",");
+      const r=await fetch("https://api.animethemes.moe/anime?filter[has]=resources&filter[site]=MyAnimeList&filter[external_id]="+ids+"&include=resources,animethemes.song,animethemes.animethemeentries.videos.audio&page[size]=30");
+      if(!r.ok) throw new Error("animethemes "+r.status); const j=await r.json();
+      (j.anime||[]).forEach(a=>{
+        const res=(a.resources||[]).find(x=>byMal.has(Number(x.external_id))), show=res ? byMal.get(Number(res.external_id)).title : clean(a.name||""); if(!show) return;
+        (a.animethemes||[]).filter(t=>t.type==="OP").slice(0,3).forEach(t=>{
+          const en=(t.animethemeentries||[]).find(e=>!e.nsfw && !e.spoiler && (e.videos||[]).length); if(!en) return;
+          const vids=en.videos.filter(v=>AT_OK(v.link)).sort((x,y)=>(x.resolution||9999)-(y.resolution||9999)), v=vids.find(x=>(x.resolution||0)>=480)||vids[0]; if(!v) return;
+          out.push({show, t:clean((t.song&&t.song.title)||t.slug||"OP"), kind:t.slug||"OP", src:v.link, aud:v.audio&&AT_OK(v.audio.link)?v.audio.link:null}); }); });
+    }
+    if(out.length<4) throw new Error("not enough songs"); return out; });
+}
 let ytApi=null;
 function loadYT(){
   if(ytApi) return ytApi;
@@ -2736,12 +2850,18 @@ function loadYT(){
   });
   return ytApi;
 }
-function stopGop(){ clearTimeout(go.timer); if(go.player){ try{ go.player.destroy(); }catch(e){} go.player=null; } go.on=false; const f=document.getElementById("gopFrame"); if(f) f.remove(); }
+function killMedia(){ if(go.player){ try{ go.player.destroy(); }catch(e){} go.player=null; } const v=document.getElementById("gopVid"); if(v){ try{ v.pause(); }catch(e){} v.removeAttribute("src"); v.load(); v.remove(); } const f=document.getElementById("gopFrame"); if(f) f.remove(); }
+function stopGop(){ clearTimeout(go.timer); killMedia(); go.on=false; }
 function startGop(){
-  const songs=opSongs(); if(songs.length<3){ toast("Need at least 3 songs with YouTube links on the OP/ED tier list."); return; }
-  const shows=[...new Map([...songs.map(s=>s.show), ...crewPool().map(x=>x.title)].map(t=>[norm(t),t])).values()];
-  if(shows.length<4){ toast("Need at least 4 different shows across the crew's lists."); return; }
-  go.qs=shuffle(songs).slice(0,GOP_ROUNDS).map(s=>({s, opts:shuffle([s.show, ...shuffle(shows.filter(t=>norm(t)!==norm(s.show))).slice(0,3)])}));
+  const builtIn=ui.gopSrc==="pop", songs=builtIn ? (themeBank().list||[]) : opSongs();
+  if(builtIn && songs.length<4){ toast("Songs are still loading…"); return; }
+  if(!builtIn && songs.length<3){ toast("Need at least 3 songs with YouTube links on the OP/ED tier list."); return; }
+  const names=builtIn ? [...songs.map(s=>s.show), ...(popAnime().list||[]).slice(0,120).map(x=>x.title)] : [...songs.map(s=>s.show), ...crewPool().map(x=>x.title)];
+  const shows=[...new Map(names.map(t=>[norm(t),t])).values()];
+  if(shows.length<4){ toast("Need at least 4 different shows."); return; }
+  // one song per show so the same anime doesn't come up twice
+  const seen=new Set(), picks=shuffle(songs).filter(s=>{ const k=norm(s.show); if(seen.has(k)) return false; seen.add(k); return true; }).slice(0,GOP_ROUNDS);
+  go.qs=picks.map(s=>({s, opts:shuffle([s.show, ...shuffle(shows.filter(t=>norm(t)!==norm(s.show))).slice(0,3)])}));
   go.on=true; go.i=0; go.score=0; go.picked=null; drawGop();
 }
 function gopClock(){
@@ -2762,40 +2882,57 @@ function gopShowResult(){
   const q=go.qs[go.i], u=go.ui, i=go.picked;
   u.stage.classList.add("clear"); u.tf.style.transition="none"; u.score.textContent=go.score+" pts";
   u.hint.textContent = i===-1 ? "⏰ Time's up! It was "+q.s.show : i===-2 ? "Skipped. It was "+q.s.show : q.opts[i]===q.s.show ? "✅ Nice! +"+go.last : "❌ It was "+q.s.show;
-  u.song.textContent = q.s.t+" · "+q.s.show+" "+q.s.kind;
+  u.song.textContent = "“"+q.s.t+"” · "+q.s.show+" "+q.s.kind;
   u.btns.forEach((b,j)=>{ b.disabled=true; if(q.opts[j]===q.s.show) b.classList.add("right"); else if(j===i) b.classList.add("wrong"); });
   u.skip.remove();
   const r=el("div","r"); r.append(bt("btn primary", go.i+1<go.qs.length?"Next song →":"See score", ()=>{ go.i++; go.picked=null; if(go.i>=go.qs.length) endGop(); else drawGop(); })); u.card.insertBefore(r, u.quit);
 }
 function drawGop(){
-  clearTimeout(go.timer); go.t0=null; if(go.player){ try{ go.player.destroy(); }catch(e){} go.player=null; }
+  clearTimeout(go.timer); go.t0=null; killMedia();
   const box=$("#playBody"); box.replaceChildren();
   const q=go.qs[go.i], c=card(), top=el("div","gtop"), score=el("b","",go.score+" pts");
   top.append(el("span","","Song "+(go.i+1)+"/"+go.qs.length), score); c.append(top);
-  const stage=el("div","opstage"), fr=el("iframe"); fr.id="gopFrame"; fr.title="Mystery song";
-  fr.src="https://www.youtube.com/embed/"+q.s.yt+"?autoplay=1&playsinline=1&rel=0&controls=0&disablekb=1&fs=0&iv_load_policy=3&enablejsapi=1&origin="+encodeURIComponent(location.origin);
-  fr.allow="autoplay; encrypted-media"; stage.append(fr);
-  const song=el("div","opsong",""), tbar=el("div","gtime"), tf=el("i"); tbar.append(tf);
-  const hint=el("div","ghint","▶ Tap the blurry video to start the song");
+  const stage=el("div","opstage"), song=el("div","opsong",""), tbar=el("div","gtime"), tf=el("i"); tbar.append(tf);
+  const hint=el("div","ghint", q.s.yt ? "▶ Tap the blurry video to start the song" : "Loading the song…");
+  const round=go.i;
+  if(q.s.yt){
+    const fr=el("iframe"); fr.id="gopFrame"; fr.title="Mystery song"; fr.allow="autoplay; encrypted-media";
+    fr.src="https://www.youtube.com/embed/"+q.s.yt+"?autoplay=1&playsinline=1&rel=0&controls=0&disablekb=1&fs=0&iv_load_policy=3&enablejsapi=1&origin="+encodeURIComponent(location.origin);
+    stage.append(fr);
+  } else {
+    const v=el("video"); v.id="gopVid"; v.playsInline=true; v.setAttribute("playsinline",""); v.preload="auto"; v.src=q.s.src; let triedAudio=false;
+    v.addEventListener("playing",()=>{ if(go.i===round) gopClock(); });
+    v.addEventListener("error",()=>{ if(go.i!==round) return; if(q.s.aud && !triedAudio){ triedAudio=true; v.src=q.s.aud; v.play().catch(()=>{}); return; } if(go.picked==null) hint.textContent="This song won't play here. Skip it below."; });
+    stage.append(v);
+    const tryPlay=()=>v.play().catch(()=>{ if(go.i===round && go.t0==null && go.picked==null) hint.textContent="▶ Tap the video to start the song"; });
+    stage.addEventListener("click",()=>{ if(v.paused) tryPlay(); });
+    tryPlay(); // called straight from the button tap, so phones allow sound
+  }
   c.append(stage, song, tbar, hint);
   const g=el("div","gopts"), btns=q.opts.map((o,i)=>{ const b=bt("gopt",o,()=>gopPick(i)); g.append(b); return b; }); c.append(g);
-  const skip=bt("link","Video won't play? Skip it",()=>gopPick(-2)); skip.style.cssText="display:block;margin:10px auto 0;font-size:12px"; c.append(skip);
+  const skip=bt("link","Song won't play? Skip it",()=>gopPick(-2)); skip.style.cssText="display:block;margin:10px auto 0;font-size:12px"; c.append(skip);
   const quit=bt("link","Quit game",()=>{ if(confirm("Quit this game?")){ stopGop(); renderPlay(true); } }); quit.style.cssText="display:block;margin:6px auto 0;font-size:12px"; c.append(quit);
   box.append(c);
   go.ui={card:c, stage, tf, hint, btns, skip, quit, score, song};
   if(go.picked!=null){ gopShowResult(); return; }
-  const round=go.i;
-  loadYT().then(YT=>{ if(!go.on||go.i!==round||!document.getElementById("gopFrame")) return;
-    go.player=new YT.Player("gopFrame",{events:{onStateChange:e=>{ if(e.data===1 && go.i===round) gopClock(); }}}); })
+  if(q.s.yt) loadYT().then(YT=>{ if(!go.on||go.i!==round||!document.getElementById("gopFrame")) return;
+      go.player=new YT.Player("gopFrame",{events:{onStateChange:e=>{ if(e.data===1 && go.i===round) gopClock(); }}}); })
     .catch(()=>{ if(go.on && go.i===round) gopClock(); });
 }
 function endGop(){ const sc=go.score; stopGop(); const nb=saveBest("gop",sc); toast(nb ? "🎉 New personal best: "+sc : "You scored "+sc); renderPlay(true); }
 PLAY.gop = box => {
   if(go.on){ drawGop(); return; }
-  const n=opSongs().length;
-  const c=card(head("Guess the OP"), el("p","hint","Up to "+GOP_ROUNDS+" openings and endings from the crew's OP/ED tier lists. The video stays blurred, so you go by ear. Name the anime fast for up to 1,000 points a song."));
-  const r=el("div","r"); r.append(bt("btn primary","▶ Play", startGop)); c.append(r);
-  c.append(el("p","hint", n>=3 ? n+" songs with YouTube links in the pool. Turn your sound on!" : "Add at least 3 songs with YouTube links on the 🎵 OP/ED tiers tab to unlock this."));
+  const c=card(head("Guess the OP"), el("p","hint","Up to "+GOP_ROUNDS+" anime openings with the video blurred, so you go by ear. Name the anime fast for up to 1,000 points a song. Turn your sound on!"));
+  const seg=el("div","seg"); [["pop","🎲 Popular anime"],["crew","👥 Crew's songs"]].forEach(([k,l])=>seg.append(bt(ui.gopSrc===k?"on":"",l,()=>{ ui.gopSrc=k; if(window.CrewLook) CrewLook.put("gopSrc",k); renderPlay(true); }))); c.append(seg);
+  const r=el("div","r"); r.append(bt("btn primary","▶ Play", startGop));
+  if(ui.gopSrc==="pop"){
+    const tb=themeBank();
+    if(tb.error) r.append(bt("btn","Try again",()=>{ delete aniCache.themes; delete aniCache.pop2; try{ localStorage.removeItem("crew.ani.themes"); }catch(e){} renderPlay(true); }));
+    c.append(r, el("p","hint", tb.loading ? "Loading openings from popular anime…" : tb.error ? "Couldn't load songs right now. Try again, or switch to the crew's songs." : tb.list.length+" openings from popular anime ready. A fresh batch loads each day."));
+  } else {
+    const n=opSongs().length;
+    c.append(r, el("p","hint", n>=3 ? n+" songs from the crew's OP/ED tier lists." : "Add at least 3 songs with YouTube links on the 🎵 OP/ED tiers tab to play with the crew's songs."));
+  }
   box.append(c, bestCard("gop"));
 };
 
@@ -2865,7 +3002,7 @@ function hlGuess(up){
 }
 function hlSide(x, show, cls){ const s=el("div","mside hlside"+(cls?" "+cls:"")); const im=new Image(); im.alt=""; im.referrerPolicy="no-referrer"; im.src=x.img; im.className="hlimg"; s.append(im, el("div","mt",x.title), el("div","hlv", show ? hlFmt(x,hl.stat) : "?")); return s; }
 PLAY.hl = box => {
-  const st=popAnime(), wait=loadingCard(st,"pop");
+  const st=popAnime(), wait=loadingCard(st,"pop2");
   const statName = hl.stat==="score" ? "AniList score" : "fan count";
   if(hl.on && !wait){
     const c=card(), top=el("div","gtop"); top.append(el("span","","Streak"), el("b","",String(hl.streak))); c.append(top);
@@ -2880,7 +3017,7 @@ PLAY.hl = box => {
   const c=card(head("Higher or lower"), el("p","hint","Two of the most popular anime ever. Guess whether the next one has a higher or lower number than the last, and see how long a streak you can build."));
   const seg=el("div","seg"); [["score","★ AniList score"],["pop","👥 Fans"]].forEach(([k,l])=>seg.append(bt(hl.stat===k?"on":"",l,()=>{ hl.stat=k; if(window.CrewLook) CrewLook.put("hlStat",k); renderPlay(true); }))); c.append(seg);
   if(wait) c.append(el("div","empty", st.loading ? "Loading shows from AniList…" : "Couldn't reach AniList right now."));
-  const r=el("div","r"); r.append(bt("btn primary","▶ Play", startHl)); if(st.error) r.append(bt("btn","Try again",()=>{ delete aniCache.pop; renderPlay(true); })); c.append(r);
+  const r=el("div","r"); r.append(bt("btn primary","▶ Play", startHl)); if(st.error) r.append(bt("btn","Try again",()=>{ delete aniCache.pop2; renderPlay(true); })); c.append(r);
   box.append(c, bestCard(hl.stat==="score"?"hls":"hlp", "Best streaks · "+(hl.stat==="score"?"score":"fans")));
 };
 
@@ -2976,8 +3113,8 @@ const sqOpt = id => id.slice(0,20);
 function cthumb(p){ const t=el("div","cthumb"); if(p.img){ const im=new Image(); im.alt=""; im.referrerPolicy="no-referrer"; im.loading="lazy"; im.src=p.img; t.append(im); } else t.append(el("span","cph",(p.n[0]||"?").toUpperCase())); t.append(el("div","cn",p.n)); return t; }
 function sqView(e){
   const b=e.b, key=e.key, phase=sqPhase(b), {owner, by}=sqSquads(key), ref="q:"+key, vs=vt(ref), me=state.me.uid;
-  const c=card(); const h=head(b.name); if(e.owner===me) h.append(sbtn("Delete",()=>{ if(confirm('Delete "'+b.name+'"?')){ ui.sq=null; mutate(m=>{ m.gx.sq=m.gx.sq.filter(x=>x.id!==b.id); }); } })); c.append(h);
-  const by2=el("div","by"); by2.append(avatarEl(e.owner,true), el("span","","by "+nameOf(e.owner))); c.append(by2);
+  const c=card(); const h=head(b.name); if(e.owner===me && !b.auto) h.append(sbtn("Delete",()=>{ if(confirm('Delete "'+b.name+'"?')){ ui.sq=null; mutate(m=>{ m.gx.sq=m.gx.sq.filter(x=>x.id!==b.id); }); } })); c.append(h);
+  const by2=el("div","by"); if(b.auto) by2.append(el("span","","⭐ This week's challenge")); else by2.append(avatarEl(e.owner,true), el("span","","by "+nameOf(e.owner))); c.append(by2);
   const lock=Date.parse(b.lock);
   c.append(el("div","dstat", phase==="pick" ? "🟢 Picking · closes "+untilText((lock-Date.now())/1000) : phase==="vote" ? "🗳️ Voting · ends "+untilText((lock+SQ_VOTE_MS-Date.now())/1000) : "🏁 Final results"));
   c.append(el("p","hint", phase==="pick" ? "Build a squad of "+SQ_N+" characters for this. Once someone picks a character, nobody else can take them." : phase==="vote" ? "Vote for the squad that wins it (not your own)." : ""));
@@ -3007,13 +3144,22 @@ function sqView(e){
     c.append(r); });
   return c;
 }
+let sqMaking=false;
+function ensureWeeklySq(){
+  if(sqMaking || !state.loaded) return; const w=isoWeek(); if(allSq().some(e=>e.b.w===w)) return;
+  const mon=nextMonday().getTime()-7*864e5, lock=Math.max(mon+4*864e5, Date.now()+2*864e5); sqMaking=true;
+  mutate(m=>{ if(m.gx.sq.some(b=>b.w===w)) return; m.gx.sq.unshift({id:uid(), name:SQ_BANK[hash(w)%SQ_BANK.length], lock:new Date(lock).toISOString(), at:nowIso(), w, auto:true}); if(m.gx.sq.length>10) m.gx.sq.length=10; });
+  sqMaking=false;
+}
 PLAY.sq = box => {
+  setTimeout(ensureWeeklySq,0);
   const list=allSq();
   const c=card(head("Squad battles", sbtn(ui.sqForm?"Cancel":"+ New battle",()=>{ ui.sqForm=!ui.sqForm; renderPlay(true); })),
-    el("p","hint","Set a challenge, everyone drafts a squad of "+SQ_N+" characters from any anime, then the crew votes on which squad wins."));
+    el("p","hint","Everyone drafts a squad of "+SQ_N+" characters from any anime for a challenge, then the crew votes on which squad wins. A new ⭐ challenge drops every Monday, or start your own."));
   if(ui.sqForm){
     const f=el("form","pform");
-    f.append(field("sqName","input",{maxLength:60, placeholder:"e.g. Survive a zombie apocalypse"}), el("label","","Picks close in"));
+    const idea=bt("btn","🎲 Give me an idea",()=>{ formVals.sqName=SQ_BANK[Math.floor(Math.random()*SQ_BANK.length)]; renderPlay(true); }); const ir=el("div","r"); ir.append(idea);
+    f.append(field("sqName","input",{maxLength:60, placeholder:"e.g. Survive a zombie apocalypse"}), ir, el("label","","Picks close in"));
     const sel=field("sqLock","select"); [["1","1 day"],["2","2 days"],["3","3 days"],["7","1 week"]].forEach(([v,l])=>sel.append(new Option(l,v))); sel.value=formVals.sqLock||"2"; f.append(sel);
     const go4=bt("btn primary","Start battle"); go4.type="submit"; const r=el("div","r"); r.append(go4); f.append(r);
     f.addEventListener("submit",ev=>{ ev.preventDefault(); blurActive(); const name=clean(formVals.sqName||"").slice(0,60); if(!name){ toast("Give the battle a challenge."); return; }
@@ -3024,7 +3170,7 @@ PLAY.sq = box => {
   }
   if(!list.length && !ui.sqForm) c.append(el("div","empty","No battles yet. Start the first one!"));
   if(list.length){ if(!ui.sq || !list.some(e=>e.key===ui.sq)) ui.sq=list[0].key;
-    const chips=el("div","people"); list.forEach(e=>{ const ph=sqPhase(e.b), ch=bt("chip"+(e.key===ui.sq?" on":""),"",()=>{ ui.sq=e.key; sqSearch.q=""; sqSearch.list=[]; renderPlay(true); }); ch.append(el("span","",(ph==="pick"?"🟢 ":ph==="vote"?"🗳️ ":"🏆 ")+e.b.name)); chips.append(ch); }); c.append(chips); }
+    const chips=el("div","people"); list.forEach(e=>{ const ph=sqPhase(e.b), ch=bt("chip"+(e.key===ui.sq?" on":""),"",()=>{ ui.sq=e.key; sqSearch.q=""; sqSearch.list=[]; renderPlay(true); }); ch.append(el("span","",(ph==="pick"?"🟢 ":ph==="vote"?"🗳️ ":"🏆 ")+(e.b.auto?"⭐ ":"")+e.b.name)); chips.append(ch); }); c.append(chips); }
   box.append(c);
   const sel=list.find(e=>e.key===ui.sq); if(sel) box.append(sqView(sel));
 };
@@ -3086,15 +3232,44 @@ PLAY.kd = box => {
 
 // ---------- 😶 emoji plot ----------
 function allEmo(){ const out=[]; Object.entries(state.docs).forEach(([id,d])=>d.gx.emo.forEach(p=>out.push({owner:id, p, ref:id+":"+p.id}))); return out.sort((a,b)=>(b.p.at||"").localeCompare(a.p.at||"")); }
+const bankEmo = () => seeded(EMO_BANK, "emo"+state.me.uid).map(p=>({owner:"bank", p, ref:"bank:"+p.id})); // each person gets their own order
 function emoMatch(p, guess){
   const strip=s=>norm(s).replace(/^the /,""), G=strip(guess); if(G.length<2) return false;
   return [p.a, ...String(p.alt||"").split(",")].map(strip).filter(Boolean).some(A=>A===G || (G.length>=4 && A.includes(G) && G.length>=A.length*0.6));
 }
 const emoPts = r => r && r.ok ? Math.max(1, 4-r.g.length) : 0;
 const EMO_TRIES=3;
+const emoMyG = ref => mine().gx.emg.find(x=>x.r===ref);
+const emoDone = ref => { const r=emoMyG(ref); return !!(r && (r.ok || r.g.length>=EMO_TRIES)); };
+function emoSolvers(ref){ const o=[]; Object.entries(state.docs).forEach(([id,d])=>{ const r=d.gx.emg.find(x=>x.r===ref); if(r&&(r.ok||r.g.length>=EMO_TRIES)) o.push({id,r}); }); return o; }
+function emoItem(x){
+  const me=state.me.uid, r=emoMyG(x.ref), mineP=x.owner===me, done=mineP || emoDone(x.ref), it=el("div","poll emo");
+  it.append(el("div","emoq",x.p.e));
+  const meta=el("div","meta2");
+  if(x.owner==="bank") meta.append(el("span","","🎲 Built-in")); else meta.append(avatarEl(x.owner,true), el("span","",nameOf(x.owner)+" · "+ago(x.p.at)));
+  const sv=emoSolvers(x.ref), ok=sv.filter(s=>s.r.ok); if(ok.length) meta.append(el("span","cd",ok.length+" solved"));
+  if(mineP) meta.append(bt("link del2","Delete",()=>{ if(confirm("Delete this puzzle?")) mutate(m=>{ m.gx.emo=m.gx.emo.filter(y=>y.id!==x.p.id); }); }));
+  it.append(meta);
+  if(done){ it.append(el("div","emoa", (mineP ? "Answer: " : r.ok ? "✅ "+(r.g.length===1?"First try! ":"")+"+"+emoPts(r)+" · " : "❌ ")+x.p.a));
+    if(sv.length) it.append(el("div","who3", sv.map(s=>nameOf(s.id)+(s.r.ok?" ✅":" ❌")).join(" · ")));
+    return it; }
+  if(r&&r.g.length) it.append(el("div","who3","Tried: "+r.g.join(", ")));
+  const fid="emoG"+x.p.id+x.owner.slice(0,6), f=el("form","grow2"), inp=field(fid,"input",{maxLength:80, placeholder:"Your guess ("+(EMO_TRIES-(r?r.g.length:0))+" left)", autocomplete:"off"}); inp.setAttribute("list","emoDL2");
+  const b=bt("btn primary","Guess"); b.type="submit"; f.append(inp,b);
+  f.addEventListener("submit",ev=>{ ev.preventDefault(); const gs=clean(formVals[fid]||inp.value).slice(0,80); if(!gs) return; clearForm(fid); blurActive(); const right=emoMatch(x.p,gs);
+    mutate(m=>{ let y=m.gx.emg.find(z=>z.r===x.ref); if(!y){ y={r:x.ref, g:[], ok:false}; m.gx.emg.unshift(y); if(m.gx.emg.length>300) m.gx.emg.length=300; } if(y.ok||y.g.length>=EMO_TRIES) return; y.g.push(gs); if(right) y.ok=true; });
+    toast(right ? "✅ Got it!" : (r?r.g.length:0)+1>=EMO_TRIES ? "❌ Out of tries. It was "+x.p.a : "❌ Nope, try again"); });
+  it.append(f);
+  // a little help: the answer's length
+  if(r && r.g.length>=1) it.append(el("div","who3","Hint: "+x.p.a.replace(/[A-Za-z0-9]/g,"_").replace(/_/g,"_ ").trim()));
+  return it;
+}
 PLAY.emo = box => {
-  const c=card(head("Emoji plot", sbtn(ui.emoForm?"Cancel":"+ New puzzle",()=>{ ui.emoForm=!ui.emoForm; renderPlay(true); })),
-    el("p","hint","Describe an anime using only emojis. Everyone else gets "+EMO_TRIES+" tries to name it: 3 points on the first try, 2 on the second, 1 on the third."));
+  if(!ui.emoTab) ui.emoTab="bank";
+  const crew=allEmo(), crewNew=crew.filter(x=>x.owner!==state.me.uid && !emoDone(x.ref)).length;
+  const c=card(head("Emoji plot", sbtn(ui.emoForm?"Cancel":"+ Make one",()=>{ ui.emoForm=!ui.emoForm; if(ui.emoForm) ui.emoTab="crew"; renderPlay(true); })),
+    el("p","hint","Name the anime from the emojis. You get "+EMO_TRIES+" tries: 3 points on the first, 2 on the second, 1 on the third."));
+  const seg=el("div","seg"); [["bank","🎲 Built-in"],["crew","👥 Crew-made"+(crewNew?" ("+crewNew+")":"")]].forEach(([k,l])=>seg.append(bt(ui.emoTab===k?"on":"",l,()=>{ ui.emoTab=k; renderPlay(true); }))); c.append(seg);
   if(ui.emoForm){
     const f=el("form","pform"), dl=titleList("emoDL");
     const e=field("emoE","input",{maxLength:60, placeholder:"Emojis only, e.g. ⚽👁️🔒🧬"}); e.classList.add("emoin");
@@ -3103,36 +3278,21 @@ PLAY.emo = box => {
     const go5=bt("btn primary","Post puzzle"); go5.type="submit"; const r=el("div","r"); r.append(go5); f.append(r);
     f.addEventListener("submit",ev=>{ ev.preventDefault(); blurActive();
       const em=Array.from(String(formVals.emoE||"").replace(/\s+/g," ").trim()).slice(0,40).join(""), ans=clean(formVals.emoA||"").slice(0,120), alt=clean(formVals.emoAlt||"").slice(0,160);
-      if(!em){ toast("Add some emojis."); return; } if(/[A-Za-z0-9]/.test(em)){ toast("Emojis only, no letters or numbers!"); return; } if(!/\p{Extended_Pictographic}/u.test(em)){ toast("Use at least one emoji."); return; }
+      if(!em){ toast("Add some emojis."); return; } if(/[A-Za-z0-9]/.test(em.replace(/[0-9]️?⃣/g,""))){ toast("Emojis only, no letters or numbers!"); return; } if(!/\p{Extended_Pictographic}/u.test(em)){ toast("Use at least one emoji."); return; }
       if(!ans){ toast("Add the answer."); return; } if(mine().gx.emo.length>=30){ toast("Delete an old puzzle first (max 30)."); return; }
       ui.emoForm=false; clearForm("emoE","emoA","emoAlt"); mutate(m=>{ m.gx.emo.unshift({id:uid(), e:em, a:ans, alt, at:nowIso()}); }); toast("😶 Posted"); });
     c.append(f);
   }
-  const all=allEmo(), me=state.me.uid, myG=ref=>mine().gx.emg.find(x=>x.r===ref);
-  const solvers=ref=>{ const o=[]; Object.entries(state.docs).forEach(([id,d])=>{ const r=d.gx.emg.find(x=>x.r===ref); if(r&&(r.ok||r.g.length>=EMO_TRIES)) o.push({id,r}); }); return o; };
-  if(!all.length && !ui.emoForm) c.append(el("div","empty","No puzzles yet. Post the first one!"));
-  // unsolved ones first
-  const state2=x=>{ if(x.owner===me) return 2; const r=myG(x.ref); return r&&(r.ok||r.g.length>=EMO_TRIES) ? 1 : 0; };
-  all.sort((a,b)=>state2(a)-state2(b)).slice(0,25).forEach(x=>{
-    const it=el("div","poll emo"), r=myG(x.ref), mineP=x.owner===me, done=mineP || (r&&(r.ok||r.g.length>=EMO_TRIES));
-    it.append(el("div","emoq",x.p.e));
-    const meta=el("div","meta2"); meta.append(avatarEl(x.owner,true), el("span","",nameOf(x.owner)+" · "+ago(x.p.at)));
-    const sv=solvers(x.ref), ok=sv.filter(s=>s.r.ok); meta.append(el("span","cd",ok.length+" solved"));
-    if(mineP) meta.append(bt("link del2","Delete",()=>{ if(confirm("Delete this puzzle?")) mutate(m=>{ m.gx.emo=m.gx.emo.filter(y=>y.id!==x.p.id); }); }));
-    it.append(meta);
-    if(done){ it.append(el("div","emoa", (mineP ? "Answer: " : r.ok ? "✅ "+(r.g.length===1?"First try! ":"")+"+"+emoPts(r)+" · " : "❌ ")+x.p.a));
-      if(sv.length) it.append(el("div","who3", sv.map(s=>nameOf(s.id)+(s.r.ok?" ✅":" ❌")).join(" · "))); }
-    else {
-      if(r&&r.g.length) it.append(el("div","who3","Tried: "+r.g.join(", ")));
-      const fid="emoG"+x.p.id+x.owner.slice(0,6), f=el("form","grow2"), inp=field(fid,"input",{maxLength:80, placeholder:"Your guess ("+(EMO_TRIES-(r?r.g.length:0))+" left)"}); inp.setAttribute("list","emoDL2");
-      const b=bt("btn primary","Guess"); b.type="submit"; f.append(inp,b);
-      f.addEventListener("submit",ev=>{ ev.preventDefault(); const gs=clean(formVals[fid]||inp.value).slice(0,80); if(!gs) return; clearForm(fid); blurActive(); const right=emoMatch(x.p,gs);
-        mutate(m=>{ let y=m.gx.emg.find(z=>z.r===x.ref); if(!y){ y={r:x.ref, g:[], ok:false}; m.gx.emg.unshift(y); if(m.gx.emg.length>300) m.gx.emg.length=300; } if(y.ok||y.g.length>=EMO_TRIES) return; y.g.push(gs); if(right) y.ok=true; });
-        toast(right ? "✅ Got it!" : "❌ Nope"); });
-      it.append(f);
-    }
-    c.append(it);
-  });
+  if(ui.emoTab==="bank"){
+    const bank=bankEmo(), left=bank.filter(x=>!emoDone(x.ref)), solved=bank.length-left.length;
+    c.append(el("p","hint",solved+" of "+bank.length+" done"+(left.length?"":". You've cleared them all! 🎉")));
+    left.slice(0,5).forEach(x=>c.append(emoItem(x)));
+    if(solved){ const d=el("details","emodone"); d.append(el("summary","","Show the ones you've done ("+solved+")")); bank.filter(x=>emoDone(x.ref)).forEach(x=>d.append(emoItem(x))); c.append(d); }
+  } else {
+    if(!crew.length && !ui.emoForm) c.append(el("div","empty","Nobody has made one yet. Tap + Make one to stump the crew."));
+    const order=x=>x.owner===state.me.uid ? 2 : emoDone(x.ref) ? 1 : 0;
+    crew.slice().sort((a,b)=>order(a)-order(b)).slice(0,25).forEach(x=>c.append(emoItem(x)));
+  }
   box.append(titleList("emoDL2"), c);
   const pts={}; Object.entries(state.docs).forEach(([id,d])=>d.gx.emg.forEach(r=>{ if(r.ok) pts[id]=(pts[id]||0)+emoPts(r); }));
   const lb=card(head("Leaderboard")), ids=Object.keys(pts).sort((a,b)=>pts[b]-pts[a]||nameOf(a).localeCompare(nameOf(b)));
@@ -3166,7 +3326,7 @@ PLAY.daily = box => {
   const c=card(head("Daily question"), el("p","hint","One quick question a day, the same for the whole crew. Answer it right on consecutive days to keep your streak alive."));
   box.append(c);
   if(!q){ const pop=popAnime(), needChars=dailyType()==="sil", ch=needChars?charPool():{list:[]};
-    const wait=loadingCard(pop,"pop")||(needChars&&ch.loading?loadingCard(ch,"chars"):null); if(wait){ box.append(wait); return; }
+    const wait=loadingCard(pop,"pop2")||(needChars&&ch.loading?loadingCard(ch,"chars"):null); if(wait){ box.append(wait); return; }
     q=makeDaily(pop.list, ch.list||[]); }
   const p=mine().gx.dp, answered=p&&p.d===today();
   const g=card(), top=el("div","gtop"); top.append(el("span","",new Date().toLocaleDateString([], {weekday:"long", month:"short", day:"numeric"})), el("b","","🔥 "+liveStreak(mine().gx.ds))); g.append(top);
