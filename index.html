@@ -529,6 +529,11 @@
   .dimg.sil img{filter:brightness(0) contrast(1.2)}.dimg.sil.shown img{filter:none;transition:filter .6s}
   .gstage.dimg img{transition:transform .6s}
   .gopts.one{grid-template-columns:1fr}
+  .chsug{display:flex;flex-direction:column;gap:4px}
+  .chopt{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:10px;padding:6px 8px;cursor:pointer;font:500 14px "Zen Kaku Gothic New"}
+  .chopt img{width:36px;height:36px;border-radius:50%;object-fit:cover;flex:none}
+  .chopt .grow{flex:1;min-width:0}.chopt b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.chopt small{display:block;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .chnone{color:var(--muted);font-size:13px;padding:6px 2px}
   /* ---- social ---- */
   .rnote{font-size:13px;font-style:italic;margin-top:2px;overflow-wrap:anywhere}
   .rst{color:var(--accent2);font-weight:700}
@@ -3067,15 +3072,27 @@ PLAY.chr = box => {
     if(!daily){ const r=el("div","r"); r.append(bt("btn primary","New character",()=>{ pc.a=null; renderPlay(true); })); g.append(r); } }
   else if(!pool.length){ g.append(el("div","empty","Characters are still loading…")); }
   else {
-    const f=el("form","pform"), dl=document.getElementById("chrDL")||el("datalist"); dl.id="chrDL"; dl.replaceChildren(); pool.forEach(x=>dl.append(new Option(x.n, x.n)));
-    const inp=field("chrIn","input",{maxLength:80, placeholder:"Type a character name…", autocomplete:"off"}); inp.setAttribute("list","chrDL");
-    const row=el("div","grow2"); row.append(inp); const go2=bt("btn primary","Guess"); go2.type="submit"; row.append(go2); f.append(dl,row);
-    f.addEventListener("submit",ev=>{ ev.preventDefault(); const x=findChar(pool, formVals.chrIn||inp.value); if(!x){ toast("Pick a name from the list."); return; } if(guesses.some(y=>y.id===x.id)){ toast("Already guessed "+x.n); return; }
-      clearForm("chrIn"); blurActive(); const ok=x.id===ans.id;
+    const f=el("form","pform");
+    const inp=field("chrIn","input",{maxLength:80, placeholder:"Start typing a character name…", autocomplete:"off", autocapitalize:"off", spellcheck:false});
+    const row=el("div","grow2"); row.append(inp); const go2=bt("btn primary","Guess"); go2.type="submit"; row.append(go2);
+    const sug=el("div","chsug"); f.append(row, sug);
+    const doGuess=x=>{ if(guesses.some(y=>y.id===x.id)){ toast("Already guessed "+x.n); return; }
+      clearForm("chrIn"); inp.value=""; sug.replaceChildren(); blurActive(); const ok=x.id===ans.id;
       if(daily){ mutate(m=>{ if(ans.local) m.gx.chq={d:ans.d, id:ans.id, n:ans.n, img:ans.img, s:ans.s, g:ans.g, r:ans.r, st:ans.st, y:ans.y, rank:ans.rank, at:ans.at};
           const p=m.gx.chp&&m.gx.chp.d===today() ? m.gx.chp : {d:today(), g:[], done:false, ok:false}; if(p.done) return; p.g.push(x.id); if(ok){ p.done=true; p.ok=true; } else if(p.g.length>=CHR_MAX) p.done=true; m.gx.chp=p; if(p.done) bumpStreak(m,"chs",p.ok); }); }
       else { pc.g.push(x); renderPlay(true); }
-      if(ok) toast("🎉 It's "+x.n+"!"); });
+      if(ok) toast("🎉 It's "+x.n+"!"); };
+    // our own suggestion list (phones don't reliably show the built-in one)
+    const matches=t=>{ const q=norm(t); if(q.length<1) return []; const used=new Set(guesses.map(y=>y.id));
+      return pool.filter(x=>!used.has(x.id)).map(x=>{ const n=norm(x.n), words=n.split(" "); const sc = n.startsWith(q)?0 : words.some(w=>w.startsWith(q))?1 : n.includes(q)?2 : norm(x.s).includes(q)&&q.length>=3?3 : 9; return [sc,x]; })
+        .filter(([sc])=>sc<9).sort((a,b)=>a[0]-b[0]||a[1].rank-b[1].rank).slice(0,8).map(([,x])=>x); };
+    const showSug=()=>{ sug.replaceChildren(); const list=matches(inp.value);
+      if(inp.value.trim() && !list.length){ sug.append(el("div","chnone","No match in the top "+pool.length+" characters. Try another spelling.")); return; }
+      list.forEach(x=>{ const b=bt("chopt","",()=>doGuess(x)); const im=new Image(); im.alt=""; im.referrerPolicy="no-referrer"; im.loading="lazy"; im.src=x.img; const t=el("div","grow"); t.append(el("b","",x.n), el("small","muted",x.s)); b.append(im,t); sug.append(b); }); };
+    inp.addEventListener("input",showSug); if(inp.value) showSug();
+    // stop tapping a suggestion from blurring the box first (which would redraw the page and swallow the tap)
+    sug.addEventListener("pointerdown",e=>e.preventDefault());
+    f.addEventListener("submit",ev=>{ ev.preventDefault(); const x=findChar(pool, inp.value)||matches(inp.value)[0]; if(!x){ toast(inp.value.trim()?"No character by that name. Pick one from the suggestions.":"Type a name first."); return; } doGuess(x); });
     g.append(f);
   }
   const list=el("div","chlist"); guesses.slice().reverse().forEach(x=>list.append(chrRow(x,ans))); g.append(list);
