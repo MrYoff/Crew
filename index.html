@@ -377,6 +377,24 @@
   .acct input{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:12px;font:16px "Zen Kaku Gothic New"}
   .acct .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
   .acct .err{color:var(--err);font-size:13px;margin-top:8px;min-height:1em}
+  .admin .seg{margin-top:4px}
+  .admin .arow{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line);font-size:14px}
+  .admin .arow:first-child{border-top:0}
+  .admin .arow .grow{flex:1;min-width:0;overflow-wrap:anywhere}
+  .admin .arow .nm{font-weight:700}
+  .admin .arow .meta{color:var(--muted);font-size:12px;margin-top:2px}
+  .admin .arow .txt{margin-top:3px;white-space:pre-wrap}
+  .admin .arow .tag{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:1px 7px;margin-left:6px;background:var(--panel2);border:1px solid var(--line);color:var(--accent2);vertical-align:1px}
+  .admin .abtns{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+  .admin .abtns .btn{padding:6px 10px;font-size:12px}
+  .admin .btn.danger{border-color:var(--accent);color:var(--accent)}
+  .admin textarea,.admin select{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:10px;font:15px "Zen Kaku Gothic New"}
+  .admin textarea{min-height:90px;resize:vertical}
+  .admin .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 4px}
+  .admin .stats div{background:var(--panel2);border-radius:12px;padding:10px;text-align:center}
+  .admin .stats b{display:block;font-family:"Dela Gothic One";font-weight:400;font-size:22px;color:var(--accent2)}
+  .admin .stats span{font-size:11px;color:var(--muted)}
+  .admin .r{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
   .codebox{font:400 26px "Dela Gothic One";letter-spacing:2px;text-align:center;background:var(--panel2);border:1px dashed var(--accent2);color:var(--accent2);border-radius:14px;padding:18px 8px;margin:10px 0;user-select:all;overflow-wrap:anywhere}
   .forgot{display:block;margin:10px auto 0;font-size:13px}
   .hidden{display:none!important}
@@ -477,6 +495,16 @@
   .opstage{position:relative;width:100%;max-width:420px;aspect-ratio:16/9;margin:12px auto 8px;border-radius:14px;overflow:hidden;background:#000}
   .opstage iframe,.opstage video{position:absolute;inset:-12%;width:124%;height:124%;border:0;object-fit:cover;filter:blur(22px) saturate(1.3);transition:filter .6s ease}
   .opstage.clear iframe,.opstage.clear video{inset:0;width:100%;height:100%;filter:none}
+  .opstage.aud video{opacity:0}
+  .opstage .opcover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s ease;pointer-events:none}
+  .opstage.aud.clear .opcover{opacity:1}
+  .opstage .eq{position:absolute;inset:0;display:none;align-items:center;justify-content:center;gap:7px;pointer-events:none;background:radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%)}
+  .opstage.aud .eq{display:flex}
+  .opstage.aud.clear .eq{display:none}
+  .opstage .eq i{width:10px;height:18%;border-radius:5px;background:linear-gradient(var(--accent2),var(--accent));animation:eqb .9s ease-in-out infinite;animation-play-state:paused}
+  .opstage.playing .eq i{animation-play-state:running}
+  .opstage .eq i:nth-child(2){animation-delay:-.3s}.opstage .eq i:nth-child(3){animation-delay:-.6s}.opstage .eq i:nth-child(4){animation-delay:-.15s}.opstage .eq i:nth-child(5){animation-delay:-.45s}
+  @keyframes eqb{0%,100%{height:18%}50%{height:62%}}
   details.emodone{margin-top:12px}details.emodone summary{cursor:pointer;color:var(--muted);font-size:13px;font-weight:700}
   .opsong{text-align:center;font-size:13px;color:var(--muted);min-height:18px;margin-bottom:6px}
   .clue{background:var(--panel2);border-radius:12px;padding:14px;margin:12px 0 4px}
@@ -638,7 +666,7 @@
       <h1>Crew</h1>
     </div>
     <div class="headright">
-    <div class="me hidden" id="me"><button class="avbtn" id="avBtn" type="button" aria-label="Change profile picture" title="Change profile picture"><span id="meAv"></span></button><div><div id="meName"></div><button class="link" id="acctBtn" type="button">Account</button> · <button class="link" id="signOut">Sign out</button></div></div>
+    <div class="me hidden" id="me"><button class="avbtn" id="avBtn" type="button" aria-label="Change profile picture" title="Change profile picture"><span id="meAv"></span></button><div><div id="meName"></div><button class="link" id="acctBtn" type="button">Account</button><span id="adminLink" class="hidden"> · <button class="link" id="adminBtn" type="button">Admin</button></span> · <button class="link" id="signOut">Sign out</button></div></div>
     <button class="gear" id="gearBtn" type="button" aria-label="Appearance settings" title="Theme &amp; background"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="13.5" cy="6.5" r="1.5" fill="currentColor"/><circle cx="17.5" cy="10.5" r="1.5" fill="currentColor"/><circle cx="8.5" cy="7.5" r="1.5" fill="currentColor"/><circle cx="6.5" cy="12.5" r="1.5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.9 0 1.6-.7 1.6-1.6 0-.4-.2-.8-.4-1.1-.3-.3-.4-.7-.4-1.1 0-.9.7-1.6 1.6-1.6H16c3.3 0 6-2.7 6-6 0-4.9-4.5-8.6-10-8.6z"/></svg></button>
     </div>
   </div>
@@ -647,6 +675,7 @@
   <div id="status" class="notice">Signing you in…</div>
   <div id="installBar" class="notice installbar hidden"><span class="grow">📲 Add Crew to your home screen so it opens like an app.</span><button class="btn primary" id="installGo" type="button">How</button><button class="btn" id="installX" type="button" aria-label="Dismiss">✕</button></div>
 
+  <div id="annBar" class="notice installbar hidden"><span class="grow" id="annText"></span><button class="btn" id="annX" type="button" aria-label="Dismiss">✕</button></div>
   <div id="recBar" class="notice installbar hidden"><span class="grow">🔑 Set up a recovery code so you can get back in if you ever forget your password.</span><button class="btn primary" id="recGo" type="button">Set up</button><button class="btn" id="recX" type="button" aria-label="Dismiss">✕</button></div>
   <div id="signinView" class="signin hidden">
     <form class="authbox" id="authForm" novalidate>
@@ -924,6 +953,19 @@
       <div class="row"><button class="btn" id="acctChange" type="button">Change password</button></div>
       <div class="err" id="acctErr"></div>
     </div>
+    <div id="acctAdmin" class="hidden">
+      <h4>Crew admin</h4>
+      <p class="hint" id="acctAdminTxt" style="margin:0"></p>
+      <div class="row"><button class="btn primary" id="acctAdminGo" type="button"></button></div>
+      <div class="err" id="acctAdminErr"></div>
+    </div>
+  </div>
+</div>
+<div class="sheet-bg hidden" id="adminSheet" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+  <div class="sheet admin">
+    <div class="head"><h3 id="adminTitle">🛠 Admin</h3><button class="ic" id="adminClose" type="button" aria-label="Close">✕</button></div>
+    <div class="seg" id="adminSeg"><button type="button" data-at="members">Members</button><button type="button" data-at="posts">Posts</button><button type="button" data-at="announce">Announce</button><button type="button" data-at="games">Games</button></div>
+    <div id="adminBody"></div>
   </div>
 </div>
 <div class="sheet-bg hidden" id="codeSheet" role="dialog" aria-modal="true" aria-labelledby="codeTitle">
@@ -1000,7 +1042,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, updateDoc, deleteDoc, deleteField, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBoOyxhUbj8yLluCp9LWj4vvxmIMmxxYVE",
@@ -1016,7 +1058,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const $ = s => document.querySelector(s);
-const state = { me:null, docs:{}, view:"me", friend:null, canWrite:true, loaded:false, unsub:null, mode:(()=>{ const v=window.CrewLook&&CrewLook.get("mode"); return ["anime","manga","overall","lists"].includes(v)?v:"anime"; })(), target:null };
+const state = { me:null, docs:{}, upd:{}, cfg:null, cfgReady:false, cfgUnsub:null, view:"me", friend:null, canWrite:true, loaded:false, unsub:null, mode:(()=>{ const v=window.CrewLook&&CrewLook.get("mode"); return ["anime","manga","overall","lists"].includes(v)?v:"anime"; })(), target:null };
 // anime lists live in top/watched/watchlist; manga lists in mtop/mread/mlist
 // overall (anime + manga mixed) top 10 lives in otop; custom lists in custom[]
 const KEYS = { anime:{top:"top",watched:"watched",watchlist:"watchlist",watching:"watching"}, manga:{top:"mtop",watched:"mread",watchlist:"mlist",watching:"mreading"}, overall:{top:"otop"}, lists:{} };
@@ -1167,7 +1209,7 @@ function backupLocal(){ try{ localStorage.setItem(pendKey(), JSON.stringify({at:
 function clearBackup(){ try{ localStorage.removeItem(pendKey()); }catch(e){} }
 function readBackup(){ try{ const v=JSON.parse(localStorage.getItem(pendKey())||"null"); return v&&v.d&&v.at?v:null; }catch(e){ return null; } }
 async function save(){
-  if(!state.me) return;
+  if(!state.me || amBanned()) return; // removed members can't save
   if(writing){ dirty=true; return; }
   writing=true; clearTimeout(retryT);
   const who=state.me.uid;
@@ -2790,10 +2832,12 @@ const insertAt = (arr, x, i) => { const a=arr.slice(); a.splice(i%(a.length+1),0
 const aniCache={};
 function aniData(key, loader){
   if(aniCache[key]) return aniCache[key];
-  try{ const v=JSON.parse(localStorage.getItem("crew.ani."+key)||"null"); if(v && v.at>Date.now()-864e5 && Array.isArray(v.list) && v.list.length) return aniCache[key]={list:v.list}; }catch(e){}
-  aniCache[key]={loading:true, list:[]};
+  let stale=null;
+  try{ const v=JSON.parse(localStorage.getItem("crew.ani."+key)||"null"); if(v && Array.isArray(v.list) && v.list.length){ if(v.at>Date.now()-864e5) return aniCache[key]={list:v.list}; stale=v.list; } }catch(e){}
+  // older than a day: keep using yesterday's copy right away and swap in the fresh one when it arrives
+  aniCache[key]=stale ? {list:stale} : {loading:true, list:[]};
   loader().then(list=>{ aniCache[key]={list}; try{ localStorage.setItem("crew.ani."+key, JSON.stringify({at:Date.now(), list})); }catch(e){} })
-    .catch(()=>{ aniCache[key]={error:true, list:[]}; })
+    .catch(()=>{ if(!stale) aniCache[key]={error:true, list:[]}; })
     .finally(()=>{ if(state.view==="play") renderPlay(); });
   return aniCache[key];
 }
@@ -2805,7 +2849,8 @@ function loadingCard(c, key){
 const POP_Q=`query($p:Int){Page(page:$p,perPage:50){media(type:ANIME,sort:POPULARITY_DESC,isAdult:false){id idMal title{english romaji} coverImage{large} averageScore popularity seasonYear format studios(isMain:true){nodes{name}}}}}`;
 const popAnime = () => aniData("pop2", async()=>{
   const out=[], seen=new Set();
-  for(const p of [1,2,3]){ const j=await aniPost(POP_Q,{p});
+  const pages=await Promise.all([1,2,3].map(p=>aniPost(POP_Q,{p})));
+  for(const j of pages){
     ((j.data&&j.data.Page&&j.data.Page.media)||[]).forEach(a=>{ const img=a.coverImage&&a.coverImage.large, t=clean(a.title.english||a.title.romaji||""); if(!t||seen.has(norm(t))) return; seen.add(norm(t));
       out.push({id:a.id, mal:a.idMal||null, title:t, img:IMG_OK(img)?img:null, score:a.averageScore||0, pop:a.popularity||0, year:a.seasonYear||null, studio:(((a.studios&&a.studios.nodes)||[])[0]||{}).name||null}); }); }
   if(!out.length) throw new Error("empty"); return out; });
@@ -2821,27 +2866,36 @@ const charPool = () => aniData("chars", async()=>{
   if(!out.length) throw new Error("empty"); return out; });
 
 // ---------- 🎧 guess the OP ----------
-var go={on:false, qs:[], i:0, score:0, picked:null, t0:null, last:0, timer:null, player:null, ui:null};
-const GOP_SECS=20, GOP_ROUNDS=8;
+var go={on:false, qs:[], spare:[], shows:[], i:0, score:0, picked:null, t0:null, last:0, timer:null, wd:null, player:null, ui:null, pre:new Map(), prep:null};
+const GOP_SECS=20, GOP_ROUNDS=8, GOP_WAIT=8000;
 if(!ui.gopSrc) ui.gopSrc=(window.CrewLook&&CrewLook.get("gopSrc"))==="crew"?"crew":"pop";
 function opSongs(){ const m=new Map(); Object.values(state.docs).forEach(d=>d.ops.forEach(o=>{ if(!o.yt) return; const k=opKey(o); if(!m.has(k)) m.set(k,{show:o.show, t:o.t, kind:o.kind, yt:o.yt}); })); return [...m.values()]; }
 // built-in songs: openings of popular anime, streamed from AnimeThemes
 const AT_OK = u => typeof u==="string" && /^https:\/\/[av]\.animethemes\.moe\/[\w.\-~%]+\.(webm|ogg)$/.test(u);
+// The audio-only files are a small fraction of the size of the videos, so they start far faster.
+// Use them wherever the browser can play them; fall back to the smallest video otherwise.
+const CAN_OGG = (()=>{ try{ const a=document.createElement("audio"); return !!(a.canPlayType('audio/ogg; codecs="opus"')||a.canPlayType('audio/ogg; codecs="vorbis"')); }catch(e){ return false; } })();
+const songKey = s => s.yt ? "yt:"+s.yt : String(s.aud||s.src||"").split("/").pop().replace(/\.\w+$/,"").slice(0,80);
+const songSrcs = s => { const a=[]; if(CAN_OGG&&s.aud) a.push(s.aud); if(s.src) a.push(s.src); if(!CAN_OGG&&s.aud) a.push(s.aud); return a; };
+const timedFetch = (url, ms) => { const ac=new AbortController(), t=setTimeout(()=>ac.abort(), ms); return fetch(url,{signal:ac.signal}).finally(()=>clearTimeout(t)); };
 function themeBank(){
   const pop=popAnime().list||[]; if(!pop.length) return popAnime().error ? {error:true, list:[]} : {loading:true, list:[]};
-  return aniData("themes", async()=>{
-    const pick=shuffle(pop.filter(x=>x.mal).slice(0,150)).slice(0,30), byMal=new Map(pick.map(x=>[x.mal,x])), out=[];
-    for(let i=0;i<pick.length;i+=15){
-      const ids=pick.slice(i,i+15).map(x=>x.mal).join(",");
-      const r=await fetch("https://api.animethemes.moe/anime?filter[has]=resources&filter[site]=MyAnimeList&filter[external_id]="+ids+"&include=resources,animethemes.song,animethemes.animethemeentries.videos.audio&page[size]=30");
-      if(!r.ok) throw new Error("animethemes "+r.status); const j=await r.json();
-      (j.anime||[]).forEach(a=>{
-        const res=(a.resources||[]).find(x=>byMal.has(Number(x.external_id))), show=res ? byMal.get(Number(res.external_id)).title : clean(a.name||""); if(!show) return;
+  return aniData("themes3", async()=>{
+    const pick=shuffle(pop.filter(x=>x.mal).slice(0,150)).slice(0,45), byMal=new Map(pick.map(x=>[x.mal,x])), out=[];
+    const batches=[]; for(let i=0;i<pick.length;i+=15) batches.push(pick.slice(i,i+15));
+    // ask for every batch at the same time, and use whatever comes back
+    const res=await Promise.allSettled(batches.map(async b=>{
+      const r=await timedFetch("https://api.animethemes.moe/anime?filter[has]=resources&filter[site]=MyAnimeList&filter[external_id]="+b.map(x=>x.mal).join(",")+"&include=resources,animethemes.song,animethemes.animethemeentries.videos.audio&page[size]=30", 20000);
+      if(!r.ok) throw new Error("animethemes "+r.status); return r.json(); }));
+    res.forEach(x=>{ if(x.status!=="fulfilled") return;
+      (x.value.anime||[]).forEach(a=>{
+        const rs=(a.resources||[]).find(y=>byMal.has(Number(y.external_id))), p=rs ? byMal.get(Number(rs.external_id)) : null, show=p ? p.title : clean(a.name||""); if(!show) return;
         (a.animethemes||[]).filter(t=>t.type==="OP").slice(0,3).forEach(t=>{
           const en=(t.animethemeentries||[]).find(e=>!e.nsfw && !e.spoiler && (e.videos||[]).length); if(!en) return;
-          const vids=en.videos.filter(v=>AT_OK(v.link)).sort((x,y)=>(x.resolution||9999)-(y.resolution||9999)), v=vids.find(x=>(x.resolution||0)>=480)||vids[0]; if(!v) return;
-          out.push({show, t:clean((t.song&&t.song.title)||t.slug||"OP"), kind:t.slug||"OP", src:v.link, aud:v.audio&&AT_OK(v.audio.link)?v.audio.link:null}); }); });
-    }
+          const vids=en.videos.filter(v=>AT_OK(v.link)).sort((x,y)=>(x.size||(x.resolution||9999)*1e5)-(y.size||(y.resolution||9999)*1e5)), v=vids[0];
+          const au=(en.videos.find(v=>v.audio&&AT_OK(v.audio.link))||{}).audio, aud=au?au.link:null;
+          if(!v && !aud) return;
+          out.push({show, t:clean((t.song&&t.song.title)||t.slug||"OP"), kind:t.slug||"OP", src:v?v.link:null, aud, img:p&&p.img||null}); }); }); });
     if(out.length<4) throw new Error("not enough songs"); return out; });
 }
 let ytApi=null;
@@ -2855,28 +2909,63 @@ function loadYT(){
   });
   return ytApi;
 }
-function killMedia(){ if(go.player){ try{ go.player.destroy(); }catch(e){} go.player=null; } const v=document.getElementById("gopVid"); if(v){ try{ v.pause(); }catch(e){} v.removeAttribute("src"); v.load(); v.remove(); } const f=document.getElementById("gopFrame"); if(f) f.remove(); }
-function stopGop(){ clearTimeout(go.timer); killMedia(); go.on=false; }
-function startGop(){
-  const builtIn=ui.gopSrc==="pop", songs=builtIn ? (themeBank().list||[]) : opSongs();
-  if(builtIn && songs.length<4){ toast("Songs are still loading…"); return; }
-  if(!builtIn && songs.length<3){ toast("Need at least 3 songs with YouTube links on the OP/ED tier list."); return; }
+const dropMedia = v => { try{ v.pause(); }catch(e){} v.removeAttribute("src"); try{ v.load(); }catch(e){} v.remove(); };
+// start downloading a song before it's needed, so the next round plays right away
+function gopPreload(s){
+  if(!s || s.yt) return; const k=songKey(s); if(go.pre.has(k)) return;
+  const srcs=songSrcs(s); if(!srcs.length) return;
+  const v=document.createElement("video"); v.playsInline=true; v.setAttribute("playsinline",""); v.preload="auto"; v.src=srcs[0]; v.dataset.si="0";
+  try{ v.load(); }catch(e){}
+  go.pre.set(k, v);
+}
+function clearPreloads(keep){ go.pre.forEach((v,k)=>{ if(k!==keep){ dropMedia(v); go.pre.delete(k); } }); }
+function killMedia(){ clearTimeout(go.wd); if(go.player){ try{ go.player.destroy(); }catch(e){} go.player=null; } const v=document.getElementById("gopVid"); if(v){ go.pre.forEach((pv,k)=>{ if(pv===v) go.pre.delete(k); }); dropMedia(v); } const f=document.getElementById("gopFrame"); if(f) f.remove(); }
+function stopGop(){ clearTimeout(go.timer); killMedia(); clearPreloads(); go.on=false; go.prep=null; }
+function gopOpts(s){ return shuffle([s.show, ...shuffle(go.shows.filter(t=>norm(t)!==norm(s.show))).slice(0,3)]); }
+// picks the songs ahead of time (and starts loading the first one) while you're still on the start screen
+function gopPrepare(){
+  const builtIn=ui.gopSrc==="pop";
+  if(go.prep && go.prep.src===ui.gopSrc) return go.prep;
+  const hidden=gopHidden(), songs=(builtIn ? (themeBank().list||[]) : opSongs()).filter(s=>!hidden.has(songKey(s)));
+  if(builtIn && songs.length<4) return null;
+  if(!builtIn && songs.length<3) return null;
   const names=builtIn ? [...songs.map(s=>s.show), ...(popAnime().list||[]).slice(0,120).map(x=>x.title)] : [...songs.map(s=>s.show), ...crewPool().map(x=>x.title)];
   const shows=[...new Map(names.map(t=>[norm(t),t])).values()];
-  if(shows.length<4){ toast("Need at least 4 different shows."); return; }
-  // one song per show so the same anime doesn't come up twice
-  const seen=new Set(), picks=shuffle(songs).filter(s=>{ const k=norm(s.show); if(seen.has(k)) return false; seen.add(k); return true; }).slice(0,GOP_ROUNDS);
-  go.qs=picks.map(s=>({s, opts:shuffle([s.show, ...shuffle(shows.filter(t=>norm(t)!==norm(s.show))).slice(0,3)])}));
+  if(shows.length<4) return null;
+  // one song per show so the same anime doesn't come up twice; the rest are backups for songs that won't load
+  const seen=new Set(), uniq=shuffle(songs).filter(s=>{ const k=norm(s.show); if(seen.has(k)) return false; seen.add(k); return true; });
+  go.prep={src:ui.gopSrc, shows, picks:uniq.slice(0,GOP_ROUNDS), spare:uniq.slice(GOP_ROUNDS)};
+  if(builtIn) gopPreload(go.prep.picks[0]);
+  return go.prep;
+}
+function startGop(){
+  const builtIn=ui.gopSrc==="pop";
+  if(builtIn && (themeBank().list||[]).length<4){ toast("Songs are still loading…"); return; }
+  if(!builtIn && opSongs().length<3){ toast("Need at least 3 songs with YouTube links on the OP/ED tier list."); return; }
+  const p=gopPrepare(); if(!p){ toast("Need at least 4 different shows."); return; }
+  go.prep=null; go.shows=p.shows; go.spare=p.spare.slice();
+  go.qs=p.picks.map(s=>({s, opts:gopOpts(s)}));
   go.on=true; go.i=0; go.score=0; go.picked=null; drawGop();
+}
+// a song that won't load gets swapped for a backup, no points lost
+function gopSwap(){
+  if(!go.on || go.picked!=null) return;
+  const used=new Set(go.qs.map(q=>norm(q.s.show))), k=go.spare.findIndex(s=>!used.has(norm(s.show)));
+  if(k<0){ if(go.ui) go.ui.hint.textContent="This song won't play here. Skip it below."; return; }
+  const s=go.spare.splice(k,1)[0]; go.qs[go.i]={s, opts:gopOpts(s)};
+  toast("That song wouldn't load, so here's another"); drawGop();
 }
 function gopClock(){
   if(go.t0!=null || go.picked!=null || !go.ui) return;
+  clearTimeout(go.wd);
   go.t0=Date.now(); const tf=go.ui.tf; tf.style.transition="width "+GOP_SECS+"s linear"; requestAnimationFrame(()=>{ tf.style.width="0%"; });
   go.ui.hint.textContent="Name that anime! Faster = more points.";
   go.timer=setTimeout(()=>{ if(go.picked==null) gopPick(-1); }, GOP_SECS*1000);
+  // now that this one is playing, get the next one ready
+  const nx=go.qs[go.i+1]; if(nx) gopPreload(nx.s);
 }
 function gopPick(i){
-  if(go.picked!=null || !go.ui) return; clearTimeout(go.timer);
+  if(go.picked!=null || !go.ui) return; clearTimeout(go.timer); clearTimeout(go.wd);
   const q=go.qs[go.i], right=i>=0 && q.opts[i]===q.s.show;
   // guessing before the song even starts only earns the minimum
   const secs = go.t0==null ? GOP_SECS : (Date.now()-go.t0)/1000;
@@ -2890,7 +2979,9 @@ function gopShowResult(){
   u.song.textContent = "“"+q.s.t+"” · "+q.s.show+" "+q.s.kind;
   u.btns.forEach((b,j)=>{ b.disabled=true; if(q.opts[j]===q.s.show) b.classList.add("right"); else if(j===i) b.classList.add("wrong"); });
   u.skip.remove();
-  const r=el("div","r"); r.append(bt("btn primary", go.i+1<go.qs.length?"Next song →":"See score", ()=>{ go.i++; go.picked=null; if(go.i>=go.qs.length) endGop(); else drawGop(); })); u.card.insertBefore(r, u.quit);
+  const r=el("div","r"); r.append(bt("btn primary", go.i+1<go.qs.length?"Next song →":"See score", ()=>{ go.i++; go.picked=null; if(go.i>=go.qs.length) endGop(); else drawGop(); }));
+  u.card.insertBefore(r, u.quit);
+  if(isAdmin()){ const key=songKey(q.s); const h=bt("link","🚫 Hide this song for everyone (admin)",async()=>{ h.disabled=true; if(await adminHideSong(key, q.s)) h.textContent="Hidden. It won't come up again."; else h.disabled=false; }); h.style.cssText="display:block;margin:8px auto 0;font-size:12px"; u.card.insertBefore(h, u.quit); }
 }
 function drawGop(){
   clearTimeout(go.timer); go.t0=null; killMedia();
@@ -2900,18 +2991,31 @@ function drawGop(){
   const stage=el("div","opstage"), song=el("div","opsong",""), tbar=el("div","gtime"), tf=el("i"); tbar.append(tf);
   const hint=el("div","ghint", q.s.yt ? "▶ Tap the blurry video to start the song" : "Loading the song…");
   const round=go.i;
+  // anything still preloading for an earlier round is just using up bandwidth
+  clearPreloads(songKey(q.s)); const nx=go.qs[go.i+1];
   if(q.s.yt){
     const fr=el("iframe"); fr.id="gopFrame"; fr.title="Mystery song"; fr.allow="autoplay; encrypted-media";
     fr.src="https://www.youtube.com/embed/"+q.s.yt+"?autoplay=1&playsinline=1&rel=0&controls=0&disablekb=1&fs=0&iv_load_policy=3&enablejsapi=1&origin="+encodeURIComponent(location.origin);
     stage.append(fr);
   } else {
-    const v=el("video"); v.id="gopVid"; v.playsInline=true; v.setAttribute("playsinline",""); v.preload="auto"; v.src=q.s.src; let triedAudio=false;
-    v.addEventListener("playing",()=>{ if(go.i===round) gopClock(); });
-    v.addEventListener("error",()=>{ if(go.i!==round) return; if(q.s.aud && !triedAudio){ triedAudio=true; v.src=q.s.aud; v.play().catch(()=>{}); return; } if(go.picked==null) hint.textContent="This song won't play here. Skip it below."; });
+    const srcs=songSrcs(q.s), k=songKey(q.s);
+    let v=go.pre.get(k); go.pre.delete(k);
+    if(!v){ v=document.createElement("video"); v.playsInline=true; v.setAttribute("playsinline",""); v.preload="auto"; v.src=srcs[0]; v.dataset.si="0"; }
+    v.id="gopVid"; let si=Number(v.dataset.si)||0, blocked=false;
+    const isAud = () => /\.ogg$/.test(srcs[si]||""); stage.classList.toggle("aud", isAud());
+    if(q.s.img){ const im=new Image(); im.className="opcover"; im.alt=""; im.referrerPolicy="no-referrer"; im.src=q.s.img; stage.append(im); }
+    const eq=el("div","eq"); for(let n=0;n<5;n++) eq.append(el("i")); stage.append(eq);
+    const tryPlay=()=>v.play().then(()=>{ blocked=false; }).catch(err=>{ if(go.i!==round || go.t0!=null || go.picked!=null) return; if(err && err.name==="NotAllowedError"){ blocked=true; clearTimeout(go.wd); hint.textContent="▶ Tap here to start the song"; } });
+    // if a source doesn't start in time, try the other format, then swap in a backup song
+    const next=()=>{ if(go.i!==round || go.t0!=null || go.picked!=null) return; si++; if(si<srcs.length){ v.src=srcs[si]; stage.classList.toggle("aud", isAud()); hint.textContent="Still loading… trying another copy"; tryPlay(); arm(); } else gopSwap(); };
+    const arm=()=>{ clearTimeout(go.wd); go.wd=setTimeout(()=>{ if(!blocked) next(); }, GOP_WAIT); };
+    v.addEventListener("playing",()=>{ if(go.i!==round) return; stage.classList.add("playing"); gopClock(); });
+    v.addEventListener("pause",()=>stage.classList.remove("playing"));
+    v.addEventListener("error",()=>{ if(go.i===round) next(); });
+    stage.addEventListener("click",()=>{ if(v.paused && go.picked==null){ blocked=false; tryPlay(); if(go.t0==null) arm(); } });
     stage.append(v);
-    const tryPlay=()=>v.play().catch(()=>{ if(go.i===round && go.t0==null && go.picked==null) hint.textContent="▶ Tap the video to start the song"; });
-    stage.addEventListener("click",()=>{ if(v.paused) tryPlay(); });
-    tryPlay(); // called straight from the button tap, so phones allow sound
+    tryPlay(); arm(); // called straight from the button tap, so phones allow sound
+    if(v.error) next();
   }
   c.append(stage, song, tbar, hint);
   const g=el("div","gopts"), btns=q.opts.map((o,i)=>{ const b=bt("gopt",o,()=>gopPick(i)); g.append(b); return b; }); c.append(g);
@@ -2923,16 +3027,18 @@ function drawGop(){
   if(q.s.yt) loadYT().then(YT=>{ if(!go.on||go.i!==round||!document.getElementById("gopFrame")) return;
       go.player=new YT.Player("gopFrame",{events:{onStateChange:e=>{ if(e.data===1 && go.i===round) gopClock(); }}}); })
     .catch(()=>{ if(go.on && go.i===round) gopClock(); });
+  else if(nx && !nx.s.yt) setTimeout(()=>{ if(go.on && go.i===round) gopPreload(nx.s); }, 4000); // in case "playing" is slow to fire
 }
 function endGop(){ const sc=go.score; stopGop(); const nb=saveBest("gop",sc); toast(nb ? "🎉 New personal best: "+sc : "You scored "+sc); renderPlay(true); }
 PLAY.gop = box => {
   if(go.on){ drawGop(); return; }
-  const c=card(head("Guess the OP"), el("p","hint","Up to "+GOP_ROUNDS+" anime openings with the video blurred, so you go by ear. Name the anime fast for up to 1,000 points a song. Turn your sound on!"));
-  const seg=el("div","seg"); [["pop","🎲 Popular anime"],["crew","👥 Crew's songs"]].forEach(([k,l])=>seg.append(bt(ui.gopSrc===k?"on":"",l,()=>{ ui.gopSrc=k; if(window.CrewLook) CrewLook.put("gopSrc",k); renderPlay(true); }))); c.append(seg);
+  const c=card(head("Guess the OP"), el("p","hint","Up to "+GOP_ROUNDS+" anime openings, and you go by ear. Name the anime fast for up to 1,000 points a song. Turn your sound on!"));
+  const seg=el("div","seg"); [["pop","🎲 Popular anime"],["crew","👥 Crew's songs"]].forEach(([k,l])=>seg.append(bt(ui.gopSrc===k?"on":"",l,()=>{ ui.gopSrc=k; if(window.CrewLook) CrewLook.put("gopSrc",k); go.prep=null; clearPreloads(); renderPlay(true); }))); c.append(seg);
   const r=el("div","r"); r.append(bt("btn primary","▶ Play", startGop));
   if(ui.gopSrc==="pop"){
     const tb=themeBank();
-    if(tb.error) r.append(bt("btn","Try again",()=>{ delete aniCache.themes; delete aniCache.pop2; try{ localStorage.removeItem("crew.ani.themes"); }catch(e){} renderPlay(true); }));
+    if(tb.list.length>=4) gopPrepare();
+    if(tb.error) r.append(bt("btn","Try again",()=>{ delete aniCache.themes3; delete aniCache.pop2; try{ localStorage.removeItem("crew.ani.themes3"); }catch(e){} renderPlay(true); }));
     c.append(r, el("p","hint", tb.loading ? "Loading openings from popular anime…" : tb.error ? "Couldn't load songs right now. Try again, or switch to the crew's songs." : tb.list.length+" openings from popular anime ready. A fresh batch loads each day."));
   } else {
     const n=opSongs().length;
@@ -4203,10 +4309,196 @@ $("#signIn").addEventListener("click", async ()=>{
 $("#signOut").addEventListener("click", ()=>{ if((unsaved||writing) && !confirm("Some of your changes haven't saved yet. Sign out anyway? (They'll come back next time you sign in on this device.)")) return; signOut(auth); });
 getRedirectResult(auth).catch(()=>{});
 
+// ---- 🛠 admin ----
+// Crew settings live in one shared doc, config/crew: who the admins are, who's been removed, the announcement,
+// and songs hidden from Guess the OP. The Firestore rules only let admins change it (or anyone create it once, to claim admin).
+const CFG = () => doc(db,"config","crew");
+function crewCfg(){
+  const c=state.cfg||{}, A=v=>Array.isArray(v)?v.filter(x=>typeof x==="string"):[];
+  const an=c.announce&&typeof c.announce.text==="string"&&c.announce.text.trim()?{text:c.announce.text.slice(0,300), at:typeof c.announce.at==="string"?c.announce.at:""}:null;
+  return {admins:A(c.admins), banned:A(c.banned), bannedNames:c.bannedNames&&typeof c.bannedNames==="object"?c.bannedNames:{}, gopHide:A(c.gopHide), announce:an};
+}
+const isAdmin = () => !!state.me && crewCfg().admins.includes(state.me.uid);
+const isBannedId = id => crewCfg().banned.includes(id);
+const amBanned = () => !!state.me && isBannedId(state.me.uid);
+const gopHidden = () => new Set(crewCfg().gopHide);
+const adminErr = e => toast(e&&e.code==="permission-denied" ? "The database said no. Make sure the new Firestore rules are published." : "Couldn't save that ("+((e&&e.code)||"error")+").");
+let lastBanned="";
+function applyCfg(){
+  if(!state.me) return;
+  const c=crewCfg();
+  $("#adminLink").classList.toggle("hidden", !isAdmin());
+  // announcement
+  let gone=""; try{ gone=localStorage.getItem("crew.annX")||""; }catch(e){}
+  const showAnn = c.announce && !amBanned() && gone!==c.announce.at;
+  $("#annBar").classList.toggle("hidden", !showAnn); if(showAnn) $("#annText").textContent="📣 "+c.announce.text;
+  // removed members disappear for everyone
+  const key=c.banned.join(",");
+  if(key!==lastBanned){ lastBanned=key; c.banned.forEach(id=>{ if(id!==state.me.uid) delete state.docs[id]; }); if(state.loaded) render(); }
+  if(amBanned()){ $("#app").classList.add("hidden"); setStatus("An admin removed you from this Crew. Ask them if you think that's a mistake.", true); }
+  if(!$("#acctSheet").classList.contains("hidden")) syncAcctAdmin();
+  if(!$("#adminSheet").classList.contains("hidden")) renderAdmin();
+}
+$("#annX").addEventListener("click",()=>{ const a=crewCfg().announce; $("#annBar").classList.add("hidden"); if(a) try{ localStorage.setItem("crew.annX",a.at); }catch(e){} });
+
+// claiming admin: only works while nobody is admin yet (the config doc doesn't exist)
+function syncAcctAdmin(){
+  const box=$("#acctAdmin"), txt=$("#acctAdminTxt"), go2=$("#acctAdminGo"); $("#acctAdminErr").textContent="";
+  if(isAdmin()){ box.classList.remove("hidden"); txt.textContent="You're an admin of this Crew."; go2.textContent="Open the admin panel"; go2.onclick=()=>{ $("#acctSheet").classList.add("hidden"); openAdmin(); }; return; }
+  if(state.cfgReady && !state.cfg){ box.classList.remove("hidden"); txt.textContent="Nobody runs this Crew yet. Whoever taps this first becomes the admin and can manage members, posts and games."; go2.textContent="Become the Crew admin";
+    go2.onclick=async()=>{ if(!confirm("Become the admin of this Crew?")) return; go2.disabled=true;
+      try{ await setDoc(CFG(), {admins:[state.me.uid], banned:[], bannedNames:{}, gopHide:[], announce:null, at:nowIso()}); toast("You're the admin now 🛠"); $("#acctSheet").classList.add("hidden"); openAdmin(); }
+      catch(e){ $("#acctAdminErr").textContent = e&&e.code==="permission-denied" ? "The database blocked it. Publish the new Firestore rules first (or someone already claimed admin)." : "Couldn't do that ("+((e&&e.code)||"error")+")."; }
+      finally{ go2.disabled=false; } };
+    return; }
+  box.classList.add("hidden");
+}
+$("#acctBtn").addEventListener("click",syncAcctAdmin);
+
+// ---- the panel ----
+let adminTab="members", adminPostType="all", adminPostN=40;
+function openAdmin(){ if(!isAdmin()) return; renderAdmin(); $("#adminSheet").classList.remove("hidden"); }
+$("#adminBtn").addEventListener("click",openAdmin);
+$("#adminClose").addEventListener("click",()=>$("#adminSheet").classList.add("hidden"));
+$("#adminSheet").addEventListener("click",e=>{ if(e.target===$("#adminSheet")) $("#adminSheet").classList.add("hidden"); });
+document.querySelectorAll("#adminSeg button").forEach(b=>b.addEventListener("click",()=>{ adminTab=b.dataset.at; renderAdmin(); }));
+function renderAdmin(){
+  const body=$("#adminBody");
+  if(!isAdmin()){ $("#adminSheet").classList.add("hidden"); return; }
+  // don't wipe something the admin is typing
+  const a=document.activeElement; if(a && body.contains(a) && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) return;
+  document.querySelectorAll("#adminSeg button").forEach(b=>b.classList.toggle("on", b.dataset.at===adminTab));
+  body.replaceChildren(); ({members:adminMembers, posts:adminPosts, announce:adminAnnounce, games:adminGames})[adminTab](body);
+}
+const abtn = (txt, fn, cls) => { const b=bt("btn"+(cls?" "+cls:""), txt, async()=>{ b.disabled=true; try{ await fn(); }catch(e){ console.error(e); adminErr(e); } finally{ b.disabled=false; } }); return b; };
+const docName = id => id===state.me.uid ? displayNameOf(state.me) : ((state.docs[id]||{}).name || crewCfg().bannedNames[id] || "Someone");
+
+function adminMembers(body){
+  const c=crewCfg(), ids=Object.keys(state.docs).filter(id=>!isBannedId(id)||id===state.me.uid);
+  const sum=k=>ids.reduce((n,id)=>n+((state.docs[id]||{})[k]||[]).length,0);
+  const st=el("div","stats"); [[ids.length,"members"],[sum("watched")+sum("mread"),"titles logged"],[sum("reviews")+sum("takes")+sum("replies"),"posts"]].forEach(([n,l])=>{ const d=el("div"); d.append(el("b","",String(n)), el("span","",l)); st.append(d); }); body.append(st);
+  body.append(el("h4","","Members"));
+  const list=el("div");
+  ids.sort((x,y)=>(state.upd[y]||"").localeCompare(state.upd[x]||"")).forEach(id=>{
+    const d=state.docs[id], me=id===state.me.uid, adm=c.admins.includes(id);
+    const r=el("div","arow"), g=el("div","grow"), nm=el("div","nm",docName(id));
+    if(me) nm.append(el("span","tag","You")); if(adm) nm.append(el("span","tag","Admin"));
+    g.append(nm, el("div","meta",(state.upd[id]?"Active "+ago(state.upd[id])+" · ":"")+d.top.length+" top 10 · "+(d.watched.length+d.mread.length)+" finished · "+d.reviews.length+" reviews · "+d.takes.length+" takes"));
+    const bs=el("div","abtns");
+    if(!me){
+      bs.append(adm ? abtn("Remove admin", async()=>{ await updateDoc(CFG(),{admins:arrayRemove(id)}); toast(docName(id)+" isn't an admin anymore"); })
+                    : abtn("Make admin", async()=>{ if(!confirm("Make "+docName(id)+" an admin? They'll be able to do everything you can here, including removing you as admin.")) return; await updateDoc(CFG(),{admins:arrayUnion(id)}); toast(docName(id)+" is an admin now"); }));
+      if(!adm) bs.append(abtn("Remove from Crew", async()=>{
+        if(!confirm("Remove "+docName(id)+" from the Crew?\n\nTheir lists, posts and votes get deleted and they can't use Crew anymore. You can let them back in later, but their stuff won't come back.")) return;
+        const n=docName(id);
+        await updateDoc(CFG(),{banned:arrayUnion(id), ["bannedNames."+id]:n.slice(0,60)});
+        await deleteDoc(doc(db,"lists",id)); toast(n+" was removed"); }, "danger"));
+    }
+    g.append(bs); r.append(avatarEl(id,true), g); list.append(r);
+  });
+  body.append(list);
+  if(c.banned.length){
+    body.append(el("h4","","Removed"));
+    const bl=el("div");
+    c.banned.forEach(id=>{ const r=el("div","arow"), g=el("div","grow"); g.append(el("div","nm",c.bannedNames[id]||"Someone"));
+      const bs=el("div","abtns"); bs.append(abtn("Let back in", async()=>{ await updateDoc(CFG(),{banned:arrayRemove(id), ["bannedNames."+id]:deleteField()}); toast("They can use Crew again (they'll start with empty lists)"); })); g.append(bs); r.append(g); bl.append(r); });
+    body.append(bl);
+  }
+  body.append(el("p","hint","Removing someone deletes their data and blocks them from saving. Their login still exists, so to stop them from signing in at all, delete their account in Firebase → Authentication."));
+}
+
+// every post anyone has made, newest first, so an admin can delete anything
+const POST_TYPES=[["all","All"],["takes","Hot takes"],["reviews","Reviews"],["replies","Replies"],["polls","Polls & predictions"],["other","Everything else"]];
+function allPosts(){
+  const out=[];
+  Object.entries(state.docs).forEach(([id,d])=>{
+    const add=(type, label, text, at, field, match)=>out.push({id, type, label, text, at:at||"", field, match});
+    d.takes.forEach(t=>add("takes","Hot take",t.text,t.at,"takes",x=>x.id===t.id));
+    d.reviews.forEach(v=>add("reviews","Review · "+v.title+(v.score?" · "+v.score+"/10":""),v.text,v.at,"reviews",x=>x.k===v.k&&x.at===v.at));
+    d.replies.forEach(v=>add("replies","Reply",v.text,v.at,"replies",x=>x.id===v.id));
+    d.polls.forEach(p=>add("polls","Poll",p.q+"\n• "+p.opts.map(o=>o.t).join("\n• "),p.at,"polls",x=>x.id===p.id));
+    d.preds.forEach(p=>add("polls","Prediction",p.q+"\n• "+p.opts.map(o=>o.t).join("\n• "),p.at,"preds",x=>x.id===p.id));
+    d.mups.filter(m=>!m.auto).forEach(m=>add("other","Matchup",m.a+" vs "+m.b,m.at,"mups",x=>x.id===m.id));
+    d.brk.forEach(b=>add("other","Bracket",b.name,b.at,"brk",x=>x.id===b.id));
+    d.ops.forEach(o=>add("other","OP/ED tier entry","“"+o.t+"” · "+o.show+" "+o.kind,o.at,"ops",x=>x.id===o.id));
+    d.recs.forEach(r=>add("other","Rec for "+nameOf(r.to),r.title+(r.note?" · "+r.note:""),r.at,"recs",x=>x.id===r.id));
+    (d.gx.emo||[]).forEach(e=>add("other","Emoji plot",e.e+"  (answer: "+e.a+")",e.at,"gx.emo",x=>x.id===e.id));
+    d.custom.forEach(l=>add("other","Custom list",l.name+" · "+l.items.length+" items","","custom",x=>x.id===l.id));
+  });
+  return out.sort((a,b)=>b.at.localeCompare(a.at));
+}
+async function adminRemove(p){
+  const d=state.docs[p.id]; if(!d) return;
+  const cur = p.field==="gx.emo" ? (d.gx.emo||[]) : (d[p.field]||[]), next=cur.filter(x=>!p.match(x));
+  if(p.id===state.me.uid){ mutate(m=>{ if(p.field==="gx.emo") m.gx.emo=next; else m[p.field]=next; }); return; }
+  await updateDoc(doc(db,"lists",p.id), {[p.field]:next});
+}
+function adminPosts(body){
+  const sel=el("select"); POST_TYPES.forEach(([k,l])=>sel.append(new Option(l,k))); sel.value=adminPostType;
+  sel.addEventListener("change",()=>{ adminPostType=sel.value; adminPostN=40; sel.blur(); renderAdmin(); }); body.append(sel);
+  const posts=allPosts().filter(p=>adminPostType==="all"||p.type===adminPostType);
+  if(!posts.length){ body.append(el("p","hint","Nothing here.")); return; }
+  const list=el("div");
+  posts.slice(0,adminPostN).forEach(p=>{
+    const r=el("div","arow"), g=el("div","grow");
+    g.append(el("div","nm",docName(p.id)), el("div","meta",p.label+(p.at?" · "+ago(p.at):"")), el("div","txt",p.text));
+    const bs=el("div","abtns"); bs.append(abtn("Delete", async()=>{ if(!confirm("Delete this "+p.label.split(" · ")[0].toLowerCase()+" by "+docName(p.id)+"?")) return; await adminRemove(p); toast("Deleted"); }, "danger"));
+    g.append(bs); r.append(avatarEl(p.id,true), g); list.append(r);
+  });
+  body.append(list);
+  if(posts.length>adminPostN){ const r=el("div","r"); r.append(bt("btn","Show more ("+(posts.length-adminPostN)+" left)",()=>{ adminPostN+=40; renderAdmin(); })); body.append(r); }
+}
+
+function adminAnnounce(body){
+  const a=crewCfg().announce;
+  body.append(el("p","hint","Post a message at the top of Crew for everyone. People can dismiss it, and a new message shows up again for everyone."));
+  if(a){ const r=el("div","arow"), g=el("div","grow"); g.append(el("div","meta","Showing now · "+ago(a.at)), el("div","txt",a.text)); r.append(g); body.append(r); }
+  const ta=el("textarea"); ta.maxLength=300; ta.placeholder="e.g. Movie night Friday at 8. Vote in the poll!"; ta.id="adminAnn"; if(formVals.adminAnn) ta.value=formVals.adminAnn;
+  ta.addEventListener("input",()=>{ formVals.adminAnn=ta.value; }); body.append(ta);
+  const r=el("div","r");
+  r.append(abtn("📣 Post to everyone", async()=>{ const t=ta.value.replace(/\s+/g," ").trim(); if(!t){ toast("Write something first"); return; }
+    await updateDoc(CFG(),{announce:{text:t.slice(0,300), at:nowIso(), by:state.me.uid}}); delete formVals.adminAnn; ta.value=""; toast("Posted"); }, "primary"));
+  if(a) r.append(abtn("Take it down", async()=>{ await updateDoc(CFG(),{announce:null}); toast("Announcement removed"); }));
+  body.append(r);
+}
+
+const BEST_GAMES=[["guess","❓ Guess"],["gop","🎧 Guess the OP"],["who","🕵️ Who ranked it"],["hls","📈 Higher/Lower (score)"],["hlp","📈 Higher/Lower (fans)"]];
+async function adminHideSong(key, s){
+  if(!isAdmin()) return false;
+  try{ await updateDoc(CFG(),{gopHide:arrayUnion(key)}); try{ localStorage.setItem("crew.gopName."+key, (s.show+" · "+s.t).slice(0,120)); }catch(e){} toast("Hidden from Guess the OP"); return true; }
+  catch(e){ adminErr(e); return false; }
+}
+function adminGames(body){
+  body.append(el("h4","","Guess the OP"));
+  const hid=crewCfg().gopHide;
+  body.append(el("p","hint", hid.length ? hid.length+" song"+(hid.length===1?"":"s")+" hidden. While playing, admins get a “Hide this song” button after each answer." : "No songs hidden. While playing, admins get a “Hide this song” button after each answer, for songs that won't play or don't fit."));
+  hid.forEach(k=>{ let nm=""; try{ nm=localStorage.getItem("crew.gopName."+k)||""; }catch(e){}
+    const r=el("div","arow"), g=el("div","grow"); g.append(el("div","nm",nm||k.replace(/^yt:/,"YouTube ")));
+    const bs=el("div","abtns"); bs.append(abtn("Unhide", async()=>{ await updateDoc(CFG(),{gopHide:arrayRemove(k)}); toast("It's back in the mix"); })); g.append(bs); r.append(g); body.append(r); });
+  const rr=el("div","r"); rr.append(bt("btn","🔄 Load a fresh batch of songs",()=>{ stopGop(); delete aniCache.themes3; try{ localStorage.removeItem("crew.ani.themes3"); }catch(e){} themeBank(); toast("Loading new songs…"); })); body.append(rr);
+
+  body.append(el("h4","","Reset high scores"));
+  body.append(el("p","hint","Wipes everyone's best score for one game, for a fresh season."));
+  const sel=el("select"); BEST_GAMES.forEach(([k,l])=>sel.append(new Option(l,k))); body.append(sel);
+  const r=el("div","r"); r.append(abtn("Reset this leaderboard", async()=>{
+    const k=sel.value, label=BEST_GAMES.find(g=>g[0]===k)[1];
+    const ids=Object.entries(state.docs).filter(([,d])=>k==="guess" ? d.gbest : (d.gx.best||{})[k]).map(([id])=>id);
+    if(!ids.length){ toast("No scores to reset"); return; }
+    if(!confirm("Reset everyone's "+label+" high score? This can't be undone.")) return;
+    for(const id of ids){
+      if(id===state.me.uid) mutate(m=>{ if(k==="guess") m.gbest=null; else { const b={...m.gx.best}; delete b[k]; m.gx.best=b; } });
+      else await updateDoc(doc(db,"lists",id), k==="guess" ? {gbest:null} : {["gx.best."+k]:deleteField()});
+    }
+    toast(label+" leaderboard reset"); }, "danger"));
+  body.append(r);
+}
+
 let recChecked=false;
 onAuthStateChanged(auth, user=>{
   window.__authSeen=true; recChecked=false; hasRecovery=null; $("#recBar").classList.add("hidden");
   if(state.unsub){ state.unsub(); state.unsub=null; }
+  if(state.cfgUnsub){ state.cfgUnsub(); state.cfgUnsub=null; }
+  state.cfg=null; state.cfgReady=false; lastBanned=""; $("#adminLink").classList.add("hidden"); $("#annBar").classList.add("hidden"); $("#adminSheet").classList.add("hidden");
   state.me = user; state.docs = {}; state.loaded=false; Object.keys(disc).forEach(k=>delete disc[k]); unsaved=false; dirty=false; clearTimeout(retryT);
   if(!user){
     $("#app").classList.add("hidden"); $("#me").classList.add("hidden"); $("#signinView").classList.remove("hidden"); $(".sub").classList.remove("hidden"); document.body.classList.remove("authed"); setStatus(null); return;
@@ -4217,10 +4509,13 @@ onAuthStateChanged(auth, user=>{
   setStatus("Loading lists…");
   render();
   const timer=setTimeout(()=>{ if(!state.loaded) setStatus("Can't reach the database yet. Check your connection.", true); },10000);
+  state.cfgUnsub = onSnapshot(CFG(), s=>{ state.cfg=s.exists()?s.data():null; state.cfgReady=!s.metadata.fromCache; applyCfg(); },
+    err=>{ console.warn("crew config", err&&err.code); state.cfg=null; state.cfgReady=false; applyCfg(); });
   state.unsub = onSnapshot(collection(db,"lists"), snap=>{
-    const next={};
+    const next={}, upd={};
     let serverAt="";
-    snap.forEach(d=>{ const raw=d.data(); next[d.id]=sanitize(raw); if(d.id===user.uid) serverAt=typeof raw.updatedAt==="string"?raw.updatedAt:""; });
+    snap.forEach(d=>{ if(d.id!==user.uid && isBannedId(d.id)) return; const raw=d.data(); next[d.id]=sanitize(raw); upd[d.id]=typeof raw.updatedAt==="string"?raw.updatedAt:""; if(d.id===user.uid) serverAt=upd[d.id]; });
+    state.upd=upd;
     let needDoc = !snap.metadata.fromCache && !next[user.uid] && !writing;
     if((writing||dirty||unsaved) && state.docs[user.uid]) next[user.uid]=state.docs[user.uid];
     else if(!state.loaded && !snap.metadata.fromCache){
@@ -4228,7 +4523,7 @@ onAuthStateChanged(auth, user=>{
       if(b && b.at>serverAt){ next[user.uid]=sanitize(b.d); needDoc=true; toast("Restored changes that hadn't saved yet"); }
       else if(b) clearBackup();
     }
-    state.docs=next; state.loaded=true; clearTimeout(timer); if(!unsaved) setStatus(null); $("#app").classList.remove("hidden"); render(); renderMe(); if(needDoc) save(); afterLoad(); if(!recChecked){ recChecked=true; checkRecovery(); }
+    state.docs=next; state.loaded=true; clearTimeout(timer); if(!unsaved) setStatus(null); $("#app").classList.remove("hidden"); render(); renderMe(); if(needDoc) save(); afterLoad(); applyCfg(); if(!recChecked){ recChecked=true; checkRecovery(); }
   }, err=>{
     clearTimeout(timer); console.error(err);
     setStatus(err && err.code==="permission-denied" ? "The database is blocking reads. Double-check the Firestore rules." : "Couldn't load the lists. Try refreshing.", true);
