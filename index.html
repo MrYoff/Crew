@@ -612,6 +612,112 @@
   nav.tabs#bottomNav .ni{font-size:20px;line-height:1.1}
   nav.tabs#bottomNav .nbadge{position:absolute;top:2px;left:calc(50% + 6px);margin:0}
   .modeseg{margin-bottom:10px}
+
+  /* ================= mobile redesign ================= */
+  .mob-more{display:none}
+  #recBar{display:none!important}
+  #crewView > #annBar{margin-bottom:12px}
+  .allbtn{display:none!important}
+  .mlist{display:flex;flex-direction:column;margin-top:6px}
+  .mlist button{display:flex;align-items:center;gap:14px;width:100%;padding:14px 4px;border:0;border-top:1px solid var(--line);background:none;color:var(--text);font:700 15px "Zen Kaku Gothic New",system-ui,sans-serif;text-align:left;cursor:pointer}
+  .mlist button:first-child{border-top:0}
+  .mlist button .mi{width:26px;text-align:center;font-size:18px;flex:none}
+  .mlist button:disabled{opacity:.4;cursor:default}
+  .mlist button.danger{color:var(--accent)}
+  .mhead{display:flex;align-items:center;gap:12px;margin-bottom:4px}
+  .mhead .t{font-weight:700;font-size:17px;flex:1;min-width:0;overflow-wrap:anywhere;line-height:1.25}
+  .mhead .t small{display:block;color:var(--muted);font-size:12px;font-weight:500}
+  .pickgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+  .pickgrid button{display:flex;flex-direction:column;align-items:center;gap:4px;border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:14px;padding:12px 4px;font:700 12px "Zen Kaku Gothic New",system-ui,sans-serif;cursor:pointer;text-align:center;line-height:1.2}
+  .pickgrid button .pe{font-size:24px;line-height:1}
+  .pickgrid button.on{border-color:var(--accent);background:color-mix(in srgb, var(--accent) 16%, var(--panel2))}
+
+  @media all{
+    .wrap{padding:10px 12px 80px}
+    /* compact header: wordmark + avatar (tap avatar for the menu) */
+    body.authed .top-row{margin-bottom:10px;align-items:center}
+    body.authed .kana{display:none}
+    body.authed h1{font-size:28px}
+    body.authed #me > div, body.authed #gearBtn{display:none}
+    body.authed .avbtn::after{display:none}
+    body.authed #meAv .av{width:36px;height:36px;box-shadow:0 0 0 2px var(--line)}
+    .sub{font-size:13px;margin:4px 0 12px}
+
+    /* banners: smaller, and never more than two at once */
+    .notice{padding:8px 10px;font-size:13px;margin-bottom:8px;border-radius:12px}
+    .installbar{gap:8px}
+    .installbar .btn{padding:6px 10px;font-size:12px;border-radius:10px}
+
+    /* mode switch + sub tabs */
+    .modeseg{margin:0 0 8px;padding:3px;max-width:none}
+    .modeseg button{padding:7px 2px;font-size:12.5px}
+    .subtabs{padding:2px 2px 8px;margin:0 -12px 4px;padding-left:12px;padding-right:12px;scroll-padding-left:56px}
+    .subtabs button{padding:7px 11px;font-size:12.5px}
+    .subtabs .allbtn{display:inline-flex!important;align-items:center;gap:4px;position:sticky;left:0;z-index:2;background:var(--panel2);color:var(--text);box-shadow:8px 0 10px -2px var(--bg)}
+
+    /* search + filters */
+    .search{margin-bottom:10px}
+    .search input{padding:11px 12px 11px 40px;border-radius:12px}
+    .search .mag{top:21px;left:13px}
+    .filters{gap:6px;margin:-2px 0 10px}
+    .filters select{padding:8px;font-size:13px;border-radius:10px}
+    .layseg button{width:34px}
+
+    /* drop the box-around-everything look (keep panels if a background picture is set, for readability) */
+    body:not(.hasbg) section.card{background:transparent;border:0;border-radius:0;padding:2px 0 0;margin-bottom:22px}
+    body.hasbg section.card{padding:12px;margin-bottom:12px}
+    .card h2{font-size:18px;margin-bottom:6px;flex-wrap:wrap;row-gap:6px}
+    .card h2 .count{font-size:12px}
+    .sharebtn{padding:5px 9px;font-size:11.5px}
+    /* hints shrink to one line; tap to read the rest */
+    .card .hint{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;font-size:12.5px;margin-bottom:10px;cursor:pointer}
+    .card .hint.open{display:block}
+
+    /* list rows */
+    ol.top{gap:6px}
+    ol.top li{padding:6px 6px 6px 0;gap:9px;border-radius:12px}
+    .rank{width:30px;font-size:19px}
+    .poster{width:40px;border-radius:6px}
+    .poster.big{width:46px;border-radius:8px}
+    .poster.big .gen b{font-size:16px}
+    .poster .gen i{display:none}
+    .title{font-size:14.5px;line-height:1.25}
+    .title small{font-size:11.5px;margin-top:1px}
+    ol.top .gtags, ul.list:not(.grid) .gtags{display:none}
+    .revlink{font-size:11.5px;margin-top:3px}
+    .whoavs .av.sm{width:18px;height:18px;font-size:9px}
+    .ic{width:34px;height:34px;border-radius:10px}
+    .actions{gap:5px;align-items:center}
+    ol.top .actions.enh{display:grid;grid-template-columns:auto auto;gap:4px 5px}
+    ol.top .actions.enh .ic:not(.mob-more){width:30px;height:28px;font-size:13px;border-radius:8px}
+    ol.top .actions.enh .mob-more{grid-row:1/3;grid-column:2;height:100%}
+    ul.list li{padding:9px 0;gap:10px}
+    select.score{padding:6px 2px;font-size:13px;border-radius:9px}
+    .mob-hide{display:none!important}
+    .title .tag{font-size:9.5px;padding:0 5px;vertical-align:2px}
+    .mob-more{display:grid;font-size:18px;letter-spacing:1px;line-height:1}
+    .prog .track{max-width:90px}
+
+    /* feed */
+    .act{padding:9px 0;font-size:13.5px;gap:9px}
+    .act .reacts{margin-top:4px}
+    .act .when{font-size:11px}
+
+    /* season grid */
+    .sgrid{gap:10px}
+    .scard .body{padding:7px 8px 9px}
+
+    /* bottom nav docked to the edge like a native app */
+    nav.tabs#bottomNav{left:0;right:0;transform:none;width:100%;bottom:0;border-radius:0;border-width:1px 0 0;padding:4px 6px calc(4px + env(safe-area-inset-bottom));box-shadow:none;background:color-mix(in srgb, var(--panel) 94%, transparent)}
+    nav.tabs#bottomNav button{padding:5px 2px 4px;font-size:10.5px;border-radius:12px;gap:2px}
+    nav.tabs#bottomNav button.on{background:transparent;color:var(--accent)}
+    nav.tabs#bottomNav .ni{font-size:19px;padding:2px 16px;border-radius:999px;transition:background .15s}
+    nav.tabs#bottomNav button.on .ni{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+    nav.tabs#bottomNav .nbadge{top:0;left:calc(50% + 8px)}
+    body.authed .wrap{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+    .toast{bottom:calc(80px + env(safe-area-inset-bottom))}
+    .credit{margin-top:8px}
+  }
 </style>
 </head>
 <body>
@@ -676,7 +782,7 @@
   <div id="installBar" class="notice installbar hidden"><span class="grow">📲 Add Crew to your home screen so it opens like an app.</span><button class="btn primary" id="installGo" type="button">How</button><button class="btn" id="installX" type="button" aria-label="Dismiss">✕</button></div>
 
   <div id="annBar" class="notice installbar hidden"><span class="grow" id="annText"></span><button class="btn" id="annX" type="button" aria-label="Dismiss">✕</button></div>
-  <div id="recBar" class="notice installbar hidden"><span class="grow">🔑 Set up a recovery code so you can get back in if you ever forget your password.</span><button class="btn primary" id="recGo" type="button">Set up</button><button class="btn" id="recX" type="button" aria-label="Dismiss">✕</button></div>
+  <div id="recBar" class="notice installbar hidden"><span class="grow">🔑 Set up a recovery code in case you forget your password.</span><button class="btn primary" id="recGo" type="button">Set up</button><button class="btn" id="recX" type="button" aria-label="Dismiss">✕</button></div>
   <div id="signinView" class="signin hidden">
     <form class="authbox" id="authForm" novalidate>
       <div class="seg"><button type="button" data-mode="signup" class="on">Create account</button><button type="button" data-mode="signin">Sign in</button></div>
@@ -4530,6 +4636,135 @@ onAuthStateChanged(auth, user=>{
   });
 });
 // Don't show the sign-in form until Firebase has told us whether you're signed in (prevents the flash on refresh).
+</script>
+<div class="sheet-bg hidden" id="mobSheet" role="dialog" aria-modal="true">
+  <div class="sheet"><div id="mobBody"></div></div>
+</div>
+<script>
+// ---- mobile layout helpers: profile menu, "⋯" row menus, all-games picker ----
+(function(){
+  const q = s => document.querySelector(s);
+  const small = () => true;
+  const sheet = q("#mobSheet"), body = q("#mobBody");
+  const close = () => { sheet.classList.add("hidden"); body.replaceChildren(); };
+  sheet.addEventListener("click", e => { if(e.target === sheet) close(); });
+  document.addEventListener("keydown", e => { if(e.key === "Escape" && !sheet.classList.contains("hidden")) close(); });
+  const mk = (tag, cls, txt) => { const e = document.createElement(tag); if(cls) e.className = cls; if(txt != null) e.textContent = txt; return e; };
+  function item(icon, label, fn, opts = {}){
+    const b = mk("button", opts.danger ? "danger" : ""); b.type = "button";
+    b.append(mk("span", "mi", icon), mk("span", "", label));
+    if(opts.disabled) b.disabled = true;
+    b.addEventListener("click", () => { close(); setTimeout(fn, 30); });
+    return b;
+  }
+  function open(head, items){
+    body.replaceChildren();
+    if(head) body.append(head);
+    const l = mk("div", "mlist"); items.forEach(i => l.append(i)); body.append(l);
+    sheet.classList.remove("hidden");
+  }
+  function closeBtn(){ const c = mk("button", "ic", "✕"); c.type = "button"; c.setAttribute("aria-label", "Close"); c.addEventListener("click", close); return c; }
+
+  // profile menu: on phones the avatar opens this instead of going straight to the photo editor
+  // only the "add to home screen" banner stays up top: announcements move to the Crew tab, recovery code lives in the profile menu
+  q("#crewView").prepend(q("#annBar"));
+  let bypass = false;
+  q("#avBtn").addEventListener("click", e => {
+    if(bypass) return;
+    e.stopImmediatePropagation(); e.preventDefault();
+    const h = mk("div", "mhead");
+    const av = q("#meAv").firstElementChild; if(av) h.append(av.cloneNode(true));
+    const t = mk("div", "t", q("#meName").textContent); t.append(mk("small", "", "Signed in")); h.append(t, closeBtn());
+    const items = [
+      item("📷", "Profile picture", () => { bypass = true; q("#avBtn").click(); bypass = false; }),
+      item("🎨", "Theme & background", () => q("#gearBtn").click()),
+      item("👤", "Account & password", () => q("#acctBtn").click())
+    ];
+    if(!q("#adminLink").classList.contains("hidden")) items.push(item("🛠", "Admin panel", () => q("#adminBtn").click()));
+    if(!q("#recBar").classList.contains("hidden")) items.unshift(item("🔑", "Set up a recovery code", () => q("#recGo").click()));
+    items.push(item("📲", "Add Crew to home screen", () => q("#installSheet").click()));
+    items.push(item("↪", "Sign out", () => q("#signOut").click(), {danger:true}));
+    open(h, items);
+  }, true);
+
+  // tap a one-line hint to read all of it
+  document.addEventListener("click", e => { const h = e.target.closest(".card .hint"); if(h && small()) h.classList.toggle("open"); });
+
+  // row actions: keep the main button(s) visible, tuck the rest behind "⋯"
+  function rowMenu(li, buttons){
+    const tEl = li.querySelector(".title");
+    const name = tEl && tEl.firstChild ? tEl.firstChild.textContent : "";
+    const h = mk("div", "mhead");
+    const p = li.querySelector(".poster"); if(p){ const c = p.cloneNode(true); c.classList.add("big"); h.append(c); }
+    const t = mk("div", "t", name); const meta = tEl && tEl.querySelector("small"); if(meta) t.append(mk("small", "", meta.textContent)); h.append(t, closeBtn());
+    const items = buttons.map(b => {
+      const lbl = b.getAttribute("aria-label") || b.textContent.trim();
+      const icon = b.classList.contains("pill") ? (b.textContent.trim()[0] === "✓" ? "✓" : "+") : b.textContent.trim();
+      const text = b.classList.contains("pill") ? b.textContent.trim().replace(/^[✓+]\s*/, (b.classList.contains("done") ? "Already on " : "Add to ")) : lbl;
+      return item(icon, text, () => b.click(), {disabled: b.disabled || b.classList.contains("done"), danger: b.classList.contains("del")});
+    });
+    if(tEl) items.unshift(item("💬", "Details & reviews", () => tEl.click()));
+    open(h, items);
+  }
+  function enhanceRow(box){
+    if(box.dataset.enh) return; box.dataset.enh = "1";
+    const li = box.closest("li"); if(!li) return;
+    const isFacts = box.classList.contains("facts");
+    const btns = [...box.querySelectorAll(":scope > button")];
+    if(!btns.length) return;
+    const keep = isFacts || li.querySelector("select.score") ? 0 : (li.closest("ol.top") ? 2 : 1);
+    const hide = btns.slice(keep);
+    if(!hide.length) return;
+    hide.forEach(b => b.classList.add("mob-hide"));
+    const more = mk("button", "ic mob-more", "⋯"); more.type = "button"; more.setAttribute("aria-label", "More options");
+    more.addEventListener("click", e => { e.stopPropagation(); rowMenu(li, hide); });
+    if(isFacts){ box.classList.add("enh"); box.style.flex = "none"; }
+    box.classList.add("enh"); box.append(more);
+  }
+
+  // long tab bars (Play has 15 games): a pinned button that shows them all as a grid
+  function enhanceTabs(bar){
+    const btns = [...bar.querySelectorAll(":scope > button:not(.allbtn)")];
+    let all = bar.querySelector(":scope > .allbtn");
+    if(btns.length < 6){ if(all) all.remove(); return; }
+    if(!all){
+      all = mk("button", "allbtn", "▦ All"); all.type = "button"; all.setAttribute("aria-label", "Show all");
+      all.addEventListener("click", () => {
+        const cur = [...bar.querySelectorAll(":scope > button:not(.allbtn)")];
+        const h = mk("div", "mhead"); h.append(mk("div", "t", bar.id === "playTabs" ? "Games" : "Sections"), closeBtn());
+        body.replaceChildren(h);
+        const g = mk("div", "pickgrid");
+        cur.forEach(b => {
+          const txt = b.firstChild && b.firstChild.nodeType === 3 ? b.firstChild.textContent.trim() : b.textContent.trim();
+          const m = txt.match(/^(\S+)\s+(.*)$/);
+          const c = mk("button", b.classList.contains("on") ? "on" : ""); c.type = "button";
+          c.append(mk("span", "pe", m ? m[1] : "•"), mk("span", "", m ? m[2] : txt));
+          const badge = b.querySelector(".nbadge"); if(badge) c.append(badge.cloneNode(true));
+          c.addEventListener("click", () => { close(); b.click(); });
+          g.append(c);
+        });
+        body.append(g); sheet.classList.remove("hidden");
+      });
+      bar.prepend(all);
+    }
+    const on = bar.querySelector(":scope > button.on");
+    if(on && bar.dataset.lastOn !== (on.dataset.pt || on.textContent)){
+      bar.dataset.lastOn = on.dataset.pt || on.textContent;
+      requestAnimationFrame(() => { bar.scrollLeft = on.offsetLeft - bar.clientWidth/2 + on.clientWidth/2; });
+    }
+  }
+
+  let queued = false;
+  function sweep(){
+    queued = false;
+    document.querySelectorAll("#app li .actions:not([data-enh]), #app li > .facts:not([data-enh])").forEach(enhanceRow);
+    document.querySelectorAll("#app .subtabs").forEach(enhanceTabs);
+    document.querySelectorAll("#app li .revlink:not([data-enh])").forEach(r => { r.dataset.enh = "1"; if(/^💬 Review$/.test(r.textContent.trim())) r.classList.add("mob-hide"); });
+  }
+  new MutationObserver(() => { if(!queued){ queued = true; requestAnimationFrame(sweep); } })
+    .observe(document.getElementById("app"), {childList:true, subtree:true, attributes:true, attributeFilter:["class"]});
+  sweep();
+})();
 </script>
 <script>
   if("serviceWorker" in navigator){ window.addEventListener("load",function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); }); }
