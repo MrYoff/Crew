@@ -615,6 +615,8 @@
 
   /* ================= mobile redesign ================= */
   .mob-more{display:none}
+  #recBar{display:none!important}
+  #crewView > #annBar{margin-bottom:12px}
   .allbtn{display:none!important}
   .mlist{display:flex;flex-direction:column;margin-top:6px}
   .mlist button{display:flex;align-items:center;gap:14px;width:100%;padding:14px 4px;border:0;border-top:1px solid var(--line);background:none;color:var(--text);font:700 15px "Zen Kaku Gothic New",system-ui,sans-serif;text-align:left;cursor:pointer}
@@ -645,7 +647,6 @@
     .notice{padding:8px 10px;font-size:13px;margin-bottom:8px;border-radius:12px}
     .installbar{gap:8px}
     .installbar .btn{padding:6px 10px;font-size:12px;border-radius:10px}
-    body:has(#recBar:not(.hidden)) #installBar, body:has(#annBar:not(.hidden)) #installBar{display:none!important}
 
     /* mode switch + sub tabs */
     .modeseg{margin:0 0 8px;padding:3px;max-width:none}
@@ -4665,9 +4666,11 @@ onAuthStateChanged(auth, user=>{
   function closeBtn(){ const c = mk("button", "ic", "✕"); c.type = "button"; c.setAttribute("aria-label", "Close"); c.addEventListener("click", close); return c; }
 
   // profile menu: on phones the avatar opens this instead of going straight to the photo editor
+  // only the "add to home screen" banner stays up top: announcements move to the Crew tab, recovery code lives in the profile menu
+  q("#crewView").prepend(q("#annBar"));
   let bypass = false;
   q("#avBtn").addEventListener("click", e => {
-    if(bypass || !small()) return;
+    if(bypass) return;
     e.stopImmediatePropagation(); e.preventDefault();
     const h = mk("div", "mhead");
     const av = q("#meAv").firstElementChild; if(av) h.append(av.cloneNode(true));
@@ -4678,6 +4681,7 @@ onAuthStateChanged(auth, user=>{
       item("👤", "Account & password", () => q("#acctBtn").click())
     ];
     if(!q("#adminLink").classList.contains("hidden")) items.push(item("🛠", "Admin panel", () => q("#adminBtn").click()));
+    if(!q("#recBar").classList.contains("hidden")) items.unshift(item("🔑", "Set up a recovery code", () => q("#recGo").click()));
     items.push(item("📲", "Add Crew to home screen", () => q("#installSheet").click()));
     items.push(item("↪", "Sign out", () => q("#signOut").click(), {danger:true}));
     open(h, items);
