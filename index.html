@@ -296,6 +296,8 @@
   .recsub{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin:16px 0 4px}
   .recsub:first-child{margin-top:4px}
   #recRefresh:disabled{opacity:.5;cursor:default}
+  .recmore{display:block;width:100%;margin-top:12px}
+  .pill.recno{background:transparent;color:var(--muted);font-size:11px;padding:4px 8px}
   .pts{font-family:"Dela Gothic One";font-size:16px;color:var(--accent2);flex:none;text-align:right}
 
   .signin{text-align:center;padding:40px 16px}
@@ -1774,11 +1776,24 @@ function addWatchFor(x, media){
 }
 // "For you": crew picks (friends' 8+ ratings) plus discovery picks from AniList, seeded by what you
 // and the crew rate highly (AniList's "if you liked X" recommendations) and your favorite genres.
-const disc={}; let recTurn=0, recBusy=false, recLast=0;
+const disc={}; let recMore=0, recTurn=0, recBusy=false, recLast=0;
 const DISC_F=`fragment F on Media{idMal format countryOfOrigin seasonYear startDate{year} episodes chapters status nextAiringEpisode{episode} genres averageScore isAdult title{romaji english} coverImage{medium large}}`;
 const DISC_REC_Q=`query($ids:[Int],$t:MediaType){Page(perPage:12){media(idMal_in:$ids,type:$t){idMal recommendations(sort:RATING_DESC,perPage:12){nodes{rating mediaRecommendation{...F}}}}}}`+DISC_F;
-const DISC_GEN_Q=`query($g:[String],$t:MediaType,$p:Int,$pop:Int){Page(page:$p,perPage:30){media(genre_in:$g,type:$t,isAdult:false,sort:[SCORE_DESC],averageScore_greater:72,popularity_greater:$pop){...F}}}`+DISC_F;
+const DISC_GEN_Q=`query($g:[String],$t:MediaType,$p:Int,$pop:Int,$sort:[MediaSort]){Page(page:$p,perPage:40){media(genre_in:$g,type:$t,isAdult:false,sort:$sort,averageScore_greater:70,popularity_greater:$pop){...F}}}`+DISC_F;
 const DISC_TREND_Q=`query($t:MediaType,$p:Int){Page(page:$p,perPage:30){media(type:$t,isAdult:false,sort:[TRENDING_DESC]){...F}}}`+DISC_F;
+const DISC_GEM_Q=`query($t:MediaType,$p:Int,$lo:Int,$hi:Int,$g:[String]){Page(page:$p,perPage:40){media(type:$t,isAdult:false,sort:[SCORE_DESC],averageScore_greater:74,popularity_greater:$lo,popularity_lesser:$hi,genre_in:$g){...F}}}`+DISC_F;
+const DISC_GEM_ANY_Q=`query($t:MediaType,$p:Int,$lo:Int,$hi:Int){Page(page:$p,perPage:40){media(type:$t,isAdult:false,sort:[SCORE_DESC],averageScore_greater:76,popularity_greater:$lo,popularity_lesser:$hi){...F}}}`+DISC_F;
+const DISC_OLD_Q=`query($t:MediaType,$p:Int,$g:[String],$before:FuzzyDateInt){Page(page:$p,perPage:40){media(type:$t,isAdult:false,sort:[SCORE_DESC],averageScore_greater:74,popularity_greater:8000,startDate_lesser:$before,genre_in:$g){...F}}}`+DISC_F;
+const DISC_NEW_Q=`query($t:MediaType,$p:Int,$after:FuzzyDateInt){Page(page:$p,perPage:40){media(type:$t,isAdult:false,sort:[POPULARITY_DESC],averageScore_greater:68,startDate_greater:$after){...F}}}`+DISC_F;
+// what you've been shown lately (per anime/manga) and what you said "not interested" to — kept on this device
+const recStore={
+  seen(md){ try{ return JSON.parse((window.CrewLook&&CrewLook.get("recseen_"+md))||"[]"); }catch(e){ return []; } },
+  saveSeen(md,b){ if(window.CrewLook) CrewLook.put("recseen_"+md, JSON.stringify(b.slice(-14))); },
+  hidden(){ try{ return new Set(JSON.parse((window.CrewLook&&CrewLook.get("rechide"))||"[]")); }catch(e){ return new Set(); } },
+  hide(key){ const h=[...recStore.hidden()]; if(!h.includes(key)) h.push(key); if(window.CrewLook) CrewLook.put("rechide", JSON.stringify(h.slice(-400))); }
+};
+const recId = (md,x) => md+":"+(x.malId||norm(x.title));
+const rnd = n => 1+Math.floor(Math.random()*n);
 function discItem(a, media){
   const img=a.coverImage&&(a.coverImage.large||a.coverImage.medium);
   const kind=media==="manga"&&COUNTRY_KIND[a.countryOfOrigin] ? COUNTRY_KIND[a.countryOfOrigin] : (KIND[a.format]||null);
@@ -1801,43 +1816,62 @@ function genreProfile(media){
   return Object.entries(g).sort((a,b)=>b[1]-a[1]).map(e=>e[0]);
 }
 async function loadDisc(media){
-  const T=media.toUpperCase(), seeds=wsample(discSeeds(media),10,s=>s.w), byId=new Map(seeds.map(s=>[s.id,s]));
-  const favG=genreProfile(media).slice(0,6), pickG=favG.length?wsample(favG,3,g=>6-favG.indexOf(g)):[];
-  const page=1+Math.floor(Math.random()*3), cand=new Map();
-  const put=(a,score,why)=>{ if(!a||a.isAdult) return; const it=discItem(a,media); if(!it.title) return; const key=it.malId?"id:"+it.malId:"t:"+norm(it.title);
-    const c=cand.get(key)||{x:it, score:0, why:[]}; c.score+=score; if(why && !c.why.includes(why)) c.why.push(why); cand.set(key,c); };
-  const jobs=[];
-  if(seeds.length) jobs.push(aniPost(DISC_REC_Q,{ids:seeds.map(s=>s.id),t:T}).then(j=>{ ((j.data&&j.data.Page&&j.data.Page.media)||[]).forEach(m=>{ const s=byId.get(m.idMal); if(!s) return;
-    ((m.recommendations&&m.recommendations.nodes)||[]).forEach(n=>{ if(!n.mediaRecommendation||n.rating<1) return; put(n.mediaRecommendation, s.w*Math.log2(1+n.rating), s.why==="you"?"Because you liked "+s.title:"Since "+s.why+" loved "+s.title); }); }); }));
-  if(pickG.length) jobs.push(aniPost(DISC_GEN_Q,{g:pickG,t:T,p:page,pop:media==="manga"?5000:20000}).then(j=>{ ((j.data&&j.data.Page&&j.data.Page.media)||[]).forEach(a=>{ const hit=(a.genres||[]).filter(n=>pickG.includes(n)); put(a, 2+hit.length*1.5+((a.averageScore||70)-70)/6, "Top rated "+hit.slice(0,2).join(" & ")); }); }));
-  if(!jobs.length) jobs.push(aniPost(DISC_TREND_Q,{t:T,p:page}).then(j=>{ ((j.data&&j.data.Page&&j.data.Page.media)||[]).forEach((a,i)=>put(a, 30-i, "Trending right now")); }));
+  const T=media.toUpperCase(), M=media==="manga";
+  // rotate seeds: ones used last refresh are less likely to be used again
+  const lastSeeds=new Set((disc[media]&&disc[media].seeds)||[]);
+  const seeds=wsample(discSeeds(media),10,s=>s.w*(lastSeeds.has(s.id)?0.3:1)), byId=new Map(seeds.map(s=>[s.id,s]));
+  const favG=genreProfile(media).slice(0,8), pickG=favG.length?wsample(favG,2+Math.floor(Math.random()*2),g=>8-favG.indexOf(g)):[];
+  const gemG=favG.length?wsample(favG,1,g=>8-favG.indexOf(g)):[];
+  const cand=new Map();
+  const put=(a,score,why,lane)=>{ if(!a||a.isAdult) return; const it=discItem(a,media); if(!it.title) return; const key=it.malId?"id:"+it.malId:"t:"+norm(it.title);
+    const c=cand.get(key)||{x:it, score:0, why:[], lane}; c.score+=score; if(why && !c.why.includes(why)) c.why.push(why); cand.set(key,c); };
+  const list=j=>(j.data&&j.data.Page&&j.data.Page.media)||[];
+  const yr=new Date().getFullYear(), jobs=[];
+  if(seeds.length) jobs.push(aniPost(DISC_REC_Q,{ids:seeds.map(s=>s.id),t:T}).then(j=>{ list(j).forEach(m=>{ const s=byId.get(m.idMal); if(!s) return;
+    ((m.recommendations&&m.recommendations.nodes)||[]).forEach(n=>{ if(!n.mediaRecommendation||n.rating<1) return; put(n.mediaRecommendation, s.w*Math.log2(1+n.rating), s.why==="you"?"Because you liked "+s.title:"Since "+s.why+" loved "+s.title, "similar"); }); }); }));
+  if(pickG.length){
+    const sort=[["SCORE_DESC"],["POPULARITY_DESC"],["FAVOURITES_DESC"]][Math.floor(Math.random()*3)];
+    jobs.push(aniPost(DISC_GEN_Q,{g:pickG,t:T,p:rnd(6),pop:M?4000:15000,sort}).then(j=>{ list(j).forEach(a=>{ const hit=(a.genres||[]).filter(n=>pickG.includes(n)); put(a, 2+hit.length*1.5+((a.averageScore||70)-70)/6, "Top rated "+hit.slice(0,2).join(" & "), "genre"); }); }));
+    jobs.push(aniPost(DISC_OLD_Q,{t:T,p:rnd(4),g:pickG.slice(0,1),before:(yr-12)*10000}).then(j=>{ list(j).forEach(a=>put(a, 3+((a.averageScore||74)-74)/4, "Classic "+(pickG[0]||"").toLowerCase()+" pick", "classic")); }));
+  }
+  const lo=M?800:3000, hi=M?12000:40000;
+  jobs.push((gemG.length?aniPost(DISC_GEM_Q,{t:T,p:rnd(4),lo,hi,g:gemG}):aniPost(DISC_GEM_ANY_Q,{t:T,p:rnd(4),lo,hi})).then(j=>{ list(j).forEach(a=>put(a, 3+((a.averageScore||74)-74)/4, "Hidden gem"+(gemG[0]?" · "+gemG[0]:""), "gem")); }));
+  jobs.push(aniPost(DISC_TREND_Q,{t:T,p:rnd(3)}).then(j=>{ list(j).forEach((a,i)=>put(a, 4-i*0.08, "Trending right now", "trend")); }));
+  jobs.push(aniPost(DISC_NEW_Q,{t:T,p:rnd(3),after:(yr-2)*10000}).then(j=>{ list(j).forEach((a,i)=>put(a, 3.5-i*0.05, "New & popular", "new")); }));
   const res=await Promise.allSettled(jobs);
   if(res.every(r=>r.status==="rejected")) throw new Error("anilist");
   // small boost for matching your favorite genres and for being well rated overall
   cand.forEach(c=>{ c.score += (c.x.genres||[]).filter(n=>favG.includes(n)).length*0.8 + ((c.x.avg||65)-65)/12; });
-  const prev=new Set(((disc[media]&&disc[media].pool)||[]).slice(0,8).map(c=>c.x.malId||c.x.title));
-  // random but score-weighted order; things shown last time sink to the back
-  return [...cand.values()].map(c=>({...c, r:Math.max(.1,c.score)*(0.55+Math.random()*0.9)*(prev.has(c.x.malId||c.x.title)?0.35:1)})).sort((a,b)=>b.r-a.r);
+  // anything shown in the last several refreshes sinks hard (the most recent ones get skipped when picking)
+  const older=new Set(recStore.seen(media).slice(0,-2).flatMap(b=>b.ids));
+  const lanes={};
+  cand.forEach(c=>{ c.r=Math.max(.1,c.score)*(0.5+Math.random())*(older.has(recId(media,c.x))?0.3:1); (lanes[c.lane]=lanes[c.lane]||[]).push(c); });
+  // mix lanes so one source (e.g. "because you liked X") can't take over every refresh
+  const order=Object.values(lanes).map(l=>l.sort((a,b)=>b.r-a.r)).sort(()=>Math.random()-.5), pool=[];
+  for(let i=0; order.some(l=>l[i]); i++) order.forEach(l=>{ if(l[i]) pool.push(l[i]); });
+  return {pool, seeds:seeds.map(s=>s.id)};
 }
 function fetchDisc(media){
   const cur=disc[media]; if(cur&&cur.loading) return;
-  disc[media]={pool:cur?cur.pool:[], loading:true, err:false, turn:recTurn};
-  loadDisc(media).then(pool=>{ disc[media]={pool, loading:false, err:false, turn:recTurn}; }).catch(()=>{ disc[media]={pool:cur?cur.pool:[], loading:false, err:true, turn:recTurn}; })
+  disc[media]={pool:cur?cur.pool:[], seeds:cur?cur.seeds:[], id:cur?cur.id:0, loading:true, err:false, turn:recTurn};
+  loadDisc(media).then(r=>{ disc[media]={pool:r.pool, seeds:r.seeds, id:Date.now(), loading:false, err:false, turn:recTurn}; }).catch(()=>{ disc[media]={...disc[media], loading:false, err:true}; })
     .finally(()=>{ recBusy=Object.values(disc).some(d=>d.loading); renderRecs(); });
 }
 $("#recRefresh").addEventListener("click",()=>{
-  if(recBusy || Date.now()-recLast<1500) return; recLast=Date.now(); recTurn++; recBusy=true;
+  if(recBusy || Date.now()-recLast<3000) return; recLast=Date.now(); recTurn++; recBusy=true; recMore=0;
   const medias = state.mode==="anime"||state.mode==="manga" ? [state.mode] : ["anime","manga"];
   medias.forEach(fetchDisc); renderRecs();
 });
-function recRow(x, whoText, showType){
+function recRow(x, whoText, showType, onHide){
   const row=el("div","crewrow"); row.append(posterEl(x));
   const mid=el("div","title"); const tt=el("div","",x.title); if(showType) tt.append(el("span","typetag",x.media==="manga"?"Manga":"Anime"));
   mid.append(tt, el("div","who",whoText), revLink(x)); row.append(mid);
   const acts=el("div","acts");
   const b=el("button","pill","+ "+WORDS[x.media].watchlist); b.type="button"; b.addEventListener("click",()=>addWatchFor(x,x.media));
   const w=el("button","pill","✓ "+WORDS[x.media].watched); w.type="button"; w.title="Already seen it? Mark it as "+WORDS[x.media].watched.toLowerCase(); w.addEventListener("click",()=>addWatchedFor(x,x.media));
-  acts.append(b, w); row.append(acts);
+  acts.append(b, w);
+  if(onHide){ const h=el("button","pill recno","✕ Not for me"); h.type="button"; h.title="Don't recommend this again"; h.addEventListener("click",onHide); acts.append(h); }
+  row.append(acts);
   return row;
 }
 function renderRecs(){
@@ -1854,15 +1888,25 @@ function renderRecs(){
   const shownKeys=new Set(crewAll.map(a=>rkey(a.x.media,a.x)));
   // discovery picks
   if(state.loaded) medias.forEach(md=>{ if(!disc[md]) fetchDisc(md); });
-  const per=both?4:6, picks=[];
-  medias.forEach(md=>{ const d=disc[md]; if(!d) return; let n=0;
-    for(const c of d.pool){ if(n>=per) break; const key=rkey(md,c.x); if(known.has(key)||shownKeys.has(key)||(c.x.malId&&knownIds.has(md+":"+c.x.malId))) continue; shownKeys.add(key); picks.push(c); n++; } });
-  if(both){ const a=picks.filter(c=>c.x.media==="anime"), m=picks.filter(c=>c.x.media==="manga"); picks.length=0; for(let i=0;i<Math.max(a.length,m.length);i++){ if(a[i]) picks.push(a[i]); if(m[i]) picks.push(m[i]); } }
+  const per=(both?5:8)+recMore*(both?4:6), picks=[], hidden=recStore.hidden();
+  medias.forEach(md=>{ const d=disc[md]; if(!d||!d.pool.length) return; let n=0;
+    // skip what the last two refreshes showed; only fall back to them if there's nothing else left
+    const seenB=recStore.seen(md), recent=new Set(seenB.filter(b=>b.t!==d.id).slice(-2).flatMap(b=>b.ids));
+    const ok=c=>{ const key=rkey(md,c.x), id=recId(md,c.x); return !(known.has(key)||shownKeys.has(key)||hidden.has(id)||(c.x.malId&&knownIds.has(md+":"+c.x.malId))); };
+    const take=c=>{ shownKeys.add(rkey(md,c.x)); picks.push(c); n++; };
+    for(const c of d.pool){ if(n>=per) break; if(ok(c) && !recent.has(recId(md,c.x))) take(c); }
+    for(const c of d.pool){ if(n>=per) break; if(ok(c)) take(c); }
+    // remember what this refresh showed
+    const ids=picks.filter(c=>c.x.media===md).map(c=>recId(md,c.x)); let cur=seenB.find(b=>b.t===d.id);
+    if(!cur){ cur={t:d.id, ids:[]}; seenB.push(cur); }
+    const before=cur.ids.length; ids.forEach(i=>{ if(!cur.ids.includes(i)) cur.ids.push(i); }); if(cur.ids.length!==before) recStore.saveSeen(md,seenB);
+  });
   const loading=medias.some(md=>disc[md]&&disc[md].loading), err=medias.some(md=>disc[md]&&disc[md].err);
   box.append(el("div","recsub","More you might like"));
   if(picks.length) picks.forEach(c=>{ const why=c.why[0]||"Popular pick"; const extra=c.why.length>1?" (+"+(c.why.length-1)+" more)":""; const g=(c.x.genres||[]).slice(0,3).join(", ");
-    box.append(recRow(c.x, why+extra+(g?" · "+g:"")+(c.x.avg?" · ★ "+c.x.avg+"%":""), both)); });
+    box.append(recRow(c.x, why+extra+(g?" · "+g:"")+(c.x.avg?" · ★ "+c.x.avg+"%":""), both, ()=>{ recStore.hide(recId(c.x.media,c.x)); renderRecs(); })); });
   else box.append(el("div","empty", loading?"Finding shows you'd like…":err?"Couldn't load picks right now. Try ↻ Refresh in a minute.":"Rate a few things you've watched and picks will show up here."));
+  if(picks.length && recMore<4){ const more=el("button","btn recmore","Show more"); more.type="button"; more.addEventListener("click",()=>{ recMore++; renderRecs(); }); box.append(more); }
   const btn=$("#recRefresh"); btn.disabled=loading; btn.textContent=loading?"Loading…":"↻ Refresh";
 }
 
