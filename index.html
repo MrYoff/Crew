@@ -297,6 +297,16 @@
   .recsub:first-child{margin-top:4px}
   #recRefresh:disabled{opacity:.5;cursor:default}
   .recmore{display:block;width:100%;margin-top:12px}
+  .playback{display:flex;align-items:center;gap:10px;margin:0 0 10px}
+  .playback #playCur{font-weight:700}
+  .ggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:6px}
+  .gcard{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:16px;padding:12px;cursor:pointer;font:inherit}
+  .gcard:active{transform:scale(.98)}
+  .gcard .ge{font-size:24px;line-height:1.1}
+  .gcard .gn{font-weight:700;font-size:14px}
+  .gcard .gd{color:var(--muted);font-size:12px;line-height:1.3}
+  #playBody > .recsub:first-child{margin-top:0}
+  body.hasbg .gcard{background:color-mix(in srgb, var(--panel) 86%, transparent)}
   .pill.recno{background:transparent;color:var(--muted);font-size:11px;padding:4px 8px}
   .pts{font-family:"Dela Gothic One";font-size:16px;color:var(--accent2);flex:none;text-align:right}
 
@@ -720,6 +730,10 @@
     .toast{bottom:calc(96px + env(safe-area-inset-bottom))}
     .credit{margin-top:8px}
   }
+  /* compact Anime/Manga switch */
+  .modeseg{max-width:330px}
+  .modeseg button{padding:6px 4px;font-size:12px}
+  @media (max-width:700px){ .modeseg{max-width:330px;margin:0 auto 8px} .modeseg button{padding:6px 2px;font-size:12px} }
 </style>
 </head>
 <body>
@@ -778,7 +792,6 @@
     <button class="gear" id="gearBtn" type="button" aria-label="Appearance settings" title="Theme &amp; background"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="13.5" cy="6.5" r="1.5" fill="currentColor"/><circle cx="17.5" cy="10.5" r="1.5" fill="currentColor"/><circle cx="8.5" cy="7.5" r="1.5" fill="currentColor"/><circle cx="6.5" cy="12.5" r="1.5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.9 0 1.6-.7 1.6-1.6 0-.4-.2-.8-.4-1.1-.3-.3-.4-.7-.4-1.1 0-.9.7-1.6 1.6-1.6H16c3.3 0 6-2.7 6-6 0-4.9-4.5-8.6-10-8.6z"/></svg></button>
     </div>
   </div>
-  <p class="sub">Your top 10s, everything you've watched and read, and what's next. See what the rest of the crew is into.</p>
 
   <div id="status" class="notice">Signing you in…</div>
   <div id="installBar" class="notice installbar hidden"><span class="grow">📲 Add Crew to your home screen so it opens like an app.</span><button class="btn primary" id="installGo" type="button">How</button><button class="btn" id="installX" type="button" aria-label="Dismiss">✕</button></div>
@@ -805,10 +818,10 @@
 
   <div id="app" class="hidden">
     <nav class="tabs" id="bottomNav">
-      <button data-view="me" class="on"><span class="ni">📚</span>Lists</button>
-      <button data-view="friends"><span class="ni">👥</span>Friends</button>
-      <button data-view="season"><span class="ni">📅</span>Season</button>
-      <button data-view="crew"><span class="ni">🏠</span>Crew<span class="nbadge hidden" id="crewBadge"></span></button>
+      <button data-view="crew"><span class="ni">🏠</span>Home<span class="nbadge hidden" id="crewBadge"></span></button>
+      <button data-view="me" class="on"><span class="ni">📚</span>My Lists</button>
+      <button data-view="discover"><span class="ni">🔍</span>Discover</button>
+      <button data-view="friends"><span class="ni">👥</span>Crew</button>
       <button data-view="play"><span class="ni">🎮</span>Play</button>
     </nav>
     <div class="modeseg" id="modeSeg"><button type="button" data-mode="anime" class="on">Anime</button><button type="button" data-mode="manga">Manga</button><button type="button" data-mode="overall">Overall</button><button type="button" data-mode="lists">Custom</button></div>
@@ -881,23 +894,32 @@
       </section>
     </div>
 
-    <div id="seasonView" class="hidden">
-      <section class="card">
-        <div class="seasonbar"><button class="ic" id="seasonPrev" type="button" aria-label="Previous season">‹</button><h2 id="seasonTitle">This season</h2><button class="ic" id="seasonNext" type="button" aria-label="Next season">›</button></div>
-        <p class="hint">The most popular anime of the season. See who in the crew is watching what, and add shows in one tap.</p>
-        <div class="filters"><select id="sGenre" aria-label="Filter by genre"></select><select id="sShow" aria-label="Show"><option value="all">All shows</option><option value="crew">Crew is watching</option><option value="mine">On my lists</option></select></div>
-        <div id="seasonGrid" class="sgrid"></div>
+    <div id="discoverView" class="hidden">
+      <div class="subtabs" id="discSub"></div>
+      <div id="seasonView" class="hidden">
+        <section class="card">
+          <div class="seasonbar"><button class="ic" id="seasonPrev" type="button" aria-label="Previous season">‹</button><h2 id="seasonTitle">This season</h2><button class="ic" id="seasonNext" type="button" aria-label="Next season">›</button></div>
+          <p class="hint">The most popular anime of the season. See who in the crew is watching what, and add shows in one tap.</p>
+          <div class="filters"><select id="sGenre" aria-label="Filter by genre"></select><select id="sShow" aria-label="Show"><option value="all">All shows</option><option value="crew">Crew is watching</option><option value="mine">On my lists</option></select></div>
+          <div id="seasonGrid" class="sgrid"></div>
+        </section>
+      </div>
+      <section class="card" id="recCard">
+        <h2>For you<button class="sharebtn" id="recRefresh" type="button">↻ Refresh</button></h2>
+        <p class="hint">Crew favorites you haven't added yet, plus picks based on what you rate highly and the genres you like.</p>
+        <div id="recList"></div>
       </section>
     </div>
 
     <div id="playView" class="hidden">
-      <div class="subtabs" id="playTabs"><button type="button" data-pt="mup">⚔️ Matchups</button><button type="button" data-pt="brk">🏆 Brackets</button><button type="button" data-pt="takes">🌶️ Hot takes</button><button type="button" data-pt="pred">🔮 Predict</button><button type="button" data-pt="draft">📋 Draft</button><button type="button" data-pt="ops">🎵 OP/ED tiers</button><button type="button" data-pt="guess">❓ Guess</button><button type="button" data-pt="daily">📅 Daily</button><button type="button" data-pt="chr">🧩 Anidle</button><button type="button" data-pt="gop">🎧 Guess the OP</button><button type="button" data-pt="who">🕵️ Who ranked it</button><button type="button" data-pt="hl">📈 Higher/Lower</button><button type="button" data-pt="kd">👍 Keep or drop</button><button type="button" data-pt="emo">😶 Emoji plot</button><button type="button" data-pt="sq">⚽ Squads</button></div>
+      <div class="playback hidden" id="playBack"><button type="button" class="btn" id="playHomeBtn">‹ All games</button><span id="playCur"></span></div>
+      <div class="subtabs hidden" id="playTabs"><button type="button" data-pt="mup">⚔️ Matchups</button><button type="button" data-pt="brk">🏆 Brackets</button><button type="button" data-pt="takes">🌶️ Hot takes</button><button type="button" data-pt="pred">🔮 Predict</button><button type="button" data-pt="draft">📋 Draft</button><button type="button" data-pt="ops">🎵 OP/ED tiers</button><button type="button" data-pt="guess">❓ Guess</button><button type="button" data-pt="daily">📅 Daily</button><button type="button" data-pt="chr">🧩 Anidle</button><button type="button" data-pt="gop">🎧 Guess the OP</button><button type="button" data-pt="who">🕵️ Who ranked it</button><button type="button" data-pt="hl">📈 Higher/Lower</button><button type="button" data-pt="kd">👍 Keep or drop</button><button type="button" data-pt="emo">😶 Emoji plot</button><button type="button" data-pt="sq">⚽ Squads</button></div>
       <div id="playBody"></div>
     </div>
 
     <div id="crewView" class="hidden">
       <div class="subtabs" id="crewSub"></div>
-      <section class="card" data-csub="inbox" id="inboxCard"><h2>Recommendations <span class="count" id="inboxCount"></span></h2><div class="seg" id="inboxSeg"><button type="button" data-ib="in" class="on">For you</button><button type="button" data-ib="sent">Sent</button></div><div id="inboxBody"></div></section>
+      <section class="card" data-csub="inbox" id="inboxCard"><h2>Recommendations <span class="count" id="inboxCount"></span></h2><div class="seg" id="inboxSeg"><button type="button" data-ib="in" class="on">Received</button><button type="button" data-ib="sent">Sent</button></div><div id="inboxBody"></div></section>
 
       <section class="card" data-csub="top" id="crewTopCard">
         <h2 id="crewTopTitle">Crew top 10</h2>
@@ -929,11 +951,6 @@
         </form>
         <datalist id="pollSuggest"></datalist>
         <div id="pollList"></div>
-      </section>
-      <section class="card" data-csub="recs" id="recCard">
-        <h2>For you<button class="sharebtn" id="recRefresh" type="button">↻ Refresh</button></h2>
-        <p class="hint">Crew favorites you haven't added yet, plus picks based on what you rate highly and the genres you like.</p>
-        <div id="recList"></div>
       </section>
       <section class="card" data-csub="feed">
         <h2>Activity</h2>
@@ -1166,7 +1183,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const $ = s => document.querySelector(s);
-const state = { me:null, docs:{}, upd:{}, cfg:null, cfgReady:false, cfgUnsub:null, view:"me", friend:null, canWrite:true, loaded:false, unsub:null, mode:(()=>{ const v=window.CrewLook&&CrewLook.get("mode"); return ["anime","manga","overall","lists"].includes(v)?v:"anime"; })(), target:null };
+const state = { me:null, docs:{}, upd:{}, cfg:null, cfgReady:false, cfgUnsub:null, view:"crew", friend:null, canWrite:true, loaded:false, unsub:null, mode:(()=>{ const v=window.CrewLook&&CrewLook.get("mode"); return ["anime","manga","overall","lists"].includes(v)?v:"anime"; })(), target:null };
 // anime lists live in top/watched/watchlist; manga lists in mtop/mread/mlist
 // overall (anime + manga mixed) top 10 lives in otop; custom lists in custom[]
 const KEYS = { anime:{top:"top",watched:"watched",watchlist:"watchlist",watching:"watching"}, manga:{top:"mtop",watched:"mread",watchlist:"mlist",watching:"mreading"}, overall:{top:"otop"}, lists:{} };
@@ -2240,8 +2257,8 @@ function loadSeason(key, s, y){
   seasonCache[key]={loading:true, list:[]};
   fetch("https://graphql.anilist.co",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({query:SEASON_Q,variables:{s,y}})})
     .then(r=>r.ok?r.json():Promise.reject(r.status))
-    .then(j=>{ seasonCache[key]={list:((j.data&&j.data.Page&&j.data.Page.media)||[]).map(a=>{ const img=a.coverImage&&(a.coverImage.large||a.coverImage.medium); return {title:clean(a.title.english||a.title.romaji||""), malId:a.idMal||null, img:IMG_OK(img)?img:null, media:"anime", kind:KIND[a.format]||null, year:a.seasonYear||y, total:a.episodes||null, genres:(a.genres||[]).slice(0,6), next:a.nextAiringEpisode||null, avg:a.averageScore||null}; }).filter(a=>a.title)}; if(state.view==="season"||state.view==="play") render(); })
-    .catch(()=>{ seasonCache[key]={error:true, list:[]}; if(state.view==="season"||state.view==="play") render(); });
+    .then(j=>{ seasonCache[key]={list:((j.data&&j.data.Page&&j.data.Page.media)||[]).map(a=>{ const img=a.coverImage&&(a.coverImage.large||a.coverImage.medium); return {title:clean(a.title.english||a.title.romaji||""), malId:a.idMal||null, img:IMG_OK(img)?img:null, media:"anime", kind:KIND[a.format]||null, year:a.seasonYear||y, total:a.episodes||null, genres:(a.genres||[]).slice(0,6), next:a.nextAiringEpisode||null, avg:a.averageScore||null}; }).filter(a=>a.title)}; if(seasonOpen()||state.view==="play") render(); })
+    .catch(()=>{ seasonCache[key]={error:true, list:[]}; if(seasonOpen()||state.view==="play") render(); });
 }
 function crewStatus(x){
   const out=[]; const match=y=>(x.malId&&y.malId===x.malId)||norm(y.title)===norm(x.title);
@@ -2464,13 +2481,29 @@ const card = (...kids) => { const c=el("section","card"); c.append(...kids.filte
 const blurActive = () => { const a=document.activeElement; if(a&&a.blur) a.blur(); };
 const ui = { mupForm:false, takeSort:"hot", takeForm:false, brk:null, brkForm:false, brkSize:8, predForm:false, opsTab:"mine", opForm:false, opPlay:null, dsea:null };
 
-state.playTab = (window.CrewLook && CrewLook.get("playTab")) || "mup";
+state.playTab = "home";
+$("#playHomeBtn").addEventListener("click",()=>{ if(typeof go!=="undefined" && go && go.on) stopGop(); state.playTab="home"; renderPlay(true); window.scrollTo({top:0}); });
+const PLAY_GROUPS=[["📅 Every day",["daily","chr"]],["🧠 Quizzes",["guess","gop","emo","who","hl"]],["🗳️ Crew votes",["mup","brk","takes","kd","pred"]],["🏗️ Build & rank",["draft","sq","ops"]]];
+const PLAY_DESC={daily:"One question a day. Keep your streak going",chr:"Guess the mystery character in a few tries",guess:"Name the anime as the poster reveals itself",gop:"Name the anime from its opening song",emo:"Name the anime from emojis",who:"Guess who in the crew said or ranked it",hl:"Higher or lower? Scores and popularity",mup:"This week's head-to-head vote",brk:"Tournament brackets, voted round by round",takes:"Hot takes the crew agrees or disagrees with",kd:"Swipe keep or drop, then compare",pred:"Call what happens next for points",draft:"Fantasy draft shows from the season",sq:"Draft a character squad, crew votes the winner",ops:"Tier openings and endings"};
+function playHome(box){
+  const lab=k=>{ const b=document.querySelector('#playTabs button[data-pt="'+k+'"]'); const t=b?b.textContent.trim():k; const m=t.match(/^(\S+)\s+(.*)$/); return m?[m[1],m[2]]:["🎮",t]; };
+  PLAY_GROUPS.forEach(([name,keys])=>{
+    box.append(el("div","recsub",name)); const g=el("div","ggrid");
+    keys.filter(k=>PLAY[k]).forEach(k=>{ const [e,n]=lab(k); const c=el("button","gcard"); c.type="button";
+      c.append(el("span","ge",e), el("span","gn",n), el("span","gd",PLAY_DESC[k]||""));
+      c.addEventListener("click",()=>{ state.playTab=k; renderPlay(true); window.scrollTo({top:0}); }); g.append(c); });
+    box.append(g); });
+}
 document.querySelectorAll("#playTabs button").forEach(b=>b.addEventListener("click",()=>{ state.playTab=b.dataset.pt; if(window.CrewLook) CrewLook.put("playTab",state.playTab); renderPlay(true); b.scrollIntoView({block:"nearest",inline:"center",behavior:"smooth"}); }));
 let playPending=false;
 $("#playView").addEventListener("focusout",()=>setTimeout(()=>{ if(playPending && !typingInPlay()){ playPending=false; renderPlay(); } },60));
 const typingInPlay = () => { const a=document.activeElement; return a && $("#playView").contains(a) && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName); };
 function renderPlay(force){
-  if(!PLAY[state.playTab]) state.playTab="mup";
+  if(!PLAY[state.playTab]) state.playTab="home";
+  const home=state.playTab==="home";
+  $("#playBack").classList.toggle("hidden", home);
+  if(home){ const box=$("#playBody"); box.replaceChildren(); playHome(box); return; }
+  { const b=document.querySelector('#playTabs button[data-pt="'+state.playTab+'"]'); $("#playCur").textContent=b?b.textContent.trim():""; }
   document.querySelectorAll("#playTabs button").forEach(b=>b.classList.toggle("on", b.dataset.pt===state.playTab));
   if(!force && typingInPlay()){ playPending=true; return; }
   if(!force && ((state.playTab==="guess" && gm.on) || (state.playTab==="gop" && go.on))) return; // don't wipe a game in progress
@@ -3667,7 +3700,7 @@ function inboxPending(){
 function renderInbox(show){
   const c=$("#inboxCard"); if(!show || !state.me) return;
   const pending=inboxPending(), sent=mine().recs; $("#inboxCount").textContent=pending.length?String(pending.length):"";
-  document.querySelectorAll("#inboxSeg button").forEach(b=>{ b.classList.toggle("on", b.dataset.ib===state.inboxTab); if(b.dataset.ib==="in") b.textContent="For you"+(pending.length?" ("+pending.length+")":""); });
+  document.querySelectorAll("#inboxSeg button").forEach(b=>{ b.classList.toggle("on", b.dataset.ib===state.inboxTab); if(b.dataset.ib==="in") b.textContent="Received"+(pending.length?" ("+pending.length+")":""); });
   const body=$("#inboxBody"); body.replaceChildren();
   if(state.inboxTab==="in"){
     if(!pending.length) body.append(el("div","empty","Nothing new. When a friend sends you something, it shows up here."));
@@ -3864,13 +3897,13 @@ function render(){
   if(state.target && !targetList()) state.target=null;
   $("#q").placeholder = state.mode==="lists" ? "Search "+({anime:"anime",manga:"manga",both:"anime or manga"})[searchType()]+" to add…" : w.search; $("#watchedTitle").textContent=w.watched; $("#watchTitle").textContent=w.watchlist; $("#watchHint").textContent=w.qHint;
   $("#crewTopTitle").textContent=w.crewTop;
-  $("#listsView").classList.toggle("hidden", state.view==="crew" || state.view==="season" || state.view==="play");
+  $("#listsView").classList.toggle("hidden", state.view==="crew" || state.view==="discover" || state.view==="play");
+  $("#discoverView").classList.toggle("hidden", state.view!=="discover");
   $("#playView").classList.toggle("hidden", state.view!=="play");
   if(state.view!=="play" && go && go.on) stopGop();
   $("#crewView").classList.toggle("hidden", state.view!=="crew");
-  $("#seasonView").classList.toggle("hidden", state.view!=="season");
-  $("#modeSeg").classList.toggle("hidden", state.view==="season" || state.view==="play");
-  $('#modeSeg button[data-mode="lists"]').classList.toggle("hidden", state.view==="crew");
+  $("#modeSeg").classList.toggle("hidden", state.view==="crew" || state.view==="play");
+  $('#modeSeg button[data-mode="lists"]').classList.toggle("hidden", state.view==="crew" || state.view==="discover");
   // shared poster index so custom-added titles pick up a poster if anyone has one
   Object.values(state.docs).forEach(d=>{
     const all=[];
@@ -3880,8 +3913,8 @@ function render(){
   });
   buildRevIndex(); buildSocialIndex();
   if(revItem) renderReviewSheet();
-  if(state.view==="crew"){ renderCrew(); return; }
-  if(state.view==="season"){ $("#kana").textContent="今期 アニメ"; renderSeason(); return; }
+  if(state.view==="crew"){ $("#kana").textContent="クルー ホーム"; renderCrew(); return; }
+  if(state.view==="discover"){ renderDiscover(); return; }
   if(state.view==="play"){ $("#kana").textContent="クルー ゲーム"; renderPlay(); return; }
 
   const myId = state.me.uid;
@@ -3894,7 +3927,7 @@ function render(){
     else {
       people.style.display="";
       if(!state.friend || (state.friend!==ALL && !friendIds.includes(state.friend))) state.friend = friendIds.length>1 ? ALL : friendIds[0];
-      if(friendIds.length>1){ const c=el("button","chip"+(state.friend===ALL?" on":"")); const g=el("span","av sm allav","👥"); c.append(g, el("span","","All friends")); c.type="button"; c.addEventListener("click",()=>{state.friend=ALL; render();}); people.append(c); }
+      if(friendIds.length>1){ const c=el("button","chip"+(state.friend===ALL?" on":"")); const g=el("span","av sm allav","👥"); c.append(g, el("span","","Whole crew")); c.type="button"; c.addEventListener("click",()=>{state.friend=ALL; render();}); people.append(c); }
       friendIds.forEach(id=>{ const c=el("button","chip"+(id===state.friend?" on":"")); const tm=tasteMatch(mine(), state.docs[id]); const nm=el("span","chipname"); nm.append(el("span","",nameOf(id)+(tm.pct!=null?" · "+tm.pct+"%":""))); const tg=topGenre(state.docs[id]); if(tg) nm.append(el("small","",tg)); c.append(avatarEl(id,true), nm); c.type="button"; c.addEventListener("click",()=>{state.friend=id; render();}); people.append(c); });
       showId=state.friend;
       if(showId!==ALL && !hasAnything(state.docs[showId])) people.append(el("div","empty",nameOf(showId)+" hasn't added anything yet."));
@@ -3932,14 +3965,14 @@ function render(){
   if(state.mode==="lists" && !tgt) $(".search").classList.add("hidden");
   if(editable) renderResults();
   if(state.mode==="lists"){ renderCustomLists(showId, editable); return; }
-  $("#topTitle").textContent = (showId===ALL ? "Friends' combined " : "") + (state.mode==="overall" ? "overall top 10" : "top 10");
+  $("#topTitle").textContent = (showId===ALL ? "Crew's combined " : "") + (state.mode==="overall" ? "overall top 10" : "top 10");
   if(showId!==ALL) $("#topTitle").textContent = state.mode==="overall" ? "Overall top 10" : "Top 10";
   $("#topHint").textContent = editable
     ? (state.mode==="overall" ? "Anime and manga together. Search above to add either one, and use the arrows to reorder." : "Search above to add "+(state.mode==="manga"?"manga":"shows")+". Use the arrows to reorder.")
     : showId===ALL ? "Everyone's "+(state.mode==="overall"?"overall ":"")+"top 10s combined. A #1 pick is worth 10 points, #10 is worth 1."
     : (showId ? nameOf(showId)+"'s "+(state.mode==="overall"?"overall ":"")+"ranking." : "");
 
-  const d = L(showId ? (showId===ALL ? allDoc(friendIds) : (state.docs[showId] || blank())) : blank());
+  const d = L(showId ? (showId===ALL ? allDoc([myId, ...friendIds]) : (state.docs[showId] || blank())) : blank());
   const k = K();
   if(std){ fillGenreSelect($("#fGenre"), [...d.top,...d.watching,...d.watched,...d.watchlist], state.genre, "All genres"); $("#fSort").value=state.sort; }
   document.querySelectorAll("#laySeg button").forEach(b=>b.classList.toggle("on", b.dataset.lay===state.layout));
@@ -4077,8 +4110,8 @@ function renderCustomLists(showId, editable){
   const box=$("#customLists"); box.replaceChildren();
   if(!showId) return;
   if(showId===ALL){
-    const ids=Object.keys(state.docs).filter(id=>id!==state.me.uid && state.docs[id].custom.length).sort((a,b)=>nameOf(a).localeCompare(nameOf(b)));
-    if(!ids.length){ const c=el("section","card"); c.append(el("div","empty","None of your friends have made a list yet.")); box.append(c); return; }
+    const ids=Object.keys(state.docs).filter(id=>state.docs[id].custom.length).sort((a,b)=>(a===state.me.uid?-1:b===state.me.uid?1:nameOf(a).localeCompare(nameOf(b))));
+    if(!ids.length){ const c=el("section","card"); c.append(el("div","empty","Nobody in the crew has made a list yet.")); box.append(c); return; }
     ids.forEach(id=>state.docs[id].custom.forEach(l=>box.append(listCard(l,false,id)))); return;
   }
   const lists=(state.docs[showId]||blank()).custom||[];
@@ -4286,7 +4319,18 @@ state.crewTab = "picks";
 state.lastMode = state.mode==="lists" ? "anime" : state.mode;
 // ---- sub-tabs: one section at a time instead of a long scroll ----
 const LIST_SUBS=[["top","🏆 Top 10"],["now","▶ Watching"],["watched","✓ Watched"],["watch","📝 Watchlist"],["stats","📊 Stats"]];
-const CREW_SUBS=[["feed","📰 Feed"],["top","🏆 Top 10"],["party","🍿 Watch party"],["polls","🗳️ Polls"],["recs","✨ For you"],["inbox","📨 Inbox"],["lists","📋 Lists"]];
+const CREW_SUBS=[["feed","📰 Activity"],["inbox","📨 Inbox"],["party","🍿 Watch party"],["polls","🗳️ Polls"]];
+const DISC_SUBS=[["recs","✨ For you"],["season","📅 This season"]];
+const seasonOpen = () => state.view==="discover" && state.sub && state.sub.disc==="season";
+function renderDiscover(){
+  const sub=pickSub("disc", DISC_SUBS); subBar("#discSub","disc",DISC_SUBS,sub);
+  const isS=sub==="season";
+  $("#seasonView").classList.toggle("hidden", !isS); $("#recCard").classList.toggle("hidden", isS);
+  $("#modeSeg").classList.toggle("hidden", isS);
+  if(isS){ $("#kana").textContent="今期 アニメ"; renderSeason(); return; }
+  if(state.mode==="lists"){ state.mode=state.lastMode||"anime"; document.querySelectorAll("#modeSeg button").forEach(b=>b.classList.toggle("on", b.dataset.mode===state.mode)); }
+  $("#kana").textContent="おすすめ"; renderRecs();
+}
 state.sub={};
 function pickSub(key, items){ let v=state.sub[key]; if(v==null && window.CrewLook) v=CrewLook.get("sub_"+key); if(!items.some(i=>i[0]===v)) v=items[0][0]; state.sub[key]=v; return v; }
 function subBar(boxSel, key, items, cur, badge){
@@ -4651,9 +4695,9 @@ onAuthStateChanged(auth, user=>{
   state.cfg=null; state.cfgReady=false; lastBanned=""; $("#adminLink").classList.add("hidden"); $("#annBar").classList.add("hidden"); $("#adminSheet").classList.add("hidden");
   state.me = user; state.docs = {}; state.loaded=false; Object.keys(disc).forEach(k=>delete disc[k]); unsaved=false; dirty=false; clearTimeout(retryT);
   if(!user){
-    $("#app").classList.add("hidden"); $("#me").classList.add("hidden"); $("#signinView").classList.remove("hidden"); $(".sub").classList.remove("hidden"); document.body.classList.remove("authed"); setStatus(null); return;
+    $("#app").classList.add("hidden"); $("#me").classList.add("hidden"); $("#signinView").classList.remove("hidden"); document.body.classList.remove("authed"); setStatus(null); return;
   }
-  $("#signinView").classList.add("hidden"); $("#app").classList.add("hidden"); $("#me").classList.remove("hidden"); $(".sub").classList.add("hidden"); document.body.classList.add("authed");
+  $("#signinView").classList.add("hidden"); $("#app").classList.add("hidden"); $("#me").classList.remove("hidden"); document.body.classList.add("authed");
   $("#meName").textContent = displayNameOf(user);
   renderMe();
   setStatus("Loading lists…");
