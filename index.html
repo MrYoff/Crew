@@ -763,6 +763,83 @@
   ol.top.shelf li.r1 .title small{font-size:12px}
   ol.top.shelf li.r1>.actions,ol.top.shelf li.r1>.facts{grid-column:2;grid-row:3;justify-content:flex-start;align-self:start}
   .fab{position:fixed;right:16px;bottom:calc(86px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:28px;border:0;background:var(--accent);color:#fff;z-index:19;box-shadow:0 6px 20px rgba(0,0,0,.35);display:grid;place-items:center;cursor:pointer}
+  /* ---- Home: story rings ---- */
+  .storycard{margin:0 0 14px}
+  .rings{display:flex;gap:14px;overflow-x:auto;padding:4px 2px 12px;scrollbar-width:none}
+  .rings::-webkit-scrollbar{display:none}
+  .ring{flex:none;width:64px;background:none;border:0;padding:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;font:700 12px "Zen Kaku Gothic New"}
+  .ring .ro{width:62px;height:62px;border-radius:50%;border:3px solid var(--line);padding:3px;box-sizing:border-box;display:grid;place-items:center}
+  .ring.fresh .ro{border-color:var(--accent)} .ring.fresh{color:var(--text)}
+  .ring .ro .av{width:100%;height:100%;font-size:20px;border-radius:50%;object-fit:cover;margin:0}
+  .ring .rl{max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .av.plus{background:var(--panel2);color:var(--text);display:grid;place-items:center;font-size:24px}
+  .shead h3{margin:6px 0 10px;font-size:16px}
+  .trow{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;margin-bottom:6px;scrollbar-width:none}
+  .trow::-webkit-scrollbar{display:none}
+  .tcard{flex:none;width:118px;min-width:0}
+  .tcard .poster{width:118px;border-radius:12px;cursor:pointer}
+  .tcard .poster .gen b{font-size:24px}
+  .ttag{position:absolute;left:6px;bottom:6px;z-index:2;background:rgba(15,14,23,.85);color:#fff;border-radius:999px;padding:3px 8px;font-size:11px;font-weight:700;max-width:calc(100% - 28px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .tt{font-size:13px;font-weight:700;margin-top:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .wrow{width:100%;display:flex;align-items:center;gap:12px;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:8px;color:var(--text);cursor:pointer;font:inherit}
+  .wrow .wi{width:40px;height:40px;flex:none;border-radius:12px;background:var(--panel2);display:grid;place-items:center;font-size:20px}
+  .wrow .wt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+  .wrow .wt b{font-size:14px} .wrow .wt small{color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .wrow .wc{color:var(--muted);font-size:22px;line-height:1}
+  /* ---- Discover: swipe deck ---- */
+  .deck{position:relative;height:clamp(280px, calc(100vh - 440px), 500px);height:clamp(280px, calc(100dvh - 440px), 500px);margin:6px 4px 14px}
+  .dcard{position:absolute;inset:0;border-radius:20px;overflow:hidden;background:var(--panel2);touch-action:pan-y;-webkit-user-select:none;user-select:none;box-shadow:0 10px 30px rgba(0,0,0,.35);cursor:grab}
+  .dcard.back{transform:rotate(-3deg) scale(.95);opacity:.5;box-shadow:none;pointer-events:none}
+  .dcard>.poster{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:auto;border-radius:0}
+  .dcard>.poster .gen b{font-size:44px}
+  .dcard>.poster img{-webkit-user-drag:none;pointer-events:none}
+  .dinfo{position:absolute;left:0;right:0;bottom:0;padding:40px 18px 18px;background:linear-gradient(transparent, rgba(10,9,16,.92) 40%);color:#fff;pointer-events:none}
+  .dinfo .dt{font-family:"Dela Gothic One";font-size:24px;line-height:1.15}
+  .dinfo .dm{font-size:13px;opacity:.8;margin-top:4px}
+  .dinfo .dw{font-size:13px;margin-top:6px}
+  .dbadge{position:absolute;top:12px;right:12px;z-index:2;background:rgba(15,14,23,.85);color:#fff;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:700;pointer-events:none}
+  .dcard.yes{box-shadow:0 0 0 4px var(--blue)} .dcard.no{box-shadow:0 0 0 4px var(--accent)}
+  .dbtns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .dbtn{min-height:56px;border-radius:16px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font:700 14px "Zen Kaku Gothic New";cursor:pointer;padding:4px}
+  .dbtn.add{background:var(--accent);border-color:var(--accent);color:#fff}
+  .dhint{text-align:center;color:var(--muted);font-size:12px;margin-top:10px}
+  /* ---- Play: daily hub ---- */
+  .phead{display:flex;justify-content:flex-end;margin:0 0 10px}
+  .pstreak{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:700}
+  .phero{width:100%;display:flex;gap:16px;align-items:center;text-align:left;background:var(--accent);color:#fff;border:0;border-radius:20px;padding:16px;cursor:pointer;font:inherit;margin-bottom:16px}
+  .phero .pa{width:64px;height:86px;flex:none;border-radius:12px;background:rgba(0,0,0,.22);display:grid;place-items:center;font-family:"Dela Gothic One";font-size:32px}
+  .phero .ptx{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .phero .pk{font-size:11px;font-weight:700;letter-spacing:1px;opacity:.9}
+  .phero .pt{font-family:"Dela Gothic One";font-size:21px;line-height:1.15}
+  .phero .ps{font-size:13px;font-weight:500;opacity:.95}
+  .lbrow{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin-bottom:6px}
+  .lbrow .lr{width:22px;font-family:"Dela Gothic One";font-size:16px;color:var(--muted)}
+  .lbrow.l1 .lr{color:var(--accent2)} .lbrow.l2 .lr{color:var(--silver)} .lbrow.l3 .lr{color:var(--bronze)}
+  .lbrow .ln{flex:1;font-weight:700;font-size:14px} .lbrow .ls{font-size:13px;color:var(--muted)}
+  .lbwrap{margin-bottom:14px}
+  /* ---- Detail page ---- */
+  #revSheet .head{position:sticky;top:0;z-index:4;height:0;margin:0;display:flex;justify-content:flex-end;overflow:visible}
+  #revSheet .head h3{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  #revSheet .head .ic{transform:translateY(14px);width:40px;height:40px;border-radius:20px;background:rgba(15,14,23,.72);color:#fff;border:0;font-size:16px}
+  .dbanner{position:relative;overflow:hidden;height:170px;margin:-18px -18px 0;background:color-mix(in srgb, var(--accent) 22%, var(--panel2))}
+  .dbanner::before{content:"";position:absolute;inset:0;background:var(--bimg, none) center/cover no-repeat}
+  .dbanner.blur::before{filter:blur(16px) saturate(1.3);transform:scale(1.25);opacity:.85}
+  .dbanner::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 40%, var(--panel))}
+  #revSheet .revhead{position:relative;z-index:2;margin-top:-66px;align-items:flex-end;gap:14px}
+  #revSheet .revhead .poster{width:100px;border:3px solid var(--panel);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+  #revSheet .revhead .t{font-family:"Dela Gothic One";font-weight:400;font-size:22px;line-height:1.15}
+  #detailBox .dacts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:14px 0 12px}
+  #detailBox .dacts .pill{min-height:46px;border-radius:14px;font-size:13px;white-space:normal;text-align:center;display:flex;align-items:center;justify-content:center;padding:6px}
+  #detailBox .dacts .pill.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+  .dscore{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin:10px 0;display:flex;flex-direction:column;gap:8px}
+  .dscore .dsh{display:flex;justify-content:space-between;align-items:baseline}
+  .dscore .dsv{font-family:"Dela Gothic One";font-size:24px;color:var(--accent2)}
+  .dscore .dsv small{font:500 13px "Zen Kaku Gothic New";color:var(--muted)}
+  .dsr{display:flex;align-items:center;gap:10px}
+  .dsr .track2{flex:1;height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+  .dsr .track2 i{display:block;height:100%;background:var(--accent);border-radius:4px}
+  .dsr .dl{min-width:76px;text-align:right;font-size:12.5px;color:var(--muted)}
+  @media (max-width:599px){ #revSheet .sheet{max-height:100vh;max-height:100dvh;height:100vh;height:100dvh;border-radius:0;border:0} }
 </style>
 </head>
 <body>
@@ -935,7 +1012,7 @@
         </section>
       </div>
       <section class="card" id="recCard">
-        <h2>For you<button class="sharebtn" id="recRefresh" type="button">↻ Refresh</button></h2>
+        <h2>For you<button class="sharebtn" id="recView" type="button">☰ List</button><button class="sharebtn" id="recRefresh" type="button">↻ Refresh</button></h2>
         <p class="hint">Crew favorites you haven't added yet, plus picks based on what you rate highly and the genres you like.</p>
         <div id="recList"></div>
       </section>
@@ -949,6 +1026,7 @@
 
     <div id="crewView" class="hidden">
       <div class="subtabs" id="crewSub"></div>
+      <section class="storycard" data-csub="feed" id="storyBody"></section>
       <section class="card" data-csub="inbox" id="inboxCard"><h2>Recommendations <span class="count" id="inboxCount"></span></h2><div class="seg" id="inboxSeg"><button type="button" data-ib="in" class="on">Received</button><button type="button" data-ib="sent">Sent</button></div><div id="inboxBody"></div></section>
 
       <section class="card" data-csub="top" id="crewTopCard">
@@ -1030,8 +1108,11 @@
 <div class="sheet-bg hidden" id="revSheet" role="dialog" aria-modal="true" aria-labelledby="revTitle">
   <div class="sheet">
     <div class="head"><h3>Details</h3><button class="ic" id="revClose" type="button" aria-label="Close">✕</button></div>
+    <div class="dbanner" id="revBanner"></div>
     <div class="revhead" id="revHead"></div>
     <div id="detailBox"></div>
+    <h4 id="revOthersTitle">From the crew</h4>
+    <div id="revList"></div>
     <div class="sendbox hidden" id="sendBox"><h4>Recommend to a friend</h4><div class="sendrow"><select id="sendTo" aria-label="Send to"></select><input id="sendNote" maxlength="140" placeholder="Add a note (optional)" aria-label="Note"><button class="btn primary" id="sendGo" type="button">📨 Send</button></div></div>
     <h4>Your review</h4>
     <div class="reved">
@@ -1043,8 +1124,6 @@
         <button class="btn primary" id="revSave" type="button">Post</button>
       </div>
     </div>
-    <h4 id="revOthersTitle">From the crew</h4>
-    <div id="revList"></div>
   </div>
 </div>
 <div class="sheet-bg hidden" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
@@ -1558,6 +1637,13 @@ function openReviews(x){
   renderReviewSheet();
   $("#revSheet").classList.remove("hidden");
 }
+function setBanner(){
+  const b=$("#revBanner"); if(!b || !revItem) return;
+  const e=detCache[revKey(revItem)], src=e&&e.m&&e.m.bannerImage;
+  const fb=revItem.img || imgIndex[(revItem.media||"anime")+":"+norm(revItem.title)];
+  const u=src||fb; b.classList.toggle("blur", !src && !!fb);
+  if(u) b.style.setProperty("--bimg", 'url("'+String(u).replace(/["\\]/g,"")+'")'); else b.style.removeProperty("--bimg");
+}
 function renderReviewSheet(){
   if(!revItem) return;
   const x=revItem, k=revKey(x);
@@ -1572,7 +1658,7 @@ function renderReviewSheet(){
   const list=$("#revList"); list.replaceChildren();
   if(!others.length) list.append(el("div","empty","Nobody else has reviewed this yet."));
   others.forEach(v=>list.append(reviewEl(v.id, v.r, false)));
-  renderSendBox(); renderDetails();
+  renderSendBox(); renderDetails(); setBanner();
 }
 function reviewEl(id, r, showTitle){
   const box=el("div","rev");
@@ -1921,8 +2007,45 @@ function recRow(x, whoText, showType, onHide){
   row.append(acts);
   return row;
 }
+
+// ---- Discover: one card at a time, swipe right to add, left to skip ----
+const recSkip=new Set();
+function renderDeck(box, deck, loading, err){
+  const left=deck.filter(c=>!recSkip.has(rkey(c.x.media,c.x)));
+  if(!left.length){
+    box.append(el("div","empty", loading?"Finding shows you'd like…":err?"Couldn't load picks right now. Try ↻ Refresh in a minute.":deck.length?"That's everything for now. Tap ↻ Refresh for a new batch.":"Rate a few things you've watched and picks will show up here."));
+    if(deck.length && !loading) box.append(bt("btn recmore","Go through skipped ones again",()=>{ recSkip.clear(); renderRecs(); }));
+    return;
+  }
+  const c=left[0], md=c.x.media||"anime";
+  const wrap=el("div","deck");
+  if(left[1]){ const bk=el("div","dcard back"); bk.append(posterEl(left[1].x,true)); wrap.append(bk); }
+  const card=el("div","dcard"); card.append(posterEl(c.x,true));
+  if(c.crew) card.append(el("span","dbadge","👥 Crew pick"));
+  const info=el("div","dinfo"); info.append(el("div","dt",c.x.title));
+  const meta=metaOf(c.x).filter(Boolean).join(" · "); if(meta) info.append(el("div","dm",meta));
+  info.append(el("div","dw",c.why)); card.append(info);
+  wrap.append(card); box.append(wrap);
+  const fly=(tf,fn)=>{ card.style.transition="transform .22s ease, opacity .22s"; card.style.transform=tf; card.style.opacity="0"; setTimeout(fn,200); };
+  const yes=()=>fly("translateX(440px) rotate(14deg)",()=>addWatchFor(c.x, md));
+  const no=()=>fly("translateX(-440px) rotate(-14deg)",()=>{ recSkip.add(rkey(md,c.x)); renderRecs(); });
+  const seen=()=>fly("translateY(-60px) scale(.94)",()=>addWatchedFor(c.x, md));
+  const btns=el("div","dbtns");
+  btns.append(bt("dbtn","✕ Skip",no), bt("dbtn add","+ "+WORDS[md].watchlist,yes), bt("dbtn","✓ "+(md==="manga"?"Read it":"Seen it"),seen));
+  box.append(btns, el("div","dhint", left.length+(left.length===1?" pick":" picks")+" left · swipe right to add, left to skip · tap for details"));
+  let sx=null, sy=0, dx=0, moved=false;
+  card.addEventListener("pointerdown",e=>{ sx=e.clientX; sy=e.clientY; dx=0; moved=false; card.style.transition="none"; });
+  card.addEventListener("pointermove",e=>{ if(sx==null) return; dx=e.clientX-sx;
+    if(!moved){ if(Math.abs(e.clientY-sy)>12 && Math.abs(dx)<12){ sx=null; return; } if(Math.abs(dx)>8){ moved=true; try{ card.setPointerCapture(e.pointerId); }catch(_){} } }
+    if(!moved) return; card.style.transform="translateX("+dx+"px) rotate("+(dx/20)+"deg)"; card.classList.toggle("yes",dx>70); card.classList.toggle("no",dx<-70); });
+  const end=()=>{ if(sx==null) return; sx=null; if(dx>90) yes(); else if(dx<-90) no(); else { card.style.transition="transform .2s"; card.style.transform=""; card.classList.remove("yes","no"); } };
+  card.addEventListener("pointerup",end); card.addEventListener("pointercancel",end);
+  card.addEventListener("click",e=>{ if(moved){ e.stopPropagation(); e.preventDefault(); moved=false; } },true);
+}
 function renderRecs(){
   const box=$("#recList"); box.replaceChildren(); if(!state.me) return;
+  const swipe = state.recView!=="list", deck=[];
+  $("#recView").textContent = swipe ? "☰ List" : "🃏 Cards";
   const medias = state.mode==="anime"||state.mode==="manga" ? [state.mode] : ["anime","manga"];
   const known=knownKeys(mine()), agg=new Map(), both=medias.length>1;
   const knownIds=new Set(); ["anime","manga"].forEach(md=>{ const k=MEDIA_KEYS[md]; [...mine()[k.top],...mine()[k.watched],...mine()[k.watchlist],...mine()[k.watching]].forEach(x=>{ if(x.malId) knownIds.add(md+":"+x.malId); }); });
@@ -1931,11 +2054,12 @@ function renderRecs(){
   // keep the strongest crew picks on top, rotate the rest on each refresh
   const CREW_N=4; let crew=crewAll.slice(0,2);
   const rest=crewAll.slice(2); if(rest.length){ const off=(recTurn*(CREW_N-2))%rest.length; crew=crew.concat(rest.slice(off).concat(rest.slice(0,off)).slice(0,CREW_N-2)); }
-  if(crew.length){ box.append(el("div","recsub","From the crew")); crew.forEach(a=>box.append(recRow(a.x, a.who.join(" · "), both))); }
+  if(swipe) crewAll.forEach(a=>deck.push({x:a.x, crew:true, why:"Crew pick · "+a.who.join(" · ")}));
+  else if(crew.length){ box.append(el("div","recsub","From the crew")); crew.forEach(a=>box.append(recRow(a.x, a.who.join(" · "), both))); }
   const shownKeys=new Set(crewAll.map(a=>rkey(a.x.media,a.x)));
   // discovery picks
   if(state.loaded) medias.forEach(md=>{ if(!disc[md]) fetchDisc(md); });
-  const per=(both?5:8)+recMore*(both?4:6), picks=[], hidden=recStore.hidden();
+  const per=swipe?(both?15:25):(both?5:8)+recMore*(both?4:6), picks=[], hidden=recStore.hidden();
   medias.forEach(md=>{ const d=disc[md]; if(!d||!d.pool.length) return; let n=0;
     // skip what the last two refreshes showed; only fall back to them if there's nothing else left
     const seenB=recStore.seen(md), recent=new Set(seenB.filter(b=>b.t!==d.id).slice(-2).flatMap(b=>b.ids));
@@ -1949,11 +2073,14 @@ function renderRecs(){
     const before=cur.ids.length; ids.forEach(i=>{ if(!cur.ids.includes(i)) cur.ids.push(i); }); if(cur.ids.length!==before) recStore.saveSeen(md,seenB);
   });
   const loading=medias.some(md=>disc[md]&&disc[md].loading), err=medias.some(md=>disc[md]&&disc[md].err);
+  if(swipe){ picks.forEach(c=>{ const why=c.why[0]||"Popular pick"; const g=(c.x.genres||[]).slice(0,3).join(", "); deck.push({x:c.x, why:why+(g?" · "+g:"")+(c.x.avg?" · ★ "+c.x.avg+"%":"")}); }); renderDeck(box, deck, loading, err); }
+  else {
   box.append(el("div","recsub","More you might like"));
   if(picks.length) picks.forEach(c=>{ const why=c.why[0]||"Popular pick"; const extra=c.why.length>1?" (+"+(c.why.length-1)+" more)":""; const g=(c.x.genres||[]).slice(0,3).join(", ");
     box.append(recRow(c.x, why+extra+(g?" · "+g:"")+(c.x.avg?" · ★ "+c.x.avg+"%":""), both, ()=>{ recStore.hide(recId(c.x.media,c.x)); renderRecs(); })); });
   else box.append(el("div","empty", loading?"Finding shows you'd like…":err?"Couldn't load picks right now. Try ↻ Refresh in a minute.":"Rate a few things you've watched and picks will show up here."));
   if(picks.length && recMore<4){ const more=el("button","btn recmore","Show more"); more.type="button"; more.addEventListener("click",()=>{ recMore++; renderRecs(); }); box.append(more); }
+  }
   const btn=$("#recRefresh"); btn.disabled=loading; btn.textContent=loading?"Loading…":"↻ Refresh";
 }
 
@@ -2253,6 +2380,8 @@ async function refreshCounts(){
 state.genre="";
 state.sort=(()=>{ const v=window.CrewLook&&CrewLook.get("sort"); return ["title","recent","score","year"].includes(v)?v:"title"; })();
 state.layout=(()=>{ const v=window.CrewLook&&CrewLook.get("layout"); return v==="list"?"list":"grid"; })();
+state.recView=(window.CrewLook&&CrewLook.get("recView"))==="list"?"list":"swipe";
+$("#recView").addEventListener("click",()=>{ state.recView=state.recView==="list"?"swipe":"list"; if(window.CrewLook) CrewLook.put("recView",state.recView); renderRecs(); });
 $("#addFab").addEventListener("click",()=>{ if(state.curSub==="stats"||state.curSub==="match"){ state.sub.me="top"; render(); } const q=$("#q"); q.scrollIntoView({block:"center",behavior:"smooth"}); q.focus({preventScroll:true}); });
 document.querySelectorAll("#laySeg button").forEach(b=>b.addEventListener("click",()=>{ state.layout=b.dataset.lay; if(window.CrewLook) CrewLook.put("layout",state.layout); render(); }));
 $("#fGenre").addEventListener("change",e=>{ state.genre=e.target.value; render(); });
@@ -2517,6 +2646,18 @@ $("#playHomeBtn").addEventListener("click",()=>{ if(typeof go!=="undefined" && g
 const PLAY_GROUPS=[["📅 Every day",["daily","chr"]],["🧠 Quizzes",["guess","gop","emo","who","hl"]],["🗳️ Crew votes",["mup","brk","takes","kd","pred"]],["🏗️ Build & rank",["draft","sq","ops"]]];
 const PLAY_DESC={daily:"One question a day. Keep your streak going",chr:"Guess the mystery character in a few tries",guess:"Name the anime as the poster reveals itself",gop:"Name the anime from its opening song",emo:"Name the anime from emojis",who:"Guess who in the crew said or ranked it",hl:"Higher or lower? Scores and popularity",mup:"This week's head-to-head vote",brk:"Tournament brackets, voted round by round",takes:"Hot takes the crew agrees or disagrees with",kd:"Swipe keep or drop, then compare",pred:"Call what happens next for points",draft:"Fantasy draft shows from the season",sq:"Draft a character squad, crew votes the winner",ops:"Tier openings and endings"};
 function playHome(box){
+  { const me=mine(), gx=me.gx||{}, s=liveStreak(gx.chs), p=gx.chp&&gx.chp.d===today()?gx.chp:null, ids=Object.keys(state.docs);
+    const played=ids.filter(id=>{ const q=(state.docs[id].gx||{}).chp; return q&&q.d===today()&&q.done; });
+    const hd=el("div","phead"); hd.append(el("span","pstreak", s ? "🔥 "+s+"-day streak" : "🔥 Start a streak today")); box.append(hd);
+    const hero=el("button","phero"); hero.type="button";
+    const tx=el("span","ptx"); tx.append(el("span","pk","DAILY CHALLENGE"), el("span","pt","Anidle"),
+      el("span","ps", p ? (p.done ? (p.ok ? "✅ Solved in "+p.g.length+(p.g.length===1?" guess":" guesses") : "❌ Missed it today. New one tomorrow") : "In progress · "+p.g.length+"/"+CHR_MAX+" guesses") : "Guess today's mystery character · "+played.length+" of "+ids.length+" crew played"));
+    hero.append(el("span","pa", p&&p.done ? (p.ok?"✓":"✕") : "?"), tx);
+    hero.addEventListener("click",()=>{ state.playTab="chr"; renderPlay(true); window.scrollTo({top:0}); }); box.append(hero);
+    const solved=ids.map(id=>({id,q:(state.docs[id].gx||{}).chp})).filter(v=>v.q&&v.q.d===today()&&v.q.done&&v.q.ok).sort((a,b)=>a.q.g.length-b.q.g.length||nameOf(a.id).localeCompare(nameOf(b.id)));
+    if(solved.length){ box.append(el("div","recsub","Today's leaderboard")); const lw=el("div","lbwrap");
+      solved.slice(0,5).forEach((v,i)=>{ const r=el("div","lbrow l"+(i+1)); r.append(el("span","lr",String(i+1)), avatarEl(v.id,true), el("span","ln",nameOf(v.id)), el("span","ls",v.q.g.length+(v.q.g.length===1?" guess":" guesses"))); lw.append(r); }); box.append(lw); }
+  }
   const lab=k=>{ const b=document.querySelector('#playTabs button[data-pt="'+k+'"]'); const t=b?b.textContent.trim():k; const m=t.match(/^(\S+)\s+(.*)$/); return m?[m[1],m[2]]:["🎮",t]; };
   PLAY_GROUPS.forEach(([name,keys])=>{
     box.append(el("div","recsub",name)); const g=el("div","ggrid");
@@ -3811,7 +3952,7 @@ async function profileCard(id){
 
 // ================= DETAILS: tap any anime/manga for synopsis, scores, genres, studio, characters =================
 const detCache={};
-const DET_F=`id idMal siteUrl format status episodes chapters volumes duration season seasonYear startDate{year month day} endDate{year month day} averageScore popularity favourites genres
+const DET_F=`id idMal bannerImage siteUrl format status episodes chapters volumes duration season seasonYear startDate{year month day} endDate{year month day} averageScore popularity favourites genres
   tags{name rank isMediaSpoiler} studios(isMain:true){nodes{name}} source countryOfOrigin description(asHtml:false) title{english romaji native} synonyms
   nextAiringEpisode{episode airingAt} rankings{rank type allTime context} trailer{id site} characters(perPage:8,sort:[ROLE,RELEVANCE,ID]){edges{role node{name{full} image{medium}}}}
   staff(perPage:3,sort:[RELEVANCE,ID]){edges{role node{name{full}}}}`;
@@ -3832,7 +3973,7 @@ const SOURCE_TXT={ORIGINAL:"Original",MANGA:"Manga",LIGHT_NOVEL:"Light novel",VI
 const plain = h => { const t=document.createElement("textarea"); t.innerHTML=String(h||"").replace(/<br\s*\/?>/gi,"\n").replace(/<[^>]+>/g,""); return t.value.replace(/\n{3,}/g,"\n\n").replace(/\(Source:[^)]*\)\s*$/i,"").trim(); };
 let detMore=false, detTrailer=false, detSpoil=false;
 function renderDetails(err){
-  const box=$("#detailBox"); if(!box || !revItem) return; box.replaceChildren();
+  const box=$("#detailBox"); if(!box || !revItem) return; box.replaceChildren(); setBanner();
   const x=revItem, media=x.media||"anime", e=detCache[revKey(x)]||fetchDetails(x);
   // your status + quick add
   const k=MEDIA_KEYS[media], me=mine(), it={...x,media};
@@ -3841,9 +3982,12 @@ function renderDetails(err){
   if(done) acts.append(el("span","pill done","✓ "+WORDS[media].watched+(done.score?" · "+done.score+"/10":"")));
   else { if(now) acts.append(el("span","pill done","▶ "+WORDS[media].watching+" · "+WORDS[media].unit+" "+(now.prog||0)));
     else acts.append(bt("pill","▶ "+WORDS[media].start,()=>addWatchingFor(x,media)));
-    if(!now && !q) acts.append(bt("pill","+ "+WORDS[media].watchlist,()=>{ addWatchFor(x,media); renderDetails(); }));
+    if(!now && !q) acts.append(bt("pill pri","+ "+WORDS[media].watchlist,()=>{ addWatchFor(x,media); renderDetails(); }));
     else if(q) acts.append(el("span","pill done","✓ On your "+WORDS[media].watchlist.toLowerCase()));
     acts.append(bt("pill","✓ "+WORDS[media].watched,()=>{ addWatchedFor(x,media); })); }
+  { const inTop=me[k.top].some(y=>same(y,it));
+    if(inTop) acts.append(el("span","pill done","★ In your top 10"));
+    else if(me[k.top].length<10) acts.append(bt("pill","★ Top 10",()=>{ const prev=state.mode; state.mode=media; addTop(it); state.mode=prev; render(); renderDetails(); })); }
   box.append(acts);
   // crew numbers (available even offline)
   const crew=crewAvgOf(x.title, media), who=crewStatus(x);
@@ -3858,6 +4002,12 @@ function renderDetails(err){
     tile(rated?"#"+rated.rank:pop?"#"+pop.rank:fmtN(m.popularity||0), rated?"top rated":pop?"most popular":"members");
     tile(fmtN(m.favourites||0),"♥ favorites"); }
   box.append(tiles);
+  { const rows=[]; Object.entries(state.docs).forEach(([id,d])=>{ const v=ratingsOf(d).get(media+":"+norm(x.title)); const ti=d[k.top].findIndex(y=>same(y,it)); if(v||ti>=0) rows.push({id, sc:v?v.sc:null, rank:ti>=0?ti+1:null}); });
+    if(rows.length){ rows.sort((a,b)=>(a.rank||99)-(b.rank||99)||(b.sc||0)-(a.sc||0));
+      const sc=el("div","dscore"), h=el("div","dsh"), v=el("span","dsv", crew?crew.v.toFixed(1):"–"); v.append(el("small",""," / 10")); h.append(el("b","","Crew score"), v); sc.append(h);
+      rows.forEach(r=>{ const rw=el("div","dsr"), tr2=el("span","track2"), f=el("i"); f.style.width=(r.sc?r.sc*10:0)+"%"; tr2.append(f);
+        rw.append(avatarEl(r.id,true), tr2, el("span","dl",[r.rank?"#"+r.rank:null, r.sc?r.sc+"/10":r.rank?null:"no score"].filter(Boolean).join(" · "))); sc.append(rw); });
+      box.append(sc); } }
   if(who.length){ const cr=el("div","dcrew"); who.forEach(c=>{ const s2=el("span","dchip"); s2.append(avatarEl(c.id,true), el("span","",c.t)); cr.append(s2); }); box.append(cr); }
   if(!m) return;
   // facts
@@ -4153,6 +4303,45 @@ function renderCustomLists(showId, editable){
   lists.forEach(l=>box.append(listCard(l, editable, null)));
 }
 
+
+// ---- Home: story rings, trending, waiting on you ----
+function lastActive(d){
+  let t=""; const bump=v=>{ if(v && v>t) t=v; };
+  ["anime","manga"].forEach(md=>{ const k=MEDIA_KEYS[md]; [...d[k.top],...d[k.watched],...d[k.watchlist],...d[k.watching]].forEach(x=>{ bump(x.at); bump(x.upd); }); });
+  [...(d.otop||[]), ...(d.custom||[]).flatMap(l=>l.items), ...(d.reviews||[]), ...(d.polls||[]), ...(d.recs||[])].forEach(x=>bump(x.at));
+  return t;
+}
+function renderStories(){
+  const box=$("#storyBody"); if(!box || !state.me) return; box.replaceChildren();
+  const me=state.me.uid, now=Date.now();
+  const goTo=(view,fn)=>()=>{ state.view=view; if(fn) fn(); render(); window.scrollTo({top:0}); };
+  const ids=Object.keys(state.docs).filter(id=>id!==me).map(id=>({id,t:lastActive(state.docs[id])})).sort((a,b)=>b.t.localeCompare(a.t));
+  const rings=el("div","rings");
+  const ring=(id,label,fresh,fn)=>{ const b=el("button","ring"+(fresh?" fresh":"")); b.type="button"; b.setAttribute("aria-label",label+(fresh?" (new activity)":"")); const o=el("span","ro"); o.append(avatarEl(id)); b.append(o, el("span","rl",label)); b.addEventListener("click",fn); return b; };
+  rings.append(ring(me,"You",false,goTo("me")));
+  ids.forEach(({id,t})=>rings.append(ring(id,nameOf(id),!!t && now-Date.parse(t)<48*3600e3,goTo("friends",()=>{ state.friend=id; }))));
+  const inv=el("button","ring"); inv.type="button"; inv.setAttribute("aria-label","Invite a friend"); const io=el("span","ro"); io.append(el("span","av plus","+")); inv.append(io, el("span","rl","Invite"));
+  inv.addEventListener("click",async()=>{ const url=location.origin+location.pathname; try{ if(navigator.share){ await navigator.share({title:"Crew", text:"Join our anime crew", url}); return; } await navigator.clipboard.writeText(url); toast("Link copied. Send it to a friend!"); }catch(e){} });
+  rings.append(inv); box.append(rings);
+  // trending: what the crew touched in the last 2 weeks
+  const cut=new Date(now-14*86400e3).toISOString(), tr=new Map();
+  Object.entries(state.docs).forEach(([id,d])=>["anime","manga"].forEach(md=>{ const k=MEDIA_KEYS[md];
+    [[k.watching,"w"],[k.watched,"f"],[k.watchlist,"q"],[k.top,"t"]].forEach(([key,verb])=>d[key].forEach(x=>{ const at=x.upd||x.at; if(!at||at<cut) return;
+      const rk=md+":"+norm(x.title), e=tr.get(rk)||{x:{...x,media:md}, who:new Set(), at:"", w:false}; e.who.add(id); if(at>e.at) e.at=at; if(verb==="w") e.w=true; if(!e.x.img && x.img) e.x.img=x.img; tr.set(rk,e); })); }));
+  const top=[...tr.values()].sort((a,b)=>b.who.size-a.who.size||b.at.localeCompare(a.at)).slice(0,10);
+  if(top.length){ const h=el("div","shead"); h.append(el("h3","","Trending in the crew")); box.append(h);
+    const row=el("div","trow"); top.forEach(e=>{ const c=el("div","tcard"); const p=posterEl(e.x,true); const n=e.who.size;
+      p.append(el("span","ttag", n>1 ? n+" in the crew" : (e.w?"▶ ":"")+nameOf([...e.who][0]))); c.append(p, el("div","tt",e.x.title)); row.append(c); }); box.append(row); }
+  // things waiting on you
+  const wait=[];
+  const inbox=inboxPending(); if(inbox.length) wait.push(["📨", inbox.length===1 ? nameOf(inbox[0].id)+" sent you a rec" : inbox.length+" new recs from the crew", inbox[0].r.title||"", goTo("crew",()=>{ state.sub.crew="inbox"; })]);
+  const voted=new Set((mine().votes||[]).map(v=>v.p));
+  Object.entries(state.docs).forEach(([id,d])=>(d.polls||[]).forEach(p=>{ if(id===me || voted.has(id+":"+p.id)) return; if(p.when && Date.parse(p.when)<now-3*3600e3) return; if(p.at && now-Date.parse(p.at)>14*86400e3) return;
+    wait.push(["🗳️","New poll from "+nameOf(id), p.q||"", goTo("crew",()=>{ state.sub.crew="polls"; })]); }));
+  const cp=mine().gx&&mine().gx.chp; if(!(cp && cp.d===today())) wait.push(["🧩","Today's Anidle is waiting","Guess the mystery character to keep your streak", goTo("play",()=>{ state.playTab="chr"; })]);
+  if(wait.length){ const h=el("div","shead"); h.append(el("h3","","Waiting on you")); box.append(h);
+    wait.slice(0,4).forEach(([ic,t,sm,fn])=>{ const b=el("button","wrow"); b.type="button"; b.append(el("span","wi",ic)); const tx=el("span","wt"); tx.append(el("b","",t), el("small","",sm)); b.append(tx, el("span","wc","›")); b.addEventListener("click",fn); box.append(b); }); }
+}
 function renderLatestReviews(){
   const box=$("#crewReviews"); box.replaceChildren();
   const all=[]; Object.entries(state.docs).forEach(([id,d])=>d.reviews.forEach(r=>all.push({id,r})));
@@ -4169,7 +4358,7 @@ function renderCrew(){
   const isLists = sub==="lists";
   document.querySelectorAll("#crewView [data-csub]").forEach(c=>c.classList.toggle("subhide", c.dataset.csub!==sub));
   $("#modeSeg").classList.toggle("hidden", !(sub==="top"||sub==="recs"));
-  if(sub==="feed"){ renderLatestReviews(); renderActivity(); }
+  if(sub==="feed"){ renderStories(); renderLatestReviews(); renderActivity(); }
   if(sub==="recs") renderRecs();
   if(sub==="polls") renderPolls();
   if(sub==="party") renderParty();
