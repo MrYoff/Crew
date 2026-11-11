@@ -840,6 +840,13 @@
   .dsr .track2 i{display:block;height:100%;background:var(--accent);border-radius:4px}
   .dsr .dl{min-width:76px;text-align:right;font-size:12.5px;color:var(--muted)}
   @media (max-width:599px){ #revSheet .sheet{max-height:100vh;max-height:100dvh;height:100vh;height:100dvh;border-radius:0;border:0} }
+  /* admin panel: full screen + smooth scrolling on phones */
+  #adminSheet .sheet{overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+  @media (max-width:599px){ #adminSheet .sheet{max-height:100vh;max-height:100dvh;height:100vh;height:100dvh;border-radius:0;border:0;padding-top:calc(14px + env(safe-area-inset-top))} #adminSheet .head{position:sticky;top:calc(-14px - env(safe-area-inset-top));z-index:3;background:var(--panel);margin:-14px -18px 6px;padding:14px 18px 8px} }
+  .admin .lbtog{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+  .admin .lbtog:first-child{border-top:0}
+  .admin .lbtog .grow{flex:1;min-width:0;font-weight:700;font-size:14px}
+  .admin .lbtog .grow small{display:block;font-weight:500;color:var(--muted);font-size:12px}
 </style>
 </head>
 <body>
@@ -2654,7 +2661,7 @@ function playHome(box){
       el("span","ps", p ? (p.done ? (p.ok ? "✅ Solved in "+p.g.length+(p.g.length===1?" guess":" guesses") : "❌ Missed it today. New one tomorrow") : "In progress · "+p.g.length+"/"+CHR_MAX+" guesses") : "Guess today's mystery character · "+played.length+" of "+ids.length+" crew played"));
     hero.append(el("span","pa", p&&p.done ? (p.ok?"✓":"✕") : "?"), tx);
     hero.addEventListener("click",()=>{ state.playTab="chr"; renderPlay(true); window.scrollTo({top:0}); }); box.append(hero);
-    const solved=ids.map(id=>({id,q:(state.docs[id].gx||{}).chp})).filter(v=>v.q&&v.q.d===today()&&v.q.done&&v.q.ok).sort((a,b)=>a.q.g.length-b.q.g.length||nameOf(a.id).localeCompare(nameOf(b.id)));
+    const solved=ids.map(id=>({id,q:(state.docs[id].gx||{}).chp})).filter(v=>!lbHid(v.id)&&v.q&&v.q.d===today()&&v.q.done&&v.q.ok).sort((a,b)=>a.q.g.length-b.q.g.length||nameOf(a.id).localeCompare(nameOf(b.id)));
     if(solved.length){ box.append(el("div","recsub","Today's leaderboard")); const lw=el("div","lbwrap");
       solved.slice(0,5).forEach((v,i)=>{ const r=el("div","lbrow l"+(i+1)); r.append(el("span","lr",String(i+1)), avatarEl(v.id,true), el("span","ln",nameOf(v.id)), el("span","ls",v.q.g.length+(v.q.g.length===1?" guess":" guesses"))); lw.append(r); }); box.append(lw); }
   }
@@ -2957,7 +2964,7 @@ PLAY.pred = box => {
   const s=nowSeason(), pts={}, tries={};
   all.filter(x=>x.p.ans && (q=>q.i===s.i&&q.y===s.y)(qOf(x.p.lock))).forEach(x=>vt(x.ref).forEach(v=>{ tries[v.from]=(tries[v.from]||0)+1; if(v.o===x.p.ans) pts[v.from]=(pts[v.from]||0)+10; else pts[v.from]=pts[v.from]||0; }));
   const lb=card(head("Leaderboard · "+SEASON_NAME[SEASONS[s.i]]+" "+s.y), el("p","hint","10 points per correct call. Resets every season."));
-  const ids=Object.keys(tries).sort((a,b)=>(pts[b]||0)-(pts[a]||0)||nameOf(a).localeCompare(nameOf(b)));
+  const ids=Object.keys(tries).filter(id=>!lbHid(id)).sort((a,b)=>(pts[b]||0)-(pts[a]||0)||nameOf(a).localeCompare(nameOf(b)));
   if(!ids.length) lb.append(el("div","empty","Points show up once a prediction gets answered."));
   ids.forEach((id,i)=>{ const r=el("div","mrow"); r.append(el("div","rk",i===0?"👑":String(i+1)), avatarEl(id,true)); const g=el("div","grow"); g.append(el("div","",nameOf(id)), el("small","muted",(pts[id]/10)+" of "+tries[id]+" right")); r.append(g, el("div","sc",pts[id]+" pts")); lb.append(r); });
   box.append(lb);
@@ -3111,7 +3118,7 @@ PLAY.guess = box => {
   const r=el("div","r"); r.append(bt("btn primary","▶ Play", startGuess)); c.append(r);
   c.append(el("p","hint", n>=4 ? "Using "+n+" shows from the crew's lists and this season." : "Add a few more shows to your lists to unlock the game."));
   box.append(c);
-  const lb=card(head("High scores")); const rows=Object.entries(state.docs).filter(([,d])=>d.gbest).sort((a,b)=>b[1].gbest.s-a[1].gbest.s);
+  const lb=card(head("High scores")); const rows=Object.entries(state.docs).filter(([id,d])=>!lbHid(id)&&d.gbest).sort((a,b)=>b[1].gbest.s-a[1].gbest.s);
   if(!rows.length) lb.append(el("div","empty","No scores yet. Set the bar."));
   rows.forEach(([id,d],i)=>{ const row=el("div","mrow"); row.append(el("div","rk",i===0?"👑":String(i+1)), avatarEl(id,true)); const g=el("div","grow"); g.append(el("div","",nameOf(id)), el("small","muted",ago(d.gbest.at))); row.append(g, el("div","sc",d.gbest.s.toLocaleString())); lb.append(row); });
   box.append(lb);
@@ -3173,7 +3180,7 @@ function bumpStreak(m, key, ok){ const s=m.gx[key]; if(s && s.last===today()) re
 function saveBest(k, s){ const b=(mine().gx.best||{})[k]||0; if(s>b) mutate(m=>{ m.gx.best={...m.gx.best, [k]:s}; }); return s>b; }
 function bestCard(k, title, unit){
   const c=card(head(title||"High scores"));
-  const rows=Object.entries(state.docs).filter(([,d])=>(d.gx.best||{})[k]).sort((a,b)=>b[1].gx.best[k]-a[1].gx.best[k]);
+  const rows=Object.entries(state.docs).filter(([id,d])=>!lbHid(id)&&(d.gx.best||{})[k]).sort((a,b)=>b[1].gx.best[k]-a[1].gx.best[k]);
   if(!rows.length) c.append(el("div","empty","No scores yet. Set the bar."));
   rows.forEach(([id,d],i)=>{ const r=el("div","mrow"); r.append(el("div","rk",i===0?"👑":String(i+1)), avatarEl(id,true)); const g=el("div","grow"); g.append(el("div","",nameOf(id))); r.append(g, el("div","sc",d.gx.best[k].toLocaleString()+(unit||""))); c.append(r); });
   return c;
@@ -3562,7 +3569,7 @@ PLAY.chr = box => {
   const lb=card(head("Crew today"), el("p","hint","Everyone gets the same character each day. Solve it on consecutive days to build a streak."));
   const ids=Object.keys(state.docs).sort((a,b)=>liveStreak(state.docs[b].gx.chs)-liveStreak(state.docs[a].gx.chs)||nameOf(a).localeCompare(nameOf(b)));
   let any=false;
-  ids.forEach(id=>{ const d=state.docs[id], p=d.gx.chp&&d.gx.chp.d===today()?d.gx.chp:null, s=liveStreak(d.gx.chs); if(!p && !s) return; any=true;
+  ids.forEach(id=>{ if(lbHid(id)) return; const d=state.docs[id], p=d.gx.chp&&d.gx.chp.d===today()?d.gx.chp:null, s=liveStreak(d.gx.chs); if(!p && !s) return; any=true;
     const r=el("div","mrow"); r.append(avatarEl(id,true)); const gg=el("div","grow"); gg.append(el("div","",nameOf(id)), el("small","muted", !p ? "Hasn't played today" : p.done ? (p.ok ? "✅ Solved in "+p.g.length : "❌ Didn't get it") : "Playing · "+p.g.length+"/"+CHR_MAX)); r.append(gg, el("div","sc", s ? "🔥 "+s : "")); lb.append(r); });
   if(!any) lb.append(el("div","empty","Nobody has played today yet."));
   box.append(lb);
@@ -3773,7 +3780,7 @@ PLAY.emo = box => {
   }
   box.append(titleList("emoDL2"), c);
   const pts={}; Object.entries(state.docs).forEach(([id,d])=>d.gx.emg.forEach(r=>{ if(r.ok) pts[id]=(pts[id]||0)+emoPts(r); }));
-  const lb=card(head("Leaderboard")), ids=Object.keys(pts).sort((a,b)=>pts[b]-pts[a]||nameOf(a).localeCompare(nameOf(b)));
+  const lb=card(head("Leaderboard")), ids=Object.keys(pts).filter(id=>!lbHid(id)).sort((a,b)=>pts[b]-pts[a]||nameOf(a).localeCompare(nameOf(b)));
   if(!ids.length) lb.append(el("div","empty","Points show up once someone solves a puzzle."));
   ids.forEach((id,i)=>{ const r=el("div","mrow"); r.append(el("div","rk",i===0?"👑":String(i+1)), avatarEl(id,true)); const g=el("div","grow"); g.append(el("div","",nameOf(id))); r.append(g, el("div","sc",pts[id]+" pts")); lb.append(r); });
   box.append(lb);
@@ -3822,7 +3829,7 @@ PLAY.daily = box => {
   box.append(g);
   const lb=card(head("Crew today")); let any=false;
   Object.keys(state.docs).sort((a,b)=>liveStreak(state.docs[b].gx.ds)-liveStreak(state.docs[a].gx.ds)||nameOf(a).localeCompare(nameOf(b))).forEach(id=>{
-    const d=state.docs[id], dp=d.gx.dp&&d.gx.dp.d===today()?d.gx.dp:null, s=liveStreak(d.gx.ds); if(!dp&&!s) return; any=true;
+    if(lbHid(id)) return; const d=state.docs[id], dp=d.gx.dp&&d.gx.dp.d===today()?d.gx.dp:null, s=liveStreak(d.gx.ds); if(!dp&&!s) return; any=true;
     const r=el("div","mrow"); r.append(avatarEl(id,true)); const gg=el("div","grow"); gg.append(el("div","",nameOf(id)), el("small","muted", !dp ? "Hasn't answered yet" : !answered && id!==state.me.uid ? "Answered · answer to see" : dp.ok ? "✅ Right" : "❌ Wrong")); r.append(gg, el("div","sc", s ? "🔥 "+s : "")); lb.append(r); });
   if(!any) lb.append(el("div","empty","Nobody has answered today yet."));
   box.append(lb);
@@ -4731,12 +4738,14 @@ const CFG = () => doc(db,"config","crew");
 function crewCfg(){
   const c=state.cfg||{}, A=v=>Array.isArray(v)?v.filter(x=>typeof x==="string"):[];
   const an=c.announce&&typeof c.announce.text==="string"&&c.announce.text.trim()?{text:c.announce.text.slice(0,300), at:typeof c.announce.at==="string"?c.announce.at:""}:null;
-  return {admins:A(c.admins), banned:A(c.banned), bannedNames:c.bannedNames&&typeof c.bannedNames==="object"?c.bannedNames:{}, gopHide:A(c.gopHide), announce:an};
+  return {admins:A(c.admins), banned:A(c.banned), bannedNames:c.bannedNames&&typeof c.bannedNames==="object"?c.bannedNames:{}, gopHide:A(c.gopHide), lbHide:A(c.lbHide), announce:an};
 }
 const isAdmin = () => !!state.me && crewCfg().admins.includes(state.me.uid);
 const isBannedId = id => crewCfg().banned.includes(id);
 const amBanned = () => !!state.me && isBannedId(state.me.uid);
 const gopHidden = () => new Set(crewCfg().gopHide);
+// people an admin has taken off the leaderboards (their games still work, they just don't get ranked)
+const lbHid = id => crewCfg().lbHide.includes(id);
 const adminErr = e => toast(e&&e.code==="permission-denied" ? "The database said no. Make sure the new Firestore rules are published." : "Couldn't save that ("+((e&&e.code)||"error")+").");
 let lastBanned="";
 function applyCfg(){
@@ -4752,8 +4761,20 @@ function applyCfg(){
   if(key!==lastBanned){ lastBanned=key; c.banned.forEach(id=>{ if(id!==state.me.uid) delete state.docs[id]; }); if(state.loaded) render(); }
   if(amBanned()){ $("#app").classList.add("hidden"); setStatus("An admin removed you from this Crew. Ask them if you think that's a mistake.", true); }
   if(!$("#acctSheet").classList.contains("hidden")) syncAcctAdmin();
-  if(!$("#adminSheet").classList.contains("hidden")) renderAdmin();
+  if(!$("#adminSheet").classList.contains("hidden")) adminRefresh();
 }
+let adminSig="", adminTouch=false, adminLater=null;
+function adminRefresh(){
+  const sig=JSON.stringify(state.cfg||null)+"|"+JSON.stringify(state.upd||{});
+  if(sig===adminSig) return;
+  if(adminTouch){ clearTimeout(adminLater); adminLater=setTimeout(adminRefresh,600); return; }
+  renderAdmin();
+}
+{ const sh=$("#adminSheet .sheet");
+  sh.addEventListener("touchstart",()=>{ adminTouch=true; clearTimeout(adminLater); },{passive:true});
+  const up=()=>{ clearTimeout(adminLater); adminLater=setTimeout(()=>{ adminTouch=false; adminRefresh(); },700); };
+  sh.addEventListener("touchend",up,{passive:true}); sh.addEventListener("touchcancel",up,{passive:true});
+  sh.addEventListener("scroll",()=>{ if(adminTouch) up(); },{passive:true}); }
 $("#annX").addEventListener("click",()=>{ const a=crewCfg().announce; $("#annBar").classList.add("hidden"); if(a) try{ localStorage.setItem("crew.annX",a.at); }catch(e){} });
 
 // claiming admin: only works while nobody is admin yet (the config doc doesn't exist)
@@ -4783,6 +4804,7 @@ function renderAdmin(){
   // don't wipe something the admin is typing
   const a=document.activeElement; if(a && body.contains(a) && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) return;
   document.querySelectorAll("#adminSeg button").forEach(b=>b.classList.toggle("on", b.dataset.at===adminTab));
+  adminSig=JSON.stringify(state.cfg||null)+"|"+JSON.stringify(state.upd||{});
   body.replaceChildren(); ({members:adminMembers, posts:adminPosts, announce:adminAnnounce, games:adminGames})[adminTab](body);
 }
 const abtn = (txt, fn, cls) => { const b=bt("btn"+(cls?" "+cls:""), txt, async()=>{ b.disabled=true; try{ await fn(); }catch(e){ console.error(e); adminErr(e); } finally{ b.disabled=false; } }); return b; };
@@ -4797,7 +4819,7 @@ function adminMembers(body){
   ids.sort((x,y)=>(state.upd[y]||"").localeCompare(state.upd[x]||"")).forEach(id=>{
     const d=state.docs[id], me=id===state.me.uid, adm=c.admins.includes(id);
     const r=el("div","arow"), g=el("div","grow"), nm=el("div","nm",docName(id));
-    if(me) nm.append(el("span","tag","You")); if(adm) nm.append(el("span","tag","Admin"));
+    if(me) nm.append(el("span","tag","You")); if(adm) nm.append(el("span","tag","Admin")); if(lbHid(id)) nm.append(el("span","tag","Off leaderboards"));
     g.append(nm, el("div","meta",(state.upd[id]?"Active "+ago(state.upd[id])+" · ":"")+d.top.length+" top 10 · "+(d.watched.length+d.mread.length)+" finished · "+d.reviews.length+" reviews · "+d.takes.length+" takes"));
     const bs=el("div","abtns");
     if(!me){
@@ -4884,6 +4906,15 @@ async function adminHideSong(key, s){
   catch(e){ adminErr(e); return false; }
 }
 function adminGames(body){
+  body.append(el("h4","","Leaderboards"));
+  body.append(el("p","hint","Hide someone from every leaderboard and high-score list in Play (daily games, high scores, predictions, emoji). They can still play, and their scores aren't deleted, so you can bring them back any time."));
+  { const c=crewCfg(), lw=el("div");
+    const ids=Object.keys(state.docs).filter(id=>!isBannedId(id)||id===state.me.uid).sort((a,b)=>(lbHid(b)?1:0)-(lbHid(a)?1:0)||docName(a).localeCompare(docName(b)));
+    ids.forEach(id=>{ const h=c.lbHide.includes(id), r=el("div","lbtog"), g=el("div","grow",docName(id)); if(id===state.me.uid) g.append(" (you)"); g.append(el("small","", h ? "🚫 Hidden from leaderboards" : "Shown on leaderboards"));
+      r.append(avatarEl(id,true), g, h ? abtn("Show", async()=>{ await updateDoc(CFG(),{lbHide:arrayRemove(id)}); toast(docName(id)+" is back on the leaderboards"); })
+                                     : abtn("Hide", async()=>{ await updateDoc(CFG(),{lbHide:arrayUnion(id)}); toast(docName(id)+" is hidden from the leaderboards"); }, "danger"));
+      lw.append(r); });
+    body.append(lw); }
   body.append(el("h4","","Guess the OP"));
   const hid=crewCfg().gopHide;
   body.append(el("p","hint", hid.length ? hid.length+" song"+(hid.length===1?"":"s")+" hidden. While playing, admins get a “Hide this song” button after each answer." : "No songs hidden. While playing, admins get a “Hide this song” button after each answer, for songs that won't play or don't fit."));
