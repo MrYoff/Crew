@@ -734,6 +734,35 @@
   .modeseg{max-width:330px}
   .modeseg button{padding:6px 4px;font-size:12px}
   @media (max-width:700px){ .modeseg{max-width:330px;margin:0 auto 8px} .modeseg button{padding:6px 2px;font-size:12px} }
+  /* ---- Poster Shelf (My Lists redesign) ---- */
+  #listSub{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px;margin:0 0 12px;scroll-padding-left:0;top:4px}
+  #listSub button{border:0;background:transparent;border-radius:10px;padding:9px 12px;flex:1 0 auto}
+  #listSub button.on{background:var(--accent);color:#fff}
+  ol.top.shelf{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 10px}
+  ol.top.shelf>.empty{grid-column:1/-1}
+  ol.top.shelf li{position:relative;flex-direction:column;align-items:stretch;gap:6px;padding:0;background:transparent;border-radius:0;overflow:visible;min-width:0}
+  ol.top.shelf li>.poster{width:100%;border-radius:10px}
+  ol.top.shelf li>.poster .gen b{font-size:22px}
+  ol.top.shelf li:not(.r1)>.poster .gen{padding-top:38px}
+  ol.top.shelf .rank{position:absolute;top:6px;left:6px;z-index:2;width:auto;min-width:28px;height:28px;padding:0 7px;box-sizing:border-box;border-radius:14px;background:rgba(15,14,23,.82);color:#f4f1ea;font-size:14px;line-height:1;display:grid;place-items:center;pointer-events:none}
+  ol.top.shelf li.r2 .rank{background:var(--silver);color:#0f0e17}
+  ol.top.shelf li.r3 .rank{background:var(--bronze);color:#0f0e17}
+  ol.top.shelf .title{font-size:13px;line-height:1.25}
+  ol.top.shelf .title small{font-size:11px}
+  ol.top.shelf .gtags{display:none}
+  ol.top.shelf .actions,ol.top.shelf .actions.enh{display:flex;justify-content:center;flex-wrap:wrap;gap:4px}
+  ol.top.shelf .ic,ol.top.shelf .actions.enh .ic:not(.mob-more){width:30px;height:30px;font-size:13px;border-radius:8px}
+  ol.top.shelf .actions.enh .mob-more{height:30px;width:30px}
+  ol.top.shelf .facts{flex:none}
+  ol.top.shelf .facts .pill{font-size:11px;padding:5px 4px;white-space:normal}
+  ol.top.shelf li.r1{grid-column:1/-1;display:grid;grid-template-columns:112px minmax(0,1fr);grid-template-rows:auto auto 1fr;column-gap:14px;row-gap:6px;padding:12px;background:var(--panel2);border:1px solid color-mix(in srgb, var(--accent2) 45%, var(--line));border-radius:16px}
+  ol.top.shelf li.r1>.poster{grid-column:1;grid-row:1/4;width:112px}
+  ol.top.shelf li.r1>.poster .gen b{font-size:28px}
+  ol.top.shelf li.r1 .rank{position:static;grid-column:2;grid-row:1;justify-self:start;background:none;padding:0;height:auto;min-width:0;font-size:40px;color:var(--accent2);display:block;text-align:left}
+  ol.top.shelf li.r1 .title{grid-column:2;grid-row:2;font-size:19px;line-height:1.2;align-self:start}
+  ol.top.shelf li.r1 .title small{font-size:12px}
+  ol.top.shelf li.r1>.actions,ol.top.shelf li.r1>.facts{grid-column:2;grid-row:3;justify-content:flex-start;align-self:start}
+  .fab{position:fixed;right:16px;bottom:calc(86px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:28px;border:0;background:var(--accent);color:#fff;z-index:19;box-shadow:0 6px 20px rgba(0,0,0,.35);display:grid;place-items:center;cursor:pointer}
 </style>
 </head>
 <body>
@@ -824,6 +853,7 @@
       <button data-view="friends"><span class="ni">👥</span>Crew</button>
       <button data-view="play"><span class="ni">🎮</span>Play</button>
     </nav>
+    <button class="fab hidden" id="addFab" type="button" aria-label="Add an anime"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
     <div class="modeseg" id="modeSeg"><button type="button" data-mode="anime" class="on">Anime</button><button type="button" data-mode="manga">Manga</button><button type="button" data-mode="overall">Overall</button><button type="button" data-mode="lists">Custom</button></div>
 
     <div id="listsView">
@@ -2222,7 +2252,8 @@ async function refreshCounts(){
 // ---- filters (genre + sort) for anime/manga lists ----
 state.genre="";
 state.sort=(()=>{ const v=window.CrewLook&&CrewLook.get("sort"); return ["title","recent","score","year"].includes(v)?v:"title"; })();
-state.layout=(()=>{ const v=window.CrewLook&&CrewLook.get("layout"); return v==="grid"?"grid":"list"; })();
+state.layout=(()=>{ const v=window.CrewLook&&CrewLook.get("layout"); return v==="list"?"list":"grid"; })();
+$("#addFab").addEventListener("click",()=>{ if(state.curSub==="stats"||state.curSub==="match"){ state.sub.me="top"; render(); } const q=$("#q"); q.scrollIntoView({block:"center",behavior:"smooth"}); q.focus({preventScroll:true}); });
 document.querySelectorAll("#laySeg button").forEach(b=>b.addEventListener("click",()=>{ state.layout=b.dataset.lay; if(window.CrewLook) CrewLook.put("layout",state.layout); render(); }));
 $("#fGenre").addEventListener("change",e=>{ state.genre=e.target.value; render(); });
 $("#fSort").addEventListener("change",e=>{ state.sort=e.target.value; if(window.CrewLook) CrewLook.put("sort",state.sort); render(); });
@@ -3898,6 +3929,7 @@ function render(){
   $("#q").placeholder = state.mode==="lists" ? "Search "+({anime:"anime",manga:"manga",both:"anime or manga"})[searchType()]+" to add…" : w.search; $("#watchedTitle").textContent=w.watched; $("#watchTitle").textContent=w.watchlist; $("#watchHint").textContent=w.qHint;
   $("#crewTopTitle").textContent=w.crewTop;
   $("#listsView").classList.toggle("hidden", state.view==="crew" || state.view==="discover" || state.view==="play");
+  $("#addFab").classList.toggle("hidden", state.view!=="me" || state.mode==="lists");
   $("#discoverView").classList.toggle("hidden", state.view!=="discover");
   $("#playView").classList.toggle("hidden", state.view!=="play");
   if(state.view!=="play" && go && go.on) stopGop();
@@ -3986,7 +4018,7 @@ function render(){
 
   $("#topCount").textContent = d.top.length+"/10";
   $("#shareTop").classList.toggle("hidden", !d.top.length || showId===ALL);
-  const tl=$("#topList"); tl.replaceChildren();
+  const tl=$("#topList"); tl.replaceChildren(); tl.classList.add("shelf");
   if(!d.top.length) tl.append(el("div","empty", editable?"Nothing ranked yet. Search for your #1 above.":"No top 10 yet."));
   d.top.forEach((x,i)=>{
     if(std && !passG(x)) return;
