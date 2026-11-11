@@ -282,8 +282,8 @@
   .empty{color:var(--muted);font-size:14px;padding:14px;text-align:center;border:1px dashed var(--line);border-radius:12px}
   .notice{background:color-mix(in srgb, var(--blue) 8%, transparent);border:1px solid color-mix(in srgb, var(--blue) 30%, transparent);color:var(--info);padding:10px 12px;border-radius:10px;font-size:14px;margin-bottom:14px}
   .notice.warn{background:rgba(255,61,90,.08);border-color:rgba(255,61,90,.35);color:var(--warnc)}
-  .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(120px);background:var(--panel2);border:1px solid var(--line);padding:10px 16px;border-radius:999px;font-size:14px;transition:transform .25s;z-index:20;max-width:90vw;text-align:center}
-  .toast.show{transform:translateX(-50%) translateY(0)}
+  .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(120px);background:var(--panel2);border:1px solid var(--line);padding:10px 16px;border-radius:999px;font-size:14px;transition:transform .25s, opacity .2s, visibility 0s .25s;z-index:20;max-width:90vw;text-align:center;opacity:0;visibility:hidden;pointer-events:none}
+  .toast.show{transform:translateX(-50%) translateY(0);opacity:1;visibility:visible;transition:transform .25s, opacity .2s, visibility 0s}
 
   .crewrow{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
   .crewrow:first-child{border-top:0}
