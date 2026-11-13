@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0f0e17">
 <title>Crew</title>
 <link rel="manifest" href="manifest.webmanifest">
@@ -855,6 +855,82 @@
   .wbtn small{font-weight:500;opacity:.8}
   .dlink{display:flex;justify-content:center;margin-top:10px}
   .ic.cr{color:#f47521;font-size:13px}
+  /* ================= smoothness pass ================= */
+  /* app-like touch: no grey tap flash, no double-tap zoom wait, no text selection on buttons */
+  html{-webkit-text-size-adjust:100%}
+  body{-webkit-tap-highlight-color:transparent}
+  button,a,select,label,.poster,.title,.ring,.tcard{touch-action:manipulation}
+  button{-webkit-user-select:none;user-select:none}
+  .poster img,.av,.ring img{-webkit-user-drag:none;-webkit-touch-callout:none}
+
+  /* press feedback: everything you can tap gives a little squish */
+  .btn,.pill,.ic,.chip,.dbtn,.gopt,.wrow,.gcard,.ring,.sharebtn,.mlist button,.pickgrid button,.subtabs button,.modeseg button,.seg button,nav.tabs button,.opt,.mside,.sw,.phero,.rategrid button,.epgrid button,.wbtn,.chopt,.bent,.fab,.tcard .poster,ol.top.shelf li>.poster,.scard .poster{transition:transform .14s ease,background-color .18s ease,border-color .18s ease,color .18s ease,opacity .18s ease,box-shadow .18s ease}
+  .btn:active,.pill:active,.ic:active,.chip:active,.dbtn:active,.gopt:active,.sharebtn:active,.subtabs button:active,.modeseg button:active,.seg button:active,.opt:active,.mside:active,.sw:active,.rategrid button:active,.epgrid button:active,.wbtn:active,.chopt:active,.bent:active,.pickgrid button:active{transform:scale(.95)}
+  .wrow:active,.gcard:active,.phero:active,.tcard .poster:active,ol.top.shelf li>.poster:active,.scard .poster:active{transform:scale(.97)}
+  .ring:active,nav.tabs#bottomNav button:active .ni{transform:scale(.9)}
+  .fab:active{transform:scale(.9)}
+  .mlist button:active{background:color-mix(in srgb, var(--text) 6%, transparent)}
+  nav.tabs#bottomNav .ni{transition:background .2s ease,transform .14s ease}
+  #revSheet .head .ic:active{transform:translateY(14px) scale(.92)}
+  :disabled:active,.pill.done:active{transform:none}
+
+  /* tab + section switches fade in instead of popping */
+  @keyframes venter{from{opacity:0}to{opacity:1}}
+  .venter{animation:venter .18s ease-out}
+
+  /* covers fade in once, then show instantly on every redraw */
+  .poster img{opacity:0;transition:opacity .25s ease}
+  .poster img.ok{opacity:1}
+
+  /* horizontal rows: glide and settle on a card, don't drag the page sideways */
+  .rings,.trow,.people,.dchars,.bscroll,.subtabs,.playtabs,.cthumbs{overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+  .trow,.dchars,.rings{scroll-snap-type:x proximity;scroll-padding-left:2px}
+  .trow>*,.dchars>*,.rings>*{scroll-snap-align:start}
+
+  /* sheets: slide up and back down (instead of blinking), scroll on their own, page behind stays put */
+  .sheet-bg.hidden{display:flex!important;visibility:hidden;pointer-events:none;opacity:0;transition:opacity .22s ease,visibility 0s linear .3s}
+  .sheet-bg{opacity:1;transition:opacity .22s ease,visibility 0s}
+  .sheet{position:relative;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;transform:none;transition:transform .32s cubic-bezier(.2,.9,.25,1)}
+  .sheet-bg.hidden .sheet{transform:translateY(105%);transition:transform .26s cubic-bezier(.4,0,.8,.4)}
+  @media (min-width:600px){ .sheet-bg.hidden .sheet{transform:translateY(24px) scale(.97)} }
+  .sheet.dragging{transition:none}
+  body:has(.sheet-bg:not(.hidden)){overflow:hidden}
+  @media (max-width:599px){
+    .sheet::before{content:"";position:absolute;top:7px;left:50%;width:38px;height:5px;margin-left:-19px;border-radius:3px;background:var(--line);z-index:6;pointer-events:none}
+    #revSheet .sheet::before,#adminSheet .sheet::before{background:rgba(255,255,255,.55)}
+    .sheet{padding-top:22px}
+  }
+
+  /* swipe deck: next card steps forward */
+  @keyframes dcardIn{from{transform:rotate(-3deg) scale(.95);opacity:.5}to{transform:none;opacity:1}}
+  .dcard.enter{animation:dcardIn .26s cubic-bezier(.2,.9,.25,1)}
+
+  /* iPhone notch / status bar: keep headers and sticky tabs below it */
+  .wrap{padding-top:calc(10px + env(safe-area-inset-top))}
+  .subtabs,.playtabs{top:env(safe-area-inset-top)}
+  #listSub{top:calc(4px + env(safe-area-inset-top))}
+  body.authed::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area-inset-top);background:var(--bg);z-index:8;pointer-events:none}
+  @media (max-width:599px){
+    #revSheet .sheet{padding-top:calc(18px + env(safe-area-inset-top))}
+    #adminSheet .sheet{padding-top:calc(14px + env(safe-area-inset-top))}
+    #revSheet .sheet::before,#adminSheet .sheet::before{top:calc(7px + env(safe-area-inset-top))}
+    #revSheet .dbanner{margin-top:calc(-18px - env(safe-area-inset-top));height:calc(170px + env(safe-area-inset-top))}
+    #revSheet .head .ic{transform:translateY(calc(14px + env(safe-area-inset-top)))}
+    #revSheet .head .ic:active{transform:translateY(calc(14px + env(safe-area-inset-top))) scale(.92)}
+  }
+  .toast{bottom:calc(96px + env(safe-area-inset-bottom))}
+  .sheet-bg{padding-top:env(safe-area-inset-top)}
+  @media (max-width:599px){ #revSheet,#adminSheet{padding-top:0} }
+
+  /* bottom bar on its own layer so it never flickers while scrolling */
+  nav.tabs#bottomNav{transform:translateZ(0)}
+  /* a background picture made every card blur what's behind it on each scroll frame: use solid glass instead */
+  body.hasbg section.card,body.hasbg .modeseg{-webkit-backdrop-filter:none;backdrop-filter:none;background:color-mix(in srgb, var(--panel) 92%, transparent)}
+  body.hasbg .gcard{background:color-mix(in srgb, var(--panel) 92%, transparent)}
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  }
 </style>
 </head>
 <body>
@@ -1293,6 +1369,32 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/fireba
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, updateDoc, deleteDoc, deleteField, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
+// ---- smooth updates: batch live-data redraws and wait until you stop touching/scrolling ----
+let rqPending=false, touching=false, lastScrollAt=0;
+addEventListener("touchstart",()=>{ touching=true; },{passive:true,capture:true});
+addEventListener("touchend",()=>{ touching=false; lastScrollAt=performance.now(); },{passive:true,capture:true});
+addEventListener("touchcancel",()=>{ touching=false; lastScrollAt=performance.now(); },{passive:true,capture:true});
+addEventListener("scroll",()=>{ lastScrollAt=performance.now(); },{passive:true,capture:true});
+function queueRender(){
+  if(rqPending) return; rqPending=true;
+  (function tick(){
+    if(!rqPending) return;
+    if(touching || performance.now()-lastScrollAt<250){ setTimeout(tick,150); return; }
+    requestAnimationFrame(()=>{ if(!rqPending) return; render(); });
+  })();
+}
+// quick fade when you switch tabs/sections
+function viewEnter(){
+  const v=["#listsView","#discoverView","#playView","#crewView"].map(x=>document.querySelector(x)).find(x=>x && !x.classList.contains("hidden"));
+  if(!v) return; v.classList.remove("venter"); void v.offsetWidth; v.classList.add("venter");
+}
+const scrollMem={};
+function goView(view){
+  if(view===state.view) return;
+  scrollMem[state.view]=window.scrollY; state.view=view; render(); viewEnter();
+  window.scrollTo(0, scrollMem[view]||0);
+}
+
 const firebaseConfig = {
   apiKey: "AIzaSyBoOyxhUbj8yLluCp9LWj4vvxmIMmxxYVE",
   authDomain: "crew-fd928.firebaseapp.com",
@@ -1591,14 +1693,17 @@ function genPoster(title){
   return g;
 }
 const imgIndex = {}; // norm(title) -> img url seen anywhere in the crew
+const imgSeen = new Set(); // covers that already loaded once this visit (redraws show them instantly)
 function posterEl(x, big){
   const p = el("div","poster"+(big?" big":""));
-  p.append(genPoster(x.title));
   const src = x.img || imgIndex[(mediaOf(x)||"anime")+":"+norm(x.title)] || (!mediaOf(x) && imgIndex["manga:"+norm(x.title)]);
+  const seen = src && imgSeen.has(src);
+  if(!seen) p.append(genPoster(x.title));
   if(src){
     const img = new Image(); img.alt=""; img.loading="lazy"; img.decoding="async"; img.referrerPolicy="no-referrer";
-    img.onload = ()=>p.querySelector(".gen")?.remove();
-    img.onerror = ()=>img.remove();
+    if(seen) img.className="ok";
+    img.onload = ()=>{ imgSeen.add(src); img.classList.add("ok"); setTimeout(()=>p.querySelector(".gen")?.remove(),300); };
+    img.onerror = ()=>{ imgSeen.delete(src); img.remove(); if(!p.querySelector(".gen")) p.prepend(genPoster(x.title)); };
     img.src = src; p.append(img);
   }
   p.addEventListener("click",e=>{ if(e.target.closest("button,a") || p.closest("#revHead,.gstage")) return; e.stopPropagation(); openReviews(x); });
@@ -2041,7 +2146,11 @@ function renderDeck(box, deck, loading, err){
   const meta=metaOf(c.x).filter(Boolean).join(" · "); if(meta) info.append(el("div","dm",meta));
   info.append(el("div","dw",c.why)); card.append(info);
   wrap.append(card); box.append(wrap);
-  const fly=(tf,fn)=>{ card.style.transition="transform .22s ease, opacity .22s"; card.style.transform=tf; card.style.opacity="0"; setTimeout(fn,200); };
+  const bkEl=wrap.querySelector(".dcard.back");
+  if(deckAdvance){ deckAdvance=false; card.classList.add("enter"); }
+  const fly=(tf,fn)=>{ card.style.transition="transform .26s cubic-bezier(.3,.7,.4,1), opacity .26s"; card.style.transform=tf; card.style.opacity="0";
+    if(bkEl){ bkEl.style.transition="transform .26s ease, opacity .26s"; bkEl.style.transform="none"; bkEl.style.opacity="1"; }
+    deckAdvance=true; setTimeout(fn,220); };
   const yes=()=>fly("translateX(440px) rotate(14deg)",()=>addWatchFor(c.x, md));
   const no=()=>fly("translateX(-440px) rotate(-14deg)",()=>{ recSkip.add(rkey(md,c.x)); renderRecs(); });
   const seen=()=>fly("translateY(-60px) scale(.94)",()=>addWatchedFor(c.x, md));
@@ -2054,11 +2163,13 @@ function renderDeck(box, deck, loading, err){
   card.addEventListener("pointerdown",e=>{ sx=e.clientX; sy=e.clientY; dx=0; moved=false; card.style.transition="none"; });
   card.addEventListener("pointermove",e=>{ if(sx==null) return; dx=e.clientX-sx;
     if(!moved){ if(Math.abs(e.clientY-sy)>12 && Math.abs(dx)<12){ sx=null; return; } if(Math.abs(dx)>8){ moved=true; try{ card.setPointerCapture(e.pointerId); }catch(_){} } }
-    if(!moved) return; card.style.transform="translateX("+dx+"px) rotate("+(dx/20)+"deg)"; card.classList.toggle("yes",dx>70); card.classList.toggle("no",dx<-70); });
-  const end=()=>{ if(sx==null) return; sx=null; if(dx>90) yes(); else if(dx<-90) no(); else { card.style.transition="transform .2s"; card.style.transform=""; card.classList.remove("yes","no"); } };
+    if(!moved) return; card.style.transform="translateX("+dx+"px) rotate("+(dx/20)+"deg)"; card.classList.toggle("yes",dx>70); card.classList.toggle("no",dx<-70);
+    if(bkEl){ const k=Math.min(1,Math.abs(dx)/160); bkEl.style.transition="none"; bkEl.style.transform="rotate("+(-3+3*k)+"deg) scale("+(.95+.05*k)+")"; bkEl.style.opacity=String(.5+.5*k); } });
+  const end=()=>{ if(sx==null) return; sx=null; if(dx>90) yes(); else if(dx<-90) no(); else { card.style.transition="transform .3s cubic-bezier(.3,1.4,.5,1)"; card.style.transform=""; card.classList.remove("yes","no"); if(bkEl){ bkEl.style.transition="transform .3s, opacity .3s"; bkEl.style.transform=""; bkEl.style.opacity=""; } } };
   card.addEventListener("pointerup",end); card.addEventListener("pointercancel",end);
   card.addEventListener("click",e=>{ if(moved){ e.stopPropagation(); e.preventDefault(); moved=false; } },true);
 }
+let deckAdvance=false;
 function renderRecs(){
   const box=$("#recList"); box.replaceChildren(); if(!state.me) return;
   const swipe = state.recView!=="list", deck=[];
@@ -4105,6 +4216,7 @@ $("#gearBtn").addEventListener("click",updateInstallUI);
 
 // ---- render ----
 function render(){
+  rqPending=false;
   document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.toggle("on", b.dataset.view===state.view));
   { const n=state.me&&state.loaded?inboxPending().length:0; const bd=$("#crewBadge"); bd.textContent=n?String(n):""; bd.classList.toggle("hidden",!n); }
   document.querySelectorAll("#modeSeg button").forEach(b=>b.classList.toggle("on", b.dataset.mode===state.mode));
@@ -4351,7 +4463,7 @@ function lastActive(d){
 function renderStories(){
   const box=$("#storyBody"); if(!box || !state.me) return; box.replaceChildren();
   const me=state.me.uid, now=Date.now();
-  const goTo=(view,fn)=>()=>{ state.view=view; if(fn) fn(); render(); window.scrollTo({top:0}); };
+  const goTo=(view,fn)=>()=>{ scrollMem[state.view]=window.scrollY; state.view=view; if(fn) fn(); render(); viewEnter(); window.scrollTo({top:0}); };
   const ids=Object.keys(state.docs).filter(id=>id!==me).map(id=>({id,t:lastActive(state.docs[id])})).sort((a,b)=>b.t.localeCompare(a.t));
   const rings=el("div","rings");
   const ring=(id,label,fresh,fn)=>{ const b=el("button","ring"+(fresh?" fresh":"")); b.type="button"; b.setAttribute("aria-label",label+(fresh?" (new activity)":"")); const o=el("span","ro"); o.append(avatarEl(id)); b.append(o, el("span","rl",label)); b.addEventListener("click",fn); return b; };
@@ -4572,7 +4684,10 @@ function renderStats(showId){
   }
   const note=el("p","hint","Hours are estimated at 24 min an episode (movies ~100 min). Shows still airing count the episodes out so far. Ongoing manga only count once you've logged chapters in Reading."); note.style.margin="10px 0 0"; body.append(note);
 }
-document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>{ state.view=b.dataset.view; render(); }));
+document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>{
+  if(b.dataset.view===state.view){ window.scrollTo({top:0,behavior:"smooth"}); return; } // tap the tab you're on to jump to the top
+  goView(b.dataset.view);
+}));
 state.crewTab = "picks";
 state.lastMode = state.mode==="lists" ? "anime" : state.mode;
 // ---- sub-tabs: one section at a time instead of a long scroll ----
@@ -4592,11 +4707,12 @@ function renderDiscover(){
 state.sub={};
 function pickSub(key, items){ let v=state.sub[key]; if(v==null && window.CrewLook) v=CrewLook.get("sub_"+key); if(!items.some(i=>i[0]===v)) v=items[0][0]; state.sub[key]=v; return v; }
 function subBar(boxSel, key, items, cur, badge){
-  const box=$(boxSel); box.replaceChildren();
+  const box=$(boxSel); const allB=box.querySelector(":scope > .allbtn"); box.replaceChildren(); if(allB) box.append(allB);
   items.forEach(([k,l])=>{ const b=el("button",k===cur?"on":"",l); b.type="button"; if(badge&&badge[k]) b.append(el("span","nbadge",String(badge[k])));
-    b.addEventListener("click",()=>{ if(state.sub[key]===k) return; state.sub[key]=k; if(window.CrewLook) CrewLook.put("sub_"+key,k); render(); window.scrollTo({top:0}); });
+    b.addEventListener("click",()=>{ if(state.sub[key]===k) return; state.sub[key]=k; if(window.CrewLook) CrewLook.put("sub_"+key,k); render(); viewEnter(); window.scrollTo({top:0}); });
     box.append(b); });
-  const on=box.querySelector(".on"); if(on) requestAnimationFrame(()=>{ const r=on.offsetLeft-box.clientWidth/2+on.clientWidth/2; box.scrollLeft=r; });
+  const on=box.querySelector(".on");
+  if(on && box.dataset.cur!==cur){ const was=box.dataset.cur; box.dataset.cur=cur; requestAnimationFrame(()=>{ const r=on.offsetLeft-box.clientWidth/2+on.clientWidth/2; box.scrollTo({left:r, behavior:was?"smooth":"auto"}); }); }
 }
 document.querySelectorAll("#modeSeg button").forEach(b=>b.addEventListener("click",()=>{
   if(state.mode===b.dataset.mode) return;
@@ -4999,7 +5115,7 @@ onAuthStateChanged(auth, user=>{
       if(b && b.at>serverAt){ next[user.uid]=sanitize(b.d); needDoc=true; toast("Restored changes that hadn't saved yet"); }
       else if(b) clearBackup();
     }
-    state.docs=next; state.loaded=true; clearTimeout(timer); if(!unsaved) setStatus(null); $("#app").classList.remove("hidden"); render(); renderMe(); if(needDoc) save(); afterLoad(); applyCfg(); if(!recChecked){ recChecked=true; checkRecovery(); }
+    const first=!state.loaded; state.docs=next; state.loaded=true; clearTimeout(timer); if(!unsaved) setStatus(null); $("#app").classList.remove("hidden"); if(first) render(); else queueRender(); renderMe(); if(needDoc) save(); afterLoad(); applyCfg(); if(!recChecked){ recChecked=true; checkRecovery(); }
   }, err=>{
     clearTimeout(timer); console.error(err);
     setStatus(err && err.code==="permission-denied" ? "The database is blocking reads. Double-check the Firestore rules." : "Couldn't load the lists. Try refreshing.", true);
@@ -5016,7 +5132,7 @@ onAuthStateChanged(auth, user=>{
   const q = s => document.querySelector(s);
   const small = () => true;
   const sheet = q("#mobSheet"), body = q("#mobBody");
-  const close = () => { sheet.classList.add("hidden"); body.replaceChildren(); };
+  const close = () => { sheet.classList.add("hidden"); };
   sheet.addEventListener("click", e => { if(e.target === sheet) close(); });
   document.addEventListener("keydown", e => { if(e.key === "Escape" && !sheet.classList.contains("hidden")) close(); });
   const mk = (tag, cls, txt) => { const e = document.createElement(tag); if(cls) e.className = cls; if(txt != null) e.textContent = txt; return e; };
@@ -5120,7 +5236,7 @@ onAuthStateChanged(auth, user=>{
     const on = bar.querySelector(":scope > button.on");
     if(on && bar.dataset.lastOn !== (on.dataset.pt || on.textContent)){
       bar.dataset.lastOn = on.dataset.pt || on.textContent;
-      requestAnimationFrame(() => { bar.scrollLeft = on.offsetLeft - bar.clientWidth/2 + on.clientWidth/2; });
+      requestAnimationFrame(() => { bar.scrollTo({left: on.offsetLeft - bar.clientWidth/2 + on.clientWidth/2, behavior: "smooth"}); });
     }
   }
 
@@ -5134,6 +5250,46 @@ onAuthStateChanged(auth, user=>{
   new MutationObserver(() => { if(!queued){ queued = true; requestAnimationFrame(sweep); } })
     .observe(document.getElementById("app"), {childList:true, subtree:true, attributes:true, attributeFilter:["class"]});
   sweep();
+})();
+</script>
+<script>
+// ---- swipe a sheet down to close it (same as tapping outside it) ----
+(function(){
+  const SKIP = "input,textarea,select,iframe,.avstage,.epgrid";
+  let s = null;
+  document.querySelectorAll(".sheet-bg").forEach(bg => {
+    const sheet = bg.querySelector(":scope > .sheet"); if(!sheet) return;
+    bg.addEventListener("touchstart", e => {
+      s = null;
+      if(e.touches.length > 1 || bg.classList.contains("hidden") || sheet.scrollTop > 0 || !sheet.contains(e.target) || e.target.closest(SKIP)) return;
+      const t = e.touches[0]; s = {x0:t.clientX, y0:t.clientY, dy:0, on:false, t0:0};
+    }, {passive:true});
+    bg.addEventListener("touchmove", e => {
+      if(!s) return;
+      const t = e.touches[0], dx = t.clientX - s.x0, dy = t.clientY - s.y0;
+      if(!s.on){
+        if(Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)){ s = null; return; }
+        if(dy < -4 || sheet.scrollTop > 0){ s = null; return; }
+        if(dy < 8) return;
+        s.on = true; s.y0 = t.clientY; s.t0 = performance.now(); sheet.classList.add("dragging");
+      }
+      e.preventDefault();
+      s.dy = Math.max(0, t.clientY - s.y0);
+      sheet.style.transform = "translateY(" + s.dy + "px)";
+      bg.style.backgroundColor = "rgba(0,0,0," + (0.5 * (1 - Math.min(1, s.dy / 500))).toFixed(3) + ")";
+    }, {passive:false});
+    const end = () => {
+      if(!s) return; const {on, dy, t0} = s; s = null; if(!on) return;
+      sheet.classList.remove("dragging");
+      const fast = dy > 40 && dy / Math.max(1, performance.now() - t0) > 0.5;
+      if(dy > 110 || fast) bg.dispatchEvent(new MouseEvent("click", {bubbles:true}));
+      sheet.style.transform = "";
+      if(bg.classList.contains("hidden")) setTimeout(() => { bg.style.backgroundColor = ""; }, 320); // let it fade out first
+      else bg.style.backgroundColor = "";
+    };
+    bg.addEventListener("touchend", end, {passive:true});
+    bg.addEventListener("touchcancel", end, {passive:true});
+  });
 })();
 </script>
 <script>
